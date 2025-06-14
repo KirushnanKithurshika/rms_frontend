@@ -1,0 +1,22 @@
+.dropdown-btn{
+  display:flex; 
+  align-items:center;
+  width: 200px;
+  height:10px;
+  padding:1rem;
+  background-color: rgb(14, 108, 113); 
+  border-radius: 0.5rem;
+  cursor:pointer;
+  color: rgb(255, 255, 255);
+  font-size: 13px;
+}
+  
+
+.dropdown-button-text{
+  font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: rgb(241, 241, 241);
+    padding-inline: 10px;
+    margin-right:20px;
+}

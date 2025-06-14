@@ -1,0 +1,65 @@
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  flex-wrap: wrap;
+  background-color: white;
+}
+
+.welcome-left {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+.welcome-img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+}
+
+.welcome-right {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  color: #036b9c;
+}
+
+.welcome-right h2 {
+  font-size: 28px;
+  color:#0a2558;
+  margin-bottom: 20px;
+}
+
+.welcome-right p {
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: bold;
+  text-align: justify;
+}
+@media screen and (max-width: 600px) {
+  .welcome-right h2 {
+    text-align: center;
+    font-size: 18px;
+  }
+
+  .welcome-right p {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .welcome-img {
+    max-width: 80%;
+  }
+
+  .welcome-container {
+    padding: 20px;
+    flex-direction: column;
+  }
+
+  .welcome-right {
+    padding: 10px;
+  }
+}
