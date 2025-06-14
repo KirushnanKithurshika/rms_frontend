@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '../../components/Navbar/navbar';
-import './verificationone.css';
+import './verification.css';
 
 const TwoStepVerification: React.FC = () => {
   const [otp, setOtp] = useState('');

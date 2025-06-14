@@ -6,6 +6,7 @@ import { FaBell, FaUserCircle } from 'react-icons/fa';
 
 
 
+
 const Navbarin: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -37,7 +38,7 @@ const Navbarin: React.FC = () => {
             <FaUserCircle className="icon" />
           </div>
           <div className="dropdown-content">
-         
+        
           </div>
         </div>
       </div>
