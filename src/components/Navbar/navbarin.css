@@ -59,11 +59,9 @@
 }
 
 .dropdown-content {
-  display: none;
   position: absolute;
   right: 0;
-  top: 36px;
-  background-color: white;
+  top: 0;
   color: black;
   min-width: 140px;
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
@@ -76,13 +74,12 @@
   cursor: pointer;
 }
 
-.dropdown-content div:hover {
-  background-color: #f3f3f3;
+
+
+.dropdown-content {
+  transition: opacity 0.2s ease-in-out;
 }
 
-.dropdown:hover .dropdown-content {
-  display: block;
-}
 
 @media screen and (max-width: 820px) {
   .navbar {
@@ -183,7 +180,7 @@
   }
 
   .dropdown-content {
-    top: 30px;
+    top: 5px;
     right: 0;
     min-width: 120px;
   }
@@ -244,7 +241,7 @@
   }
 
   .dropdown-content {
-    top: 30px;
+    top: 5px;
     right: 0;
     min-width: 120px;
   }

@@ -39,6 +39,33 @@
   font-weight: bold;
   text-align: justify;
 }
+
+@media screen and (max-width: 860px) {
+  .welcome-right h2 {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .welcome-right p {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .welcome-img {
+    max-width: 80%;
+  }
+
+  .welcome-container {
+    padding: 20px;
+    flex-direction: column;
+  }
+
+  .welcome-right {
+    padding: 10px;
+  }
+}
+
+
 @media screen and (max-width: 600px) {
   .welcome-right h2 {
     text-align: center;
@@ -63,3 +90,4 @@
     padding: 10px;
   }
 }
+
