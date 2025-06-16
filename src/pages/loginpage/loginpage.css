@@ -43,7 +43,16 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
 }
+
+
+.login-input:hover {
+  border-color: #0a2558;
+  box-shadow: 0 0 5px rgba(10, 37, 88, 0.3);
+}
+
 
 
 .login-button {
@@ -72,9 +81,12 @@
 }
 
 .forgot-text {
-  margin-top: 12px;
+  display: block;
+  text-align: left;
+  margin-left: 0;
+  margin-top: 20px;
   font-size: 12px;
-  text-align:left;
+  color: #0a2558; 
 }
 
 .forgot-text a {
@@ -95,9 +107,16 @@
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 40px; /* space for eye icon */
+  padding-right: 40px; 
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
 }
 
+
+.password-wrapper input:hover {
+  border-color: #0a2558;
+  box-shadow: 0 0 5px rgba(10, 37, 88, 0.3);
+}
 .toggle-icon {
   position: absolute;
   right: 12px;

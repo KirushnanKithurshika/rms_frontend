@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import Navbar from '../../components/Navbar/navbar';
 import './LoginPage.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); 
+
+  const handleLogin = () => {
+   
+    navigate('/verification');
+  };
 
   return (
     <div className="page-wrapper">
@@ -35,12 +42,16 @@ const LoginPage: React.FC = () => {
           </div>
 
           <div className="button-wrapper">
-            <button className="login-button">Log in</button>
+            <button className="login-button" onClick={handleLogin}>
+              Log in
+            </button>
           </div>
 
-          <p className="forgot-text">
-            Forget Password? <a href="#">Click Here</a>
-          </p>
+          <div>
+            <span className="forgot-text">
+              Forget Password? <a href="#">Click Here</a>
+            </span>
+          </div>
         </div>
       </div>
     </div>

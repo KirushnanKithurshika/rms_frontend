@@ -8,6 +8,7 @@ import WelcomePage from "./pages/Intropage/welcomepage";
 import LoginPage from "./pages/loginpage/loginpage";
 import TwoStepVerification from "./pages/verificaionpage/verification";
 import UserDropdown from "./components/UserDropdown/userdropdown";
+import CourseSidebar from "./components/sidebarlecturer/coursesidebar";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
 
           <Route path="/welcomepage" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage/>} />
+          <Route path="/CourseSidebar" element={<CourseSidebar/>}/>
           <Route path="drop" element={<UserDropdown/>}/>
           <Route path="/createcourse" element={<CreateCourseForm />} />
           <Route path="/verification" element={<TwoStepVerification/>}/>
