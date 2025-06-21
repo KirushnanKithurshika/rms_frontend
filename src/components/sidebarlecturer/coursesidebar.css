@@ -1,20 +1,23 @@
 .course-sidebar {
   position: relative;
+  max-height: 80vh; 
   width: 280px;
+  overflow-x: hidden;
   background-color: #ffffff;
   padding-top: 16px;
   border: 1px solid #ffffff;
-  border-radius: 20px;
+  border-radius: 2px;
   font-family: 'Segoe UI', sans-serif;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: width 0.3s ease;
 }
 
+
+
 .course-sidebar.collapsed {
   width: 70px;
 }
 
-/* Title when expanded */
 .course-title {
   font-weight: bold;
   font-size: 16px;
@@ -25,7 +28,7 @@
   color: #0a2558;
 }
 
-/* Title when collapsed */
+
 .course-collapsed-title {
   font-size: 18px;
   font-weight: bold;
@@ -56,7 +59,7 @@
 }
 .sidebar-item:hover {
   background-color: #eef3f9;
-  border-bottom: 1px solid #0a2558;
+  border-bottom: 1px solid #b2b2b2;
 }
 
 .sidebar-item.active {
@@ -80,10 +83,16 @@
 }
 
 
+.sidebar-wrapper {
+  position: relative; 
+  width: fit-content;
+}
+
 .sidebar-toggle-btn {
   position: absolute;
- 
+  top: 16px;
   right: -14px;
+  z-index: 100; /* ensure it's above scroll */
   background-color: white;
   border: none;
   border-radius: 5px;
@@ -94,10 +103,8 @@
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  z-index: 10;
   font-size: 16px;
   color: #0a2558;
-  padding: 0;
 }
 
 .course-sidebar.hidden {
@@ -109,7 +116,7 @@
 }
 
 .course-sidebar.hidden .sidebar-toggle-btn {
-  margin-top: 100px;
+  margin-top: 160px;
   position: fixed;
   top:0px;
   left: 0;
@@ -149,7 +156,7 @@
   align-items: center;
   margin-left: 60px;
   font-size: 16px;
-  color: #a9aaab;
+  color: #068b9f;
 }
 
 
@@ -159,7 +166,7 @@
   display: flex;
   align-items: center;
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: 14px;
   color: #0a96a8;
   font-weight: 600;
   border-radius: 4px;
@@ -246,7 +253,7 @@
     width: 24px;
     height: 48px;
     font-size: 14px;
-    right: -12px;
+  
   }
 
   .sidebar-item.clickable {

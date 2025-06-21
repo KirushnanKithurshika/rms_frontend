@@ -1,0 +1,93 @@
+.lec-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Fixed Navbar */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* Fixed Breadcrumb below navbar */
+.breadcrumb {
+  position: fixed;
+  top: 100px; /* Assuming navbar is 60px */
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background-color: #fff;
+  padding: 8px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Main layout starts after navbar + breadcrumb */
+.main-area {
+  display: flex;
+  flex: 1;
+  margin-top: 160px; 
+  height: calc(100vh - 110px);
+  background-color: #e4e4e4;
+  overflow: hidden;
+}
+
+/* Sidebar with scroll */
+.sidebar {
+  width:fit-content;
+  height: 100hv;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Content area scrollable */
+.dashboard-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* Cards */
+.dashboard-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  flex: 1 1 200px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.card p {
+  font-size: 14px;
+  color: #444;
+}
+
+.card h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0a2d52;
+  margin-top: 8px;
+}
+
+.analytics-section h3 {
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.chart-image {
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+  border-radius: 8px;
+}

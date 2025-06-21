@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './CourseSidebar.css';
 import {
   FaPlusCircle,
@@ -19,8 +19,9 @@ import {
 
 type SidebarState = 'expanded' | 'collapsed' | 'hidden';
 
-const CourseSidebar: React.FC = () => {
-  const [sidebarState, setSidebarState] = useState<SidebarState>('expanded');
+const LectureSidebar: React.FC = () => {
+  // Sidebar will always start in 'collapsed' mode
+  const [sidebarState, setSidebarState] = useState<SidebarState>('collapsed');
   const [coursesExpanded, setCoursesExpanded] = useState(false);
 
   const courseList = [
@@ -29,17 +30,12 @@ const CourseSidebar: React.FC = () => {
     { code: 'CS6103', name: 'Machine Learning' },
   ];
 
-  useEffect(() => {
-    if (window.innerWidth <= 500) {
-      setSidebarState('collapsed');
-    }
-  }, []);
-
+  // Toggle the sidebar between expanded, collapsed, and hidden
   const handleToggle = () => {
     setSidebarState(prev =>
       prev === 'expanded' ? 'collapsed' :
-        prev === 'collapsed' ? 'hidden' :
-          'expanded'
+      prev === 'collapsed' ? 'hidden' :
+      'expanded'
     );
   };
 
@@ -120,27 +116,27 @@ const CourseSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Results Preview</span>}
           </div>
 
-          {/* Course Details (active by default) */}
+          {/* Course Details */}
           <div className="sidebar-item active">
             <FaInfoCircle className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Course Details</span>}
           </div>
-          
+
+          {/* Student Enquiries */}
           <div className="sidebar-item">
             <FaComments className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Student Enquiries</span>}
           </div>
 
-         
+          {/* Announcements */}
           <div className="sidebar-item">
             <FaBullhorn className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Announcements</span>}
           </div>
-
         </>
       )}
     </div>
   );
 };
 
-export default CourseSidebar;
+export default LectureSidebar;
