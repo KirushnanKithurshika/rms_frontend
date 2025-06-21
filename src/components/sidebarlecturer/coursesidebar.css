@@ -18,7 +18,9 @@
 .course-title {
   font-weight: bold;
   font-size: 16px;
+  margin-top: 20px;
   margin-bottom: 8px;
+  border-bottom: #0a2558 2px;
   margin-left: 20px;
   color: #0a2558;
 }
@@ -80,9 +82,8 @@
 
 .sidebar-toggle-btn {
   position: absolute;
-  top: 50%;
+ 
   right: -14px;
-  transform: translateY(-50%);
   background-color: white;
   border: none;
   border-radius: 5px;
@@ -124,6 +125,84 @@
   align-items: center;
 }
 
+.sidebar-item.clickable {
+  
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid #eeeeee;
+  font-size: 16px;
+  font-weight: 500;
+  color: #0a2558;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 2px;
+  display: flex;
+}
+
+.sidebar-item.clickable:hover {
+  background-color: #f0f9ff;
+}
+
+
+.tree-toggle-icon {
+  display: flex;
+  align-items: center;
+  margin-left: 60px;
+  font-size: 16px;
+  color: #a9aaab;
+}
+
+
+
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #0a96a8;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+}
+
+.tree-item:hover {
+  background-color: #e0f7fa;
+  color: #007b91;
+}
+
+.tree-item.active {
+  background-color: #cceef1;
+  color: #084c61;
+  font-weight: bold;
+}
+
+.tree-icon {
+  margin-right: 10px; /* Space between icon and text */
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+
+.tree-item:hover {
+  background-color: #e0f7fa;
+  color: #007b91;
+}
+
+.tree-item.active {
+  background-color: #cceef1;
+  color: #084c61;
+  font-weight: bold;
+}
+
+.tree-icon {
+  margin-left: 20px;
+  margin-right:20px;
+  
+  
+}
+
 
 /* For tablets and below (max-width: 768px) */
 @media screen and (max-width: 768px) {
@@ -134,6 +213,13 @@
   .course-sidebar.collapsed {
     width: 70px;
   }
+.tree-toggle-icon {
+  display: flex;
+  align-items: center;
+  margin-left: 40px;
+  font-size: 16px;
+  color: #068b9f;
+}
 
   .course-title {
     font-size: 14px;
@@ -148,7 +234,7 @@
   .sidebar-item {
     gap: 14px;
     padding: 12px 0px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .sidebar-icon {
@@ -162,6 +248,23 @@
     font-size: 14px;
     right: -12px;
   }
+
+  .sidebar-item.clickable {
+ 
+  font-size: 14px;
+  font-weight: 600;
+  
+}
+.tree-icon {
+  margin-left: 20px;
+  margin-right:20px;
+  font-size: 12px;
+  
+  
+}
+
+
+
 }
 
 
@@ -201,4 +304,18 @@
     font-size: 13px;
     right: -10px;
   }
+
+   .sidebar-item.clickable {
+ 
+  font-size: 12px;
+  font-weight: 600;
+  
+}
+.tree-icon {
+  margin-left: 20px;
+  margin-right:20px;
+  font-size: 13px;
+  
+  
+}
 }
