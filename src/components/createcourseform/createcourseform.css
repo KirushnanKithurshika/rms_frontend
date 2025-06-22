@@ -1,8 +1,6 @@
-
-
 .form-wrapper {
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 10px auto;
   padding: 20px;
 }
 
@@ -12,30 +10,30 @@
   color: #5C5C5C;
   font-weight: 600;
   margin-bottom: 24px;
+  text-decoration: underline;
+}
+
+.section-heading {
+  text-align: left;
+  font-size: 16px;
+  color: #8d4f11;
 }
 
 .section {
   margin-bottom: 2rem;
 }
 
-
-
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
-
-
-
 @media (min-width: 1024px) {
   .form-grid {
-    grid-template-columns: 1fr 1fr; 
+    grid-template-columns: 1fr 1fr;
   }
 }
-
-
 
 .form-group {
   display: flex;
@@ -50,7 +48,6 @@
   color: #454545;
   text-align: left;
 }
-
 
 .input {
   margin-top: 6px;
@@ -76,9 +73,11 @@
   opacity: 1;
 }
 
+.submit-button-createcoursediv {
+  text-align: left;
+}
 
-
-.submit-button {
+.submit-button-createcourse {
   background-color: #08234C;
   color: white;
   padding: 10px 24px;
@@ -91,28 +90,24 @@
   transition: background-color 0.3s ease, box-shadow 0.2s ease;
 }
 
-.submit-button:hover {
-  background-color: #105192;
+.submit-button-createcourse:hover {
+  background-color: #2EA3BD;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.submit-button:active {
+.submit-button-createcourse:active {
   background-color: #061c3f;
   transform: scale(0.98);
 }
 
-.submit-button:focus {
+.submit-button-createcourse:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(10, 59, 117, 0.4);
 }
 
-
-
 .full-width {
   grid-column: span 2;
 }
-
-
 
 .checkbox-grid {
   display: grid;
@@ -120,31 +115,18 @@
   gap: 0.75rem;
 }
 
-@media (min-width: 640px) {
-  .checkbox-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 768px) {
-  .checkbox-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 .checkbox-item {
   display: flex;
   align-items: center;
   gap: 1rem;
-  font-size: 14px;
+  font-size: 13px;
   color: #4f4e4e;
   font-weight: 500;
 }
 
-
 .custom-checkbox {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   appearance: none;
   border: 1px solid #ccc;
   cursor: pointer;
@@ -165,4 +147,46 @@
   position: absolute;
   top: 0;
   left: 4px;
+}
+
+/* Responsive Design Tweaks */
+
+@media (min-width: 768px) {
+  .checkbox-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 640px) {
+  .checkbox-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .form-wrapper {
+    padding: 12px;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .section-heading {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .full-width {
+    grid-column: span 1 !important;
+  }
+
+  .submit-button-createcourse {
+    font-size: 13px;
+  }
 }

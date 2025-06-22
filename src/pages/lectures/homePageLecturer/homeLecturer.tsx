@@ -4,7 +4,8 @@ import './homeLecturer.css';
 import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx'
-
+import DonutChart from '../../../components/graphs/passfailgraph/passfailgraph.tsx'
+import MarksRangeBarChart from '../../../components/graphs/marksrangegraph/marksrange.tsx'
 const LecturerDashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -48,9 +49,24 @@ const LecturerDashboard = () => {
               <div className='searchbarlecturer'>
                 <CourseSearchBarlechome />
               </div>
-            </div>
 
-            <div className='analytic_graphs'></div>
+
+            </div>
+           <div className="analytics-graphs-container">
+  <div className="graph-card">
+    <h4 className="graph-title">Pass vs Fail Percentage</h4>
+    <DonutChart />
+  </div>
+
+  <div className="graph-card">
+    <h4 className="graph-title">Marks Range Vs Students Number</h4>
+    <MarksRangeBarChart />
+  </div>
+</div>
+
+
+            
+
           </div>
 
         </div>

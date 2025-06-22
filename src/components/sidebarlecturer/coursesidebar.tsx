@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import './CourseSidebar.css';
 import {
   FaPlusCircle,
@@ -41,16 +42,17 @@ const LectureSidebar: React.FC = () => {
     <div className={`course-sidebar ${sidebarState}`}>
       <button className="sidebar-toggle-btn" onClick={handleToggle}>
         {sidebarState === 'hidden' ? <FaChevronRight /> : <FaChevronLeft />}
+        {sidebarState !== 'expanded' && <div className="mobile-sidebar-backdrop" onClick={handleToggle}></div>}
       </button>
 
       {(sidebarState === 'expanded' || sidebarState === 'collapsed') && (
         <>
           <div className="sidebar-divider" />
 
-          <div className="sidebar-item">
+          <NavLink to="/lecturerhome" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaHome className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Dashboard</span>}
-          </div>
+          </NavLink>
 
           <div className="sidebar-item clickable" onClick={() => setCoursesExpanded(!coursesExpanded)}>
             <FaBookOpen className="sidebar-icon" />
@@ -75,40 +77,40 @@ const LectureSidebar: React.FC = () => {
             </div>
           )}
 
-          <div className="sidebar-item">
+          <NavLink to="/createcourseui" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaPlusCircle className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Create Course</span>}
-          </div>
+          </NavLink>
 
-          <div className="sidebar-item">
+          <NavLink to="/results-analysis" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaChartBar className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Results Analysis</span>}
-          </div>
+          </NavLink>
 
-          <div className="sidebar-item">
+          <NavLink to="/modify-results" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaPencilAlt className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Modify Results</span>}
-          </div>
+          </NavLink>
 
-          <div className="sidebar-item">
+          <NavLink to="/results-preview" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaEye className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Results Preview</span>}
-          </div>
+          </NavLink>
 
-          <div className="sidebar-item active">
+          <NavLink to="/course-details" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaInfoCircle className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Course Details</span>}
-          </div>
+          </NavLink>
 
-          <div className="sidebar-item">
+          <NavLink to="/student-enquiries" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaComments className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Student Enquiries</span>}
-          </div>
+          </NavLink>
 
-          <div className="sidebar-item">
+          <NavLink to="/announcements" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaBullhorn className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Announcements</span>}
-          </div>
+          </NavLink>
         </>
       )}
     </div>

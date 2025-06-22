@@ -7,6 +7,8 @@ import LoginPage from "./pages/loginpage/loginpage";
 import TwoStepVerification from "./pages/verificaionpage/verification";
 import UserDropdown from "./components/UserDropdown/userdropdown";
 import LecturerDashboard from "./pages/lectures/homePageLecturer/homeLecturer";
+import CreateCourseUI from "./pages/lectures/createcourse/createcourse";
+import Courses from "./pages/lectures/courses/courses";
 
 function App() {
   return (
@@ -20,6 +22,9 @@ function App() {
           <Route path="/createcourse" element={<CreateCourseForm />} />
           <Route path="/verification" element={<TwoStepVerification/>}/>
          <Route path="/lecturerhome" element={<LecturerDashboard/>}/>
+         <Route path="/createcourseui" element={<CreateCourseUI/>}/>
+       <Route path="/courses" element={<Courses/>}/>
+       
         </Routes>
       </div>
     </Router>

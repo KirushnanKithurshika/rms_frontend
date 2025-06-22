@@ -81,7 +81,7 @@ const CreateCourseForm: React.FC = () => {
                             <input id="coordinator" className="input" placeholder="Coordinator" />
                         </div>
 
-                        <div className="form-group">
+                        <div className="form-group ">
                             <label htmlFor="staffId">Coordinator Staff ID</label>
                             <input id="staffId" className="input" placeholder="Coordinator Staff ID" />
                         </div>
@@ -116,10 +116,11 @@ const CreateCourseForm: React.FC = () => {
                     </div>
                 </div>
 
-
-                <button type="submit" className="submit-button">
-                    Create course
-                </button>
+                <div className='submit-button-createcoursediv'>
+                    <button type="submit" className="submit-button-createcourse">
+                        Create course
+                    </button>
+                </div>
             </form>
         </div>
     );

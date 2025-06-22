@@ -3,10 +3,14 @@ import './searchdropdown.css';
 import { FaSearch, FaChevronDown } from 'react-icons/fa';
 
 const courses = [
-  'EC7201 - Information Security',
-  'EE7001 - Research & Methodology',
-  'CS6103 - Machine Learning',
-  'CE7102 - Data Structures',
+  'EC7201 - Information Security-22nd',
+  'EE7001 - Research & Methodology-23rd',
+  'CS6103 - Machine Learning-22nd',
+  'CE7102 - Data Structures-22nd',
+  'EC7201 - Information Security-22nd',
+  'EE7001 - Research & Methodology-23rd',
+  'CS6103 - Machine Learning-22nd',
+  'CE7102 - Data Structures-22nd',
 ];
 
 const CourseSearchBarlechome: React.FC = () => {
