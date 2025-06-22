@@ -4,7 +4,7 @@
   width: 280px;
   overflow-x: hidden;
   background-color: #ffffff;
-  padding-top: 16px;
+  padding-top: 10px;
   border: 1px solid #ffffff;
   border-radius: 2px;
   font-family: 'Segoe UI', sans-serif;
@@ -89,15 +89,14 @@
 }
 
 .sidebar-toggle-btn {
-  position: absolute;
-  top: 16px;
-  right: -14px;
-  z-index: 100; /* ensure it's above scroll */
+  margin-left: 20px;
+margin-bottom: 10px;
+  z-index: 1000; /* ensure it's above scroll */
   background-color: white;
   border: none;
   border-radius: 5px;
   width: 28px;
-  height: 60px;
+  height: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -116,14 +115,15 @@
 }
 
 .course-sidebar.hidden .sidebar-toggle-btn {
-  margin-top: 160px;
+  margin-top: 180px;
   position: fixed;
-  top:0px;
+  top:0;
+  margin-left: 0px;
   left: 0;
   right: auto;
   border-radius: 0 6px 6px 0;
   width: 28px;
-  height: 60px;
+  height: 28px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   z-index: 1000;
@@ -211,7 +211,7 @@
 }
 
 
-/* For tablets and below (max-width: 768px) */
+
 @media screen and (max-width: 768px) {
   .course-sidebar {
     width: 200px;
@@ -250,8 +250,8 @@
   }
 
   .sidebar-toggle-btn {
-    width: 24px;
-    height: 48px;
+    width: 28px;
+    height: 28px;
     font-size: 14px;
   
   }
@@ -269,8 +269,9 @@
   
   
 }
-
-
+.course-sidebar.hidden .sidebar-toggle-btn {
+  margin-top: 10px;
+}
 
 }
 
@@ -306,10 +307,10 @@
   }
 
   .sidebar-toggle-btn {
-    width: 22px;
-    height: 44px;
+    width: 28px;
+    height: 28px;
     font-size: 13px;
-    right: -10px;
+   
   }
 
    .sidebar-item.clickable {

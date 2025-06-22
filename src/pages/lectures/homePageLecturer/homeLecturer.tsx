@@ -1,23 +1,31 @@
-
+import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import './homeLecturer.css';
 import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
+import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx'
 
 const LecturerDashboard = () => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleBackdropClick = () => setSidebarOpen(false);
+
   return (
     <div className="lec-dashboard-container">
-    <div className='nav'>   <Navbarin /></div>
-   
+      <div className='nav'> <Navbarin /></div>
 
       <div className='breadcrumb'>
-<BreadcrumbNav/>
+        <BreadcrumbNav />
       </div>
+
+      {/* Show backdrop only on mobile */}
+      <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={handleBackdropClick}></div>
+
       <div className="main-area">
-        <div className='sidebar'> <LectureSidebar /></div>
+        <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}>
+          <LectureSidebar />
+        </div>
 
-
-        
         <div className="dashboard-content">
           <div className="dashboard-cards">
             <div className="card">
@@ -35,9 +43,16 @@ const LecturerDashboard = () => {
           </div>
 
           <div className="analytics-section">
-            <h3>Analytics Latest Updates</h3>
-            {/* Place charts here */}
+            <div className="analytics-header">
+              <h3>Analytics Latest Updates</h3>
+              <div className='searchbarlecturer'>
+                <CourseSearchBarlechome />
+              </div>
+            </div>
+
+            <div className='analytic_graphs'></div>
           </div>
+
         </div>
       </div>
     </div>

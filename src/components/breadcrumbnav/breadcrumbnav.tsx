@@ -5,8 +5,8 @@ import { FaChevronRight } from 'react-icons/fa';
 const BreadcrumbNav: React.FC = () => {
   const breadcrumbItems = [
     { label: 'EC 7212', link: '#' },
-    { label: 'Take Home Assignments', link: '#' },
-    { label: 'Take Home Assignment 1', link: null }
+    { label: 'Results', link: '#' },
+    { label: 'CA Marks', link: null }
   ];
 
   return (
