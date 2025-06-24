@@ -33,8 +33,8 @@ const LectureSidebar: React.FC = () => {
   const handleToggle = () => {
     setSidebarState(prev =>
       prev === 'expanded' ? 'collapsed' :
-      prev === 'collapsed' ? 'hidden' :
-      'expanded'
+        prev === 'collapsed' ? 'hidden' :
+          'expanded'
     );
   };
 
@@ -54,17 +54,21 @@ const LectureSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Dashboard</span>}
           </NavLink>
 
-          <div className="sidebar-item clickable" onClick={() => setCoursesExpanded(!coursesExpanded)}>
-            <FaBookOpen className="sidebar-icon" />
-            {sidebarState === 'expanded' && (
-              <>
-                <div className="sidebar-label">Courses</div>
-                <div className="tree-toggle-icon">
-                  {coursesExpanded ? <FaAngleDown /> : <FaAngleRight />}
-                </div>
-              </>
-            )}
-          </div>
+        <NavLink
+  to="/courses"
+  className={({ isActive }) => `sidebar-item clickable ${isActive ? 'active' : ''}`}
+  onClick={() => setCoursesExpanded(!coursesExpanded)}
+>
+  <FaBookOpen className="sidebar-icon" />
+  {sidebarState === 'expanded' && (
+    <>
+      <div className="sidebar-label">Courses</div>
+      <div className="tree-toggle-icon">
+        {coursesExpanded ? <FaAngleDown /> : <FaAngleRight />}
+      </div>
+    </>
+  )}
+</NavLink>
 
           {coursesExpanded && sidebarState === 'expanded' && (
             <div className="sidebar-tree">

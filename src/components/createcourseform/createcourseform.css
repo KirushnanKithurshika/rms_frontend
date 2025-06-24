@@ -13,7 +13,7 @@
   text-decoration: underline;
 }
 
-.section-heading {
+.section-headingCC {
   text-align: left;
   font-size: 16px;
   color: #8d4f11;
@@ -173,9 +173,9 @@
     text-align: center;
   }
 
-  .section-heading {
+  .section-headingCC {
     font-size: 14px;
-    text-align: center;
+    text-align: left;
   }
 
   .form-grid {

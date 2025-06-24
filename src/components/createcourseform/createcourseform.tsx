@@ -12,7 +12,7 @@ const CreateCourseForm: React.FC = () => {
             <form className="form-content">
 
                 <div className="section course-section">
-                    <h3 className="section-heading">Course Details</h3>
+                    <h3 className="section-headingCC">Course Details</h3>
                     <div className="form-grid">
                         <div>
                             <div className="form-group">
@@ -74,7 +74,7 @@ const CreateCourseForm: React.FC = () => {
 
 
                 <div className="section coordinator-section">
-                    <h3 className="section-heading">Coordinator Details</h3>
+                    <h3 className="section-headingCC">Coordinator Details</h3>
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="coordinator">Coordinator</label>
@@ -96,7 +96,7 @@ const CreateCourseForm: React.FC = () => {
 
 
                 <div className="assessment-section">
-                    <h3 className="section-heading">Assessment Components:</h3>
+                    <h3 className="section-headingCC">Assessment Components:</h3>
                     <div className="checkbox-grid">
                         {[
                             'Quizzes',

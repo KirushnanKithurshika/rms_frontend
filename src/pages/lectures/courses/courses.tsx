@@ -34,8 +34,6 @@ const Courses= () => {
                                 <div className="course-title">Machine Learning</div>
                             </div>
 
-
-
                         </div>
 
                     </div>
