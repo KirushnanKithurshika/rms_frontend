@@ -52,20 +52,20 @@ const LecturerDashboard = () => {
 
 
             </div>
-           <div className="analytics-graphs-container">
-  <div className="graph-card">
-    <h4 className="graph-title">Pass vs Fail Percentage</h4>
-    <DonutChart />
-  </div>
+            <div className="analytics-graphs-container">
+              <div className="graph-card">
+                <h4 className="graph-title">Pass vs Fail Percentage</h4>
+                <DonutChart />
+              </div>
 
-  <div className="graph-card">
-    <h4 className="graph-title">Marks Range Vs Students Number</h4>
-    <MarksRangeBarChart />
-  </div>
-</div>
+              <div className="graph-card">
+                <h4 className="graph-title">Marks Range Vs Students Number</h4>
+                <MarksRangeBarChart />
+              </div>
+            </div>
 
 
-            
+
 
           </div>
 

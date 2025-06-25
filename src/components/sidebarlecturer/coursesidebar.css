@@ -29,14 +29,6 @@
 }
 
 
-.course-collapsed-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #0a2558;
-  text-align: center;
-  margin-bottom: 12px;
-}
-
 .sidebar-divider {
   border-bottom: 2px solid #0a2558;
 }
@@ -49,7 +41,7 @@
   overflow-y: auto;
   border-bottom: 1px solid #eeeeee;
   padding: 16px 0px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #0a2558;
   cursor: pointer;
