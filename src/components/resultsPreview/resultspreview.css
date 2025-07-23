@@ -38,7 +38,7 @@ h3 {
   font-weight: 600;
 }
 
-/* Report Card */
+
 .report-card {
   border: 1px solid #999;
   padding: 15px;
@@ -46,7 +46,7 @@ h3 {
   background-color: #fff;
 }
 
-/* Report Header with 3 equal columns */
+
 .report-header {
   display: flex;
   justify-content: space-between;
@@ -67,7 +67,7 @@ h3 {
   font-weight: bold;
 }
 .report-section p {
-text-align: left;
+  text-align: left;
   margin-bottom: 6px;
   font-size: 14px;
   color: #0a2558;
@@ -93,15 +93,15 @@ text-align: left;
   margin-bottom: 6px;
 }
 
-/* Table Wrapper */
 .table-wrapper {
   overflow-x: auto;
   display: flex;
   justify-content: center;
 }
 
-/* Results Table */
+
 .results-table {
+  overflow-x: auto;
   width: 100%;
   max-width: 744px;
   border-collapse: collapse;
@@ -130,6 +130,7 @@ text-align: left;
 .print-footer{
     color:#797979 ;
     font-size:12px;
+    text-align: left;
 }
 /* Print Styles */
 @media print {
@@ -182,7 +183,8 @@ text-align: left;
 
 
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
+
   .results-preview-container {
     padding: 10px;
   }
