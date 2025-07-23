@@ -4,6 +4,7 @@ import './courses.css';
 import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import ResultUploadInterface from '../../../components/resultuploadinterface/ResultUploadInterface.tsx';
+import FileUploadCard from '../../../components/fileuploadcard/fileuploadcard.tsx';
 
 interface Course {
     code: string;
@@ -23,6 +24,7 @@ const Courses: React.FC = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const [uploadedFileName, setUploadedFileName] = useState<string | null>(null); // state to pass to FileUploadCard
 
     const handleBackdropClick = () => setSidebarOpen(false);
 
@@ -33,10 +35,12 @@ const Courses: React.FC = () => {
 
     const handleCourseClick = (course: Course) => {
         setSelectedCourse(course);
+        setUploadedFileName(null); // reset file when changing course
     };
 
     const handleBack = () => {
         setSelectedCourse(null);
+        setUploadedFileName(null);
     };
 
     return (
@@ -94,8 +98,16 @@ const Courses: React.FC = () => {
                         </div>
                     ) : (
                         <div className="result-upload-section">
-                             <div className="card">
-                            <ResultUploadInterface course={selectedCourse} onBack={handleBack} />
+                            <div className="card">
+                                {/* Pass callback to update file name after upload */}
+                                <ResultUploadInterface
+                                    course={selectedCourse}
+                                    onBack={handleBack}
+                                    // Add file upload callback to capture file name
+                                    onFileUpload={(name: string) => setUploadedFileName(name)}
+                                />
+                                {/* Show file upload card below if a file has been uploaded */}
+                                {uploadedFileName && <FileUploadCard fileName={uploadedFileName} />}
                             </div>
                         </div>
                     )}

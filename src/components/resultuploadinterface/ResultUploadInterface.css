@@ -8,6 +8,7 @@
     transition: border-color 0.3s ease;
     margin: 10px 0;
     position: relative;
+
 }
 
 .upload-box-icons {
@@ -64,13 +65,8 @@
     display: none;
 }
 
-.file-placeholder-icon {
-    color: #ccc;
-    opacity: 0.6;
-    margin-bottom: 12px;
-}
 
-.file-name {
+.file-name-uploadsection {
     font-weight: bold;
     color: #08234C;
     font-size: 16px;
@@ -146,9 +142,9 @@
     background-color: #f9f9f9;
 }
 
-.file-placeholder-icon {
+.custom-icon-uploadinterface {
     color: grey;
-    font-size: 80px;
+    font-size: 60px;
     margin-bottom: 12px;
 }
 
@@ -223,8 +219,8 @@
         font-size: 12px;
     }
 
-    .file-placeholder-icon {
-        font-size: 40px;
+    .custom-icon-uploadinterface {
+        font-size:40px ;
     }
 
     .upload-btn {
@@ -241,8 +237,9 @@
         gap: 8px;
     }
 
-    .file-name {
+    .file-name-uploadsection{
         font-size: 14px;
+
     }
 
 
@@ -291,8 +288,8 @@
         font-size: 12px;
     }
 
-    .file-placeholder-icon {
-        font-size: 40px;
+    .custom-icon-uploadinterface {
+        font-size: 40px !important;
     }
 
     .upload-btn {
@@ -309,8 +306,8 @@
         gap: 8px;
     }
 
-    .file-name {
-        font-size: 14px;
+    .file-name-uploadsection {
+        font-size: 12px;
     }
 
 
