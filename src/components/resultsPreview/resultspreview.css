@@ -132,6 +132,64 @@ h3 {
     font-size:12px;
     text-align: left;
 }
+
+.select-container {
+  display: flex;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.select-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #40444e;
+}
+
+.custom-select {
+  appearance: none;
+  width: 250px;
+  padding: 10px 36px 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  color: #0a2558;
+  background-image: url("data:image/svg+xml,%3Csvg fill='navy' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Focus color */
+.custom-select:focus {
+  outline: none;
+  border-color: #939496;
+}
+
+.custom-select option {
+  padding: 10px;
+  background-color: #ffffff;
+  color: #0a2558;
+  border:1px solid #939496;
+  font-size: 12px;
+}
+
+
+.custom-select option:hover {
+  background-color: #6b6a6a;
+}
+
+.dropdown-divider {
+  border: none;
+  border-top: 3px solid #041748;
+  margin: 20px 0;
+}
+
+
 /* Print Styles */
 @media print {
   body * {
@@ -227,6 +285,7 @@ text-align:center;
 
   .previewh-text {
     text-align:center;
+    font-size: 12px;
   }
 
   .results-table {
@@ -237,4 +296,7 @@ text-align:center;
   .report-logo img {
     width: 120px;
   }
+
+ 
+
 }

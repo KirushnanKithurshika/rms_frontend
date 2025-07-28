@@ -10,17 +10,43 @@ const dummyData = [
   { id: '5', name: 'Student E', project: '20', quiz1: '28', quiz2: '28', total: '76', status: 'Pass' },
 ];
 
+const courses = [
+  { code: 'EC7201', name: 'Information Security' },
+  { code: 'EC7202', name: 'Computer Networks' },
+  { code: 'EC7203', name: 'Web Engineering' },
+];
+
 const ResultsPreview: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'CA' | 'FE'>('CA');
+  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
 
   const handlePrint = () => {
     window.print();
   };
 
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const course = courses.find(c => c.code === e.target.value);
+    if (course) {
+      setSelectedCourse(course);
+    }
+  };
+
   return (
     <div className="results-preview-container">
-      <h3>Results Preview : EC7201 - Information Security</h3>
-      
+      <div className="course-select-header">
+        <h3>Results Preview</h3>
+        <div className="select-container">
+  <label className="select-label">Select Course:</label>
+  <select className="custom-select">
+    <option value="EC7201">EC7201 - Information Security</option>
+    <option value="EC7202">EC7202 - Cryptography</option>
+   
+  </select>
+</div>
+<hr className="dropdown-divider" />
+
+      </div>
+
       <div className="tabs">
         <button
           className={activeTab === 'CA' ? 'tab active' : 'tab'}
@@ -43,7 +69,7 @@ const ResultsPreview: React.FC = () => {
         <div className="report-card">
           <div className="report-header">
             <div className="report-section">
-              <h4>Information Security</h4>
+              <h4>{selectedCourse.name}</h4>
               <p>CA Marks (Total 40%)</p>
             </div>
             <div className="report-logo">
@@ -54,7 +80,7 @@ const ResultsPreview: React.FC = () => {
                 2024<br />
                 22nd Batch<br />
                 Department: Computer Engineering<br />
-                Module Code: EC7201
+                Module Code: {selectedCourse.code}
               </p>
             </div>
           </div>

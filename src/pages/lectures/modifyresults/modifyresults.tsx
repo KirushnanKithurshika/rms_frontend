@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import Navbarin from '../../components/Navbar/navbarin.tsx';
+import Navbarin from '../../../components/Navbar/navbarin.tsx';
+import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
+import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
+import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
 
-import LectureSidebar from '../../components/sidebarlecturer/coursesidebar.tsx';
-import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
-import ResultsPreview from '../../components/resultsPreview/resultspreview.tsx';
-const ResultsPreviewPage = () => {
+
+const ModifyResultsPage= () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleBackdropClick = () => setSidebarOpen(false);
@@ -17,7 +18,7 @@ const ResultsPreviewPage = () => {
                 <BreadcrumbNav />
             </div>
 
-            {/* Show backdrop only on mobile */}
+          
             <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={handleBackdropClick}></div>
 
             <div className="main-area">
@@ -26,14 +27,21 @@ const ResultsPreviewPage = () => {
                 </div>
 
                 <div className="dashboard-content">
-                    <div className="dashboard-cards-preview">
-                        <div className="card">
-                             <ResultsPreview />
-                        </div>
+                     <div className="analytics-section">
+            <div className="analytics-header">
+              <h3>Analytics Latest Updates</h3>
+              <div className='searchbarlecturer'>
+                <CourseSearchBarlechome />
+              </div>
 
 
-                    </div>
+            </div>
+           
 
+
+
+
+          </div>
                 </div>
             </div>
         </div>
@@ -41,4 +49,4 @@ const ResultsPreviewPage = () => {
     );
 };
 
-export default ResultsPreviewPage;
+export default ModifyResultsPage;

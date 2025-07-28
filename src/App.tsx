@@ -9,8 +9,9 @@ import UserDropdown from "./components/UserDropdown/userdropdown";
 import LecturerDashboard from "./pages/lectures/homePageLecturer/homeLecturer";
 import CreateCourseUI from "./pages/lectures/createcourse/createcourse";
 import Courses from "./pages/lectures/courses/courses";
-import ResultsPreview from "./components/resultsPreview/resultspreview";
-import ResultsPreviewPage from "./pages/resultspreviewpage/resultspreviewpage";
+
+import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
+import AnalizePage from "./pages/analysepage/analysepage";
 
 
 
@@ -30,7 +31,7 @@ function App() {
       <Route path="/results-preview" element={<ResultsPreviewPage/>}/>
        
        <Route path="/courses" element={<Courses/>}/>
-       
+             <Route path="/results-analysis" element={<AnalizePage/>}/>
         </Routes>
       </div>
     </Router>
