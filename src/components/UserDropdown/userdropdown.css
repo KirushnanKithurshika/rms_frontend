@@ -1,17 +1,7 @@
-.user-dropdown {
- 
-  display: inline-block;
-}
 
 
-.user-icon {
-  font-size: 24px;
-  color: white;
-  cursor: pointer;
-}
 
-
-.dropdown-menu {
+.dropdown-menuuser {
   position: absolute;
   top: 36px;
   right: 0;
@@ -19,37 +9,37 @@
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  width: 150px;
+  width: 140px;
   padding: 6px 0;
   border: 1px solid #e0e0e0;
 }
 
-.dropdown-item {
+.dropdown-itemuser {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 0px;
-  font-size: 14px;
+  font-size: 12px;
   color: #0a2558;
   cursor: pointer;
   border-radius: 2px;
   transition: background-color 0.2s ease;
 }
 
-.dropdown-item:hover {
+.dropdown-itemuser:hover {
   background-color: #e4e4e4;
 }
 
 
 
-.dropdown-icon {
-  font-size: 16px;
+.dropdown-iconuser {
+  font-size: 14px;
   color: #0a2558;
 }
 
 @media screen and (max-width: 768px) {
 
-.dropdown-item {
+.dropdown-itemuser {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -59,7 +49,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-.dropdown-menu {
+.dropdown-menuuser {
   position: absolute;
   top: 36px;
   right: 0;
@@ -75,7 +65,7 @@
 }
 @media screen and (max-width: 480px) {
 
-.dropdown-item {
+.dropdown-itemuser {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -85,7 +75,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-.dropdown-menu {
+.dropdown-menuuser {
   position: absolute;
   top: 36px;
   right: 0;

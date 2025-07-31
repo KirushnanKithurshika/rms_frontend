@@ -141,7 +141,7 @@ const handleCreateCourse = () => {
                         )}
                       </div>
 
-                      <div className="card-details">
+                      <div className="cardcourse-details">
                         <div className="course-code">{course.code}</div>
                         <div className="course-title">{course.title}</div>
                       </div>

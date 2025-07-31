@@ -41,9 +41,9 @@
   overflow-y: auto;
   border-bottom: 1px solid #eeeeee;
   padding: 16px 0px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
-  color: #0a2558;
+  color: #5b616d;
   cursor: pointer;
   transition: background-color 0.2s ease;
   border-radius: 2px;
@@ -54,6 +54,7 @@
 
 .sidebar-icon{
     margin-left: 30px;
+    color: #0a2558
 }
 .sidebar-item:hover {
   background-color: #eef3f9;
@@ -219,7 +220,7 @@ margin-bottom: 10px;
 
 @media screen and (max-width: 768px) {
   .course-sidebar {
-    width: 200px;
+    width: 240px;
   }
 
   .course-sidebar.collapsed {

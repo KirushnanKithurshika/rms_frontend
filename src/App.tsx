@@ -13,6 +13,9 @@ import Courses from "./pages/lectures/courses/courses";
 import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
 import AnalizePage from "./pages/analysepage/analysepage";
 
+import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
+import UserManagement from "./pages/Admin/usermanagement/usermanagement";
+
 
 
 function App() {
@@ -22,16 +25,17 @@ function App() {
         <Routes>
 
           <Route path="/welcomepage" element={<WelcomePage />} />
-          <Route path="/login" element={<LoginPage/>} />
-          <Route path="drop" element={<UserDropdown/>}/>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="drop" element={<UserDropdown />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
-          <Route path="/verification" element={<TwoStepVerification/>}/>
-         <Route path="/lecturerhome" element={<LecturerDashboard/>}/>
-         <Route path="/createcourseui" element={<CreateCourseUI/>}/>
-      <Route path="/results-preview" element={<ResultsPreviewPage/>}/>
-       
-       <Route path="/courses" element={<Courses/>}/>
-             <Route path="/results-analysis" element={<AnalizePage/>}/>
+          <Route path="/verification" element={<TwoStepVerification />} />
+          <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/createcourseui" element={<CreateCourseUI />} />
+          <Route path="/results-preview" element={<ResultsPreviewPage />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/results-analysis" element={<AnalizePage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+          <Route path="/admin/user-management" element={<UserManagement/>}/>
         </Routes>
       </div>
     </Router>

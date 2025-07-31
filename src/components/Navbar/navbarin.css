@@ -22,7 +22,7 @@
 
 
 .navbar-center {
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .navbar-right {
@@ -33,12 +33,12 @@
 }
 
 .icon {
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
 }
 
 .iconbell{
- font-size: 24px;
+ font-size: 20px;
   cursor: pointer;
   gap:20px;
 }
@@ -52,7 +52,7 @@
 
 .name {
   display: inline-block;
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .dropdown {
