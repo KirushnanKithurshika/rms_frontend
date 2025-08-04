@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate, Link } from 'react-router-dom';
+
 import Navbar from '../../components/Navbar/navbar';
 import './LoginPage.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleLogin = () => {
-   
+
     navigate('/verification');
   };
 
@@ -49,8 +50,9 @@ const LoginPage: React.FC = () => {
 
           <div>
             <span className="forgot-text">
-              Forget Password? <a href="#">Click Here</a>
+              Forget Password? <Link to="/reset-password-mail">Click Here</Link>
             </span>
+
           </div>
         </div>
       </div>

@@ -1,0 +1,65 @@
+.privileges-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.privileges-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.privileges-table thead {
+  background-color: #1b4b7a;
+  color: white;
+}
+.privileges-table-container {
+  width: 100%;
+}
+
+.privileges-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+/* Header */
+.privileges-table thead {
+  background-color: #1b4b7a;
+  color: white;
+}
+
+.privileges-table th {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: 1px solid #ececec;
+}
+
+.privileges-table-body {
+  max-height: 400px; 
+  overflow-y: auto;
+  display: block;
+}
+
+.privileges-table tbody td {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: 1px solid #ececec;
+  white-space: nowrap; 
+}
+
+.privileges-table tbody tr:nth-child(even) {
+  background-color: #f8f8f8;
+}
+
+.privileges-table tbody tr:hover {
+  background-color: #eaf3ff;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}

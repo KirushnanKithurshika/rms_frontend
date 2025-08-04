@@ -16,7 +16,7 @@
 .section-headingCC {
   text-align: left;
   font-size: 16px;
-  color: #8d4f11;
+  color: #784a1d;
 }
 
 .section {
@@ -27,6 +27,85 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
+}
+/* Custom Dropdown */
+.custom-dropdown-userform {
+ 
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.dropdown-label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #454545;
+  text-align: left;
+}
+
+.dropdown-selected {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.dropdown-selected:hover {
+  border-color: #0a58ca;
+}
+
+.dropdown-icon {
+  transition: transform 0.2s ease;
+  font-size: 12px;
+  color: #0f2a54;
+}
+
+.dropdown-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 105%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 10;
+  animation: fadeDropdown 0.2s ease;
+  overflow: hidden;
+}
+
+.dropdown-option {
+  padding: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown-option:hover {
+  background: #f2f2f2;
+}
+
+.dropdown-option.active {
+  background: #0b3054;
+  color: white;
+  font-weight: bold;
+}
+
+@keyframes fadeDropdown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (min-width: 1024px) {
@@ -45,7 +124,7 @@
   margin-bottom: 6px;
   font-weight: 500;
   font-size: 14px;
-  color: #454545;
+  color: #102670;
   text-align: left;
 }
 
@@ -82,8 +161,8 @@
   color: white;
   padding: 10px 24px;
   border: 2px solid rgb(147, 135, 135);
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 50px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   margin-top: 4rem;
@@ -91,8 +170,9 @@
 }
 
 .submit-button-createcourse:hover {
-  background-color: #2EA3BD;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #dadada;
+    color: #0a2558;
+    border-color: #0a2558;
 }
 
 .submit-button-createcourse:active {
@@ -149,7 +229,7 @@
   left: 4px;
 }
 
-/* Responsive Design Tweaks */
+
 
 @media (min-width: 768px) {
   .checkbox-grid {

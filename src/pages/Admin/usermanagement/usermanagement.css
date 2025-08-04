@@ -39,7 +39,7 @@
 
 .custom-dropdown {
     position: relative;
-    display: inline-block;
+
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -53,7 +53,7 @@
     gap: 12px;
     color: #0a2558;
     font-size: 12px;
-    font-weight:normal;
+    font-weight: normal;
     cursor: pointer;
 }
 
@@ -120,95 +120,97 @@
 }
 
 .add-user-btn {
-  background-color: #0a2558;        
-  color: white;
-  padding: 6px 20px;
-  border: 2px solid #acaeaf;       
-  border-radius: 50px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s ease;
-  font-family: 'Segoe UI', sans-serif;
+    background-color: #0a2558;
+    color: white;
+    padding: 6px 20px;
+    border: 2px solid #acaeaf;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .add-user-btn:hover {
-  background-color: #dadada;
-  color: #0a2558;
-  border-color: #0a2558;
+    background-color: #dadada;
+    color: #0a2558;
+    border-color: #0a2558;
 }
+
 .user-table {
- margin-top: 50px;
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  overflow: hidden;
-min-width: 1000px;
+    margin-top: 30px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    overflow: hidden;
+    min-width: 1000px;
+    overflow-x: auto;
 }
 
 .user-table thead {
-  background-color: #0c3787;
-  color: white;
-  padding: 8px 5px;
+    background-color: #1b4b7a;
+    color: white;
+    padding: 8px 5px;
 }
 
 .user-table th,
 .user-table td {
-  padding: 5px 10px;
-  text-align: left;
-  border-bottom: 1px solid #e5e5e5;
+    padding: 5px 10px;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
 }
 
-/* Alternating row colors for tbody */
+
 .user-table tbody tr:nth-child(even) {
-  background-color: #f5f7fa; /* Light grey-blue */
+    background-color: #f5f7fa;
 
 }
 
 .user-table tbody tr:nth-child(odd) {
-  background-color: #ffffff; /* White */
+    background-color: #ffffff;
 }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
 }
 
 .status-badge.active {
-  background: #2ecc71;
+    background: #2ecc71;
 }
 
 .status-badge.inactive {
-  background: #bdc3c7;
+    background: #bdc3c7;
 }
 
 .status-badge.banned {
-  background: #e74c3c;
+    background: #e74c3c;
 }
 
 .status-badge.pending {
-  background: #2c3e50;
+    background: #2c3e50;
 }
 
 .status-badge.suspended {
-  background: #f39c12;
+    background: #f39c12;
 }
 
 .actions svg {
-  margin-right: 8px;
-  cursor: pointer;
+    margin-right: 8px;
+    cursor: pointer;
 }
 
 .edit-icon {
-  color: #3498db;
+    color: #3498db;
 }
 
 .delete-icon {
-  color: #e74c3c;
+    color: #e74c3c;
 }
 
 .status-active {
@@ -237,12 +239,12 @@ min-width: 1000px;
 }
 
 .table-wrapper {
-  width: 100%;
-  overflow-x: auto;
+    width: 100%;
+    overflow-x: auto;
 }
 
 @media (max-width: 768px) {
-  .table-wrapper {
-    overflow-x: auto;
-  }
+    .table-wrapper {
+        overflow-x: auto;
+    }
 }

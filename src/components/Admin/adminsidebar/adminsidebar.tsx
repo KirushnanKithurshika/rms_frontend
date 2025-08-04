@@ -54,7 +54,7 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Results Management</span>}
           </NavLink>
 
-          <NavLink to="/admin/roles" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/admin/role-management" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaUserShield className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Role & Management</span>}
           </NavLink>

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Navbarin from '../../components/Navbar/navbarin.tsx';
-import LectureSidebar from '../../components/sidebarlecturer/coursesidebar.tsx';
-import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
-import CourseSearchBarlechome from '../../components/SearchDropdown/searchdropdown.tsx';
-import DonutChart from '../../components/graphs/passfailgraph/passfailgraph.tsx';
-import MarksRangeBarChart from '../../components/graphs/marksrangegraph/marksrange.tsx';
+import Navbarin from '../../../components/Navbar/navbarin.tsx';
+import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
+import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
+import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
+import DonutChart from '../../../components/graphs/passfailgraph/passfailgraph.tsx';
+import MarksRangeBarChart from '../../../components/graphs/marksrangegraph/marksrange.tsx';
 
 const AnalizePage= () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);

@@ -19,7 +19,7 @@ const TwoStepVerification: React.FC = () => {
       </div>
       <div className="verification-container">
         <div className="verification-box">
-          <h3>Two Step Verification</h3>
+          <span className='verificationH'>Two Step Verification</span>
           <p>
             For added security, please enter the verification code sent to your
             registered email or mobile number to complete the login process.

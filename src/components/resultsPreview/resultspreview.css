@@ -9,8 +9,9 @@
 
 /* Header */
 h3 {
-  font-size: 22px;
+  font-size: 20px;
   color: #0a2558;
+ margin-top: -10px;
   margin-bottom: 16px;
   text-align:left;
 }

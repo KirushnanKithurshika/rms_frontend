@@ -1,0 +1,257 @@
+.account-settings-wrapper {
+
+  margin: 0 auto;
+  padding: 50px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.account-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-btn {
+  margin-right: 40px;
+ background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0b3054;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.back-btn:hover {
+  color: #0b3054; 
+  background-color: #dddddd;
+  border-radius: 3px;
+}
+
+.account-title {
+  text-align: center;
+  margin-top: 0px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0b3054;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  gap: 15px;
+}
+.profile-picture-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-picture {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.camera-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #0b3054;
+  color: white;
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  transition: 0.2s;
+}
+
+.camera-icon:hover {
+  background-color: #2ea3b5;
+}
+
+.profile-picture {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.profile-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0b3054;
+}
+
+.profile-id {
+  text-align: left;
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #2a1a69;
+}
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 35px; 
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+
+  cursor: pointer;
+  font-size: 16px;
+  color: #777779;
+  transition: 0.2s;
+}
+
+.eye-icon:hover {
+  color: #a09f9f;
+}
+
+.rotate {
+  transform: rotate(180deg);
+  transition: 0.3s ease;
+}
+
+.input {
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  border-color: #0a58ca;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.disabled-input {
+  background-color: #f5f5f5;
+  color: #777;
+  cursor: not-allowed;
+}
+
+.password-section {
+  margin-top: 30px;
+}
+
+.password-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #0b3054;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.collapse-btn {
+  background-color: #fefefe;
+  border: #0b3054 1px solid;
+  border-radius:2px;
+  cursor: pointer;
+}
+
+.collapse-btn .rotate {
+  transform: rotate(180deg);
+  transition: 0.2s;
+}
+
+.password-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.button-row {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.save-btn {
+  color: white;
+  background-color: #0b3054;
+  width:100px;
+  border: 2px solid #acaeaf;
+  border-radius: 50px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.save-btn:hover {
+  background-color: #2ea3b5;
+}
+
+.cancel-btn {
+  background: #ccc;
+  color: black;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  width:100px;
+  border: 2px solid #acaeaf;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cancel-btn:hover {
+  background-color: #bbb;
+}
+
+@media (max-width: 768px) {
+  .form-grid, .password-grid {
+    grid-template-columns: 1fr;
+  }
+  .full-width {
+    grid-column: span 1;
+  }
+}

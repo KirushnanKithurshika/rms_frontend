@@ -16,8 +16,8 @@ html, body, #root {
 }
 
 .verification-container {
- display: flex;
-   justify-content: center;
+  display: flex;
+  justify-content: center;
   height: calc(100vh - 150px); 
   background-color: #f2f2f2;
   padding-top: 30px;;
@@ -34,22 +34,25 @@ html, body, #root {
   display: flex;
   flex-direction: column;
 }
-
-.verification-box h3 {
+.verificationH{
   color: #0a2558;
   margin-bottom: 12px;
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 18px;
 }
+
 
 .verification-box p {
   font-size: 14px;
-  color: #333;
+  color: #8d8d8d;
   text-align: justify;
   margin-bottom: 20px;
   line-height: 1.6;
 }
 
 .otp-input {
-  width: 90%;
+ 
   padding: 12px;
   font-size: 18px;
   text-align: center;
@@ -95,8 +98,9 @@ html, body, #root {
     border-radius: 0;
   }
 
-
-
+.otp-input {
+  width:90%;
+}
 .verification-container {
   display: flex;
   justify-content: center;
@@ -106,4 +110,11 @@ html, body, #root {
   padding-top: 30px;
 }
 
+
+.verificationH{
+  color: #0a2558;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+}
 }

@@ -11,10 +11,14 @@ import CreateCourseUI from "./pages/lectures/createcourse/createcourse";
 import Courses from "./pages/lectures/courses/courses";
 
 import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
-import AnalizePage from "./pages/analysepage/analysepage";
+import AnalizePage from "./pages/lectures/analysepage/analysepage";
 
 import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
 import UserManagement from "./pages/Admin/usermanagement/usermanagement";
+import RoleManagement from "./pages/Admin/rolemanagementpage/rolemanagement";
+import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
+import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
+import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 
 
 
@@ -36,6 +40,10 @@ function App() {
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
           <Route path="/admin/user-management" element={<UserManagement/>}/>
+           <Route path="/admin/role-management" element={<RoleManagement/>}/>
+            <Route path="/account-setting" element={<AccountSettings/>}/>
+            <Route path="/reset-password" element={<ResetPassword/>}/>
+                <Route path="/reset-password-mail" element={<ResetPasswordEmail/>}/>
         </Routes>
       </div>
     </Router>
