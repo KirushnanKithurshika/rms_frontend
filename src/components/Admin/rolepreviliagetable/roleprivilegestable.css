@@ -1,41 +1,35 @@
 .privileges-table-container {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; 
+  border: 1px solid #ececec;
 }
+
 
 .privileges-table {
   width: 100%;
+  min-width: 600px; 
   border-collapse: collapse;
   font-family: Arial, sans-serif;
   text-align: center;
+  table-layout: fixed; 
 }
+
 
 .privileges-table thead {
   background-color: #1b4b7a;
   color: white;
-}
-.privileges-table-container {
-  width: 100%;
-}
-
-.privileges-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-
-/* Header */
-.privileges-table thead {
-  background-color: #1b4b7a;
-  color: white;
+  position: sticky; 
+  top: 0;
+  z-index: 2;
 }
 
 .privileges-table th {
   padding: 8px 12px;
   font-size: 12px;
   border: 1px solid #ececec;
+  white-space: nowrap; 
 }
+
 
 .privileges-table-body {
   max-height: 400px; 
@@ -43,11 +37,18 @@
   display: block;
 }
 
+.privileges-table-body table {
+  width: 100%;
+  min-width: 600px; 
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
 .privileges-table tbody td {
   padding: 8px 12px;
   font-size: 12px;
   border: 1px solid #ececec;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .privileges-table tbody tr:nth-child(even) {
@@ -57,6 +58,7 @@
 .privileges-table tbody tr:hover {
   background-color: #eaf3ff;
 }
+
 
 input[type="checkbox"] {
   width: 18px;

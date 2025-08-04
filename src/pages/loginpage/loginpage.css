@@ -76,8 +76,9 @@
 }
 
 .login-button:hover {
-  background-color: #2EA3BD;
-  border: 2px solid rgb(177, 176, 176);
+  color:#0a2558;
+  background-color: #dbd9d9;
+  border: 2px solid rgb(19, 13, 93);
 }
 
 .forgot-text {

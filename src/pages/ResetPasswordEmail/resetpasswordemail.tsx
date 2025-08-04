@@ -44,7 +44,7 @@ const ResetPasswordEmail: React.FC = () => {
 
           <div>
             <span className="forgot-text" onClick={() => navigate('/login')}>
-              Back to Login
+            <a href="/login">Back to Login</a>  
             </span>
           </div>
         </div>

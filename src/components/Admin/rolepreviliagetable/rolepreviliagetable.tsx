@@ -12,40 +12,41 @@ interface Privilege {
 const RolePrivilegesTable: React.FC = () => {
   const [privileges, setPrivileges] = useState<Privilege[]>([
     { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: true, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: true, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: true, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: true, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
-    { module: "Results", view: false, edit: false, delete: false, add: false },
+    { module: "Students", view: true, edit: false, delete: false, add: false },
+    { module: "Lecturers", view: false, edit: false, delete: false, add: false },
+    { module: "Courses", view: false, edit: false, delete: false, add: false },
+    { module: "Departments", view: false, edit: false, delete: false, add: false },
+    { module: "Dashboard", view: true, edit: false, delete: false, add: false },
+    { module: "Settings", view: false, edit: false, delete: false, add: false },
+    { module: "Reports", view: false, edit: false, delete: false, add: false },
+    { module: "User Management", view: false, edit: false, delete: false, add: false },
+    { module: "Attendance", view: true, edit: false, delete: false, add: false },
+    { module: "Library", view: false, edit: false, delete: false, add: false },
+    { module: "Timetable", view: false, edit: false, delete: false, add: false },
+    { module: "Finance", view: false, edit: false, delete: false, add: false },
+    { module: "Exams", view: true, edit: false, delete: false, add: false },
   ]);
 
+  const fields: (keyof Privilege)[] = ["view", "edit", "delete", "add"];
+
   const handleCheckboxChange = (rowIndex: number, field: keyof Privilege) => {
-    const updated = [...privileges];
-    updated[rowIndex][field] = !updated[rowIndex][field]; // Toggle value
-    setPrivileges(updated);
+    setPrivileges((prev) =>
+      prev.map((priv, i) =>
+        i === rowIndex ? { ...priv, [field]: !priv[field] } : priv
+      )
+    );
   };
 
   return (
     <div className="privileges-table-container">
-      {/* Header Table */}
-      <table className="privileges-table">
+      {/* Header */}
+      <table className="privileges-table header-table">
         <thead>
           <tr>
             <th>Module</th>
-            <th>View</th>
-            <th>Edit</th>
-            <th>Delete</th>
-            <th>Add</th>
+            {fields.map((field) => (
+              <th key={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</th>
+            ))}
           </tr>
         </thead>
       </table>
@@ -55,16 +56,14 @@ const RolePrivilegesTable: React.FC = () => {
         <table className="privileges-table">
           <tbody>
             {privileges.map((priv, index) => (
-              <tr key={index}>
+              <tr key={`${priv.module}-${index}`}>
                 <td>{priv.module}</td>
-                {["view", "edit", "delete", "add"].map((field) => (
-                  <td key={field}>
+                {fields.map((field) => (
+                  <td key={`${index}-${field}`}>
                     <input
                       type="checkbox"
-                      checked={priv[field as keyof Privilege]}
-                      onChange={() =>
-                        handleCheckboxChange(index, field as keyof Privilege)
-                      }
+                    
+                      onChange={() => handleCheckboxChange(index, field)}
                     />
                   </td>
                 ))}

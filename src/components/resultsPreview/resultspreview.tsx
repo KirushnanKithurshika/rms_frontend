@@ -36,14 +36,14 @@ const ResultsPreview: React.FC = () => {
       <div className="course-select-header">
         <h3>Results Preview</h3>
         <div className="select-container">
-  <label className="select-label">Select Course:</label>
-  <select className="custom-select">
-    <option value="EC7201">EC7201 - Information Security</option>
-    <option value="EC7202">EC7202 - Cryptography</option>
-   
-  </select>
-</div>
-<hr className="dropdown-divider" />
+          <label className="select-label">Select Course:</label>
+          <select className="custom-select">
+            <option value="EC7201">EC7201 - Information Security</option>
+            <option value="EC7202">EC7202 - Cryptography</option>
+
+          </select>
+        </div>
+        <hr className="dropdown-divider" />
 
       </div>
 
