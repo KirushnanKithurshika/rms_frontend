@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - main   # Change if your deploy branch is different
-
+  pull_request:
+    branches:
+      - main
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
