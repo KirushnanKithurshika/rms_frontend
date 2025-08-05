@@ -3,7 +3,7 @@ name: Build and Push Frontend Docker Image
 on:
   push:
     branches:
-      - dev_kithu   
+      - main  
   pull_request:
     branches:
       - main
