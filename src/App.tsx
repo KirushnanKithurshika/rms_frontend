@@ -40,14 +40,14 @@ function App() {
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
-          <Route path="/admin/user-management" element={<UserManagement/>}/>
-           <Route path="/admin/role-management" element={<RoleManagement/>}/>
-            <Route path="/account-setting" element={<AccountSettings/>}/>
-            <Route path="/reset-password" element={<ResetPassword/>}/>
-                <Route path="/reset-password-mail" element={<ResetPasswordEmail/>}/>
-                <Route path="/admin/student-management" element={<StudentManagement/>}/>
-                  <Route path="/student/student-dashboard" element={<StudentDashboard/>}/>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/user-management" element={<UserManagement />} />
+          <Route path="/admin/role-management" element={<RoleManagement />} />
+          <Route path="/account-setting" element={<AccountSettings />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
+          <Route path="/admin/student-management" element={<StudentManagement />} />
+          <Route path="/student/student-dashboard" element={<StudentDashboard />} />
         </Routes>
       </div>
     </Router>
