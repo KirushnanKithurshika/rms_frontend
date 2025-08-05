@@ -12,7 +12,7 @@ import {
 import { MdEdit, MdDelete } from "react-icons/md";
 import { FiSearch } from 'react-icons/fi';
 import Pagination from '../../../components/Admin/pagination/pagination.tsx';
-import AddUserForm from '../../../components/Admin/adduserform/adduserform.tsx';
+
 import AddStudentForm from '../../../components/Admin/addstudentsform/addstudentsform.tsx';
 
 const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];

@@ -20,6 +20,7 @@ import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
 import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
 import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
+import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
 
 
 
@@ -45,7 +46,8 @@ function App() {
             <Route path="/account-setting" element={<AccountSettings/>}/>
             <Route path="/reset-password" element={<ResetPassword/>}/>
                 <Route path="/reset-password-mail" element={<ResetPasswordEmail/>}/>
-                <Route path="//admin/student-management" element={<StudentManagement/>}/>
+                <Route path="/admin/student-management" element={<StudentManagement/>}/>
+                  <Route path="/student/student-dashboard" element={<StudentDashboard/>}/>
         </Routes>
       </div>
     </Router>

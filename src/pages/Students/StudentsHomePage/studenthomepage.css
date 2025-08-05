@@ -1,0 +1,6 @@
+.subnav-divider {
+  width: 100%;
+  height: 3px; /* line thickness */
+  background-color: #0b3054; /* dark blue color */
+  margin: 0; /* remove extra spacing */
+}

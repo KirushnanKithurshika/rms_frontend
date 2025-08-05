@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
 import "./StudentsubNav.css";
 
 const StudentSubNav: React.FC = () => {
   const [active, setActive] = useState("Home");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const tabs = [
     "Home",
@@ -14,12 +16,20 @@ const StudentSubNav: React.FC = () => {
 
   return (
     <div className="rounded-nav-container">
-      <ul className="rounded-nav">
+
+      <div className="hamburger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        {isMenuOpen ? <FaTimes /> : <FaBars />}
+      </div>
+
+      <ul className={`rounded-nav ${isMenuOpen ? "open" : ""}`}>
         {tabs.map((tab) => (
           <li
             key={tab}
             className={active === tab ? "nav-item active" : "nav-item"}
-            onClick={() => setActive(tab)}
+            onClick={() => {
+              setActive(tab);
+              setIsMenuOpen(false); 
+            }}
           >
             {tab}
           </li>
