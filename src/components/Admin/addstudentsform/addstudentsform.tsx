@@ -2,37 +2,22 @@ import React, { useState } from "react";
 import "./adduserform.css";
 import { FaArrowLeft, FaChevronDown, FaUpload, FaCheckCircle } from "react-icons/fa";
 
-interface AddUserFormProps {
+interface AddStudentFormProps {
   onClose: () => void;
-  onCreate: (user: {
+  onCreate: (student: {
     username: string;
     password: string;
-    role: string;
     fullName: string;
     email: string;
   }) => void;
 }
 
-interface Role {
-  label: string;
-}
-
-const roles: Role[] = [
-  { label: "Admin" },
-  { label: "Moderator" },
-  { label: "User" },
-  { label: "Guest" },
-];
-
-const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
+const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("User");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [isRoleOpen, setIsRoleOpen] = useState(false);
 
-  // For collapsible manual form
   const [showManualForm, setShowManualForm] = useState(true);
 
   // File upload states
@@ -67,12 +52,11 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
       return;
     }
 
-    onCreate({ username, password, role, fullName, email });
+    onCreate({ username, password, fullName, email });
 
     // Reset form
     setUsername("");
     setPassword("");
-    setRole("User");
     setFullName("");
     setEmail("");
     setFile(null);
@@ -84,17 +68,17 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
   return (
     <div className="dashboard-cards">
       <div className="add-user-form-container">
-
+        {/* Header */}
         <div className="add-user-form-header">
           <button type="button" className="add-user-back-btn" onClick={onClose}>
             <FaArrowLeft className="add-user-back-icon" />
           </button>
-          <span className="add-user-title">Add User</span>
+          <span className="add-user-title">Add Student</span>
         </div>
 
-
+        {/* File Upload */}
         <div className="add-user-file-section">
-          <label className="add-user-label">Select File(Excel File)</label>
+          <label className="add-user-label">Select File (Excel File)</label>
           <div className="add-user-file-container">
             <input
               type="file"
@@ -108,7 +92,6 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
               <FaUpload className="add-user-upload-icon" />
             </label>
           </div>
-
 
           {file && (
             <div className="file-progress-container">
@@ -127,7 +110,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           )}
         </div>
 
-
+        {/* Divider */}
         <div
           className="add-user-divider"
           onClick={() => setShowManualForm((prev) => !prev)}
@@ -138,12 +121,11 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           />
         </div>
 
-
-
+        {/* Manual Form */}
         {showManualForm && (
           <div className="add-user-form-grid">
             <div className="add-user-form-group">
-              <label className="add-user-label">User Name</label>
+              <label className="add-user-label">Username</label>
               <input
                 type="text"
                 className="add-user-input"
@@ -160,37 +142,6 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </div>
-
-            <div className="add-user-form-group role-selector">
-              <label className="add-user-label">Role</label>
-              <div
-                className="custom-role-dropdown"
-                onClick={() => setIsRoleOpen((prev) => !prev)}
-              >
-                <span className="selected-role">{role}</span>
-                <FaChevronDown
-                  className={`dropdown-icon ${isRoleOpen ? "open" : ""}`}
-                />
-              </div>
-
-              {isRoleOpen && (
-                <div className="custom-role-options">
-                  {roles.map((r, index) => (
-                    <div
-                      key={index}
-                      className={`role-option-card ${role === r.label ? "active" : ""
-                        }`}
-                      onClick={() => {
-                        setRole(r.label);
-                        setIsRoleOpen(false);
-                      }}
-                    >
-                      <span>{r.label}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div className="add-user-form-group">
@@ -237,4 +188,4 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
   );
 };
 
-export default AddUserForm;
+export default AddStudentForm;

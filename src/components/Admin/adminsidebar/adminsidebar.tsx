@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import {
   FaHome,
   FaUsers,
+  FaUserGraduate,
   FaChartBar,
   FaUserShield,
   FaFileAlt,
@@ -32,7 +33,9 @@ const AdminSidebar: React.FC = () => {
     <div className={`course-sidebar ${sidebarState}`}>
       <button className="sidebar-toggle-btn" onClick={handleToggle}>
         {sidebarState === 'hidden' ? <FaChevronRight /> : <FaChevronLeft />}
-        {sidebarState !== 'expanded' && <div className="mobile-sidebar-backdrop" onClick={handleToggle}></div>}
+        {sidebarState !== 'expanded' && (
+          <div className="mobile-sidebar-backdrop" onClick={handleToggle}></div>
+        )}
       </button>
 
       {(sidebarState === 'expanded' || sidebarState === 'collapsed') && (
@@ -49,6 +52,12 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>User Management</span>}
           </NavLink>
 
+        
+          <NavLink to="/admin/student-management" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+            <FaUserGraduate className="sidebar-icon" />
+            {sidebarState === 'expanded' && <span>Student Management</span>}
+          </NavLink>
+
           <NavLink to="/admin/results-management" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaChartBar className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Results Management</span>}
@@ -61,7 +70,7 @@ const AdminSidebar: React.FC = () => {
 
           <NavLink to="/admin/audit-logs" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaFileAlt className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Audit logs</span>}
+            {sidebarState === 'expanded' && <span>Audit Logs</span>}
           </NavLink>
 
           <NavLink to="/admin/disciplinary-cases" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>

@@ -2,9 +2,8 @@ import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import AdminSidebar from '../../../components/Admin/adminsidebar/adminsidebar.tsx';
-import './usermanagement.css';
+
 import {
-    FaUser,
     FaChevronDown,
     FaSpinner,
     FaCalendarAlt,
@@ -14,8 +13,8 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { FiSearch } from 'react-icons/fi';
 import Pagination from '../../../components/Admin/pagination/pagination.tsx';
 import AddUserForm from '../../../components/Admin/adduserform/adduserform.tsx';
+import AddStudentForm from '../../../components/Admin/addstudentsform/addstudentsform.tsx';
 
-const roles = ['All Roles', 'Admin', 'Moderator', 'User', 'Guest'];
 const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];
 const dateOptions = ['Newest', 'Oldest', 'Joined This Month', 'Joined Last 30 Days'];
 
@@ -57,12 +56,11 @@ const statusColors: Record<string, string> = {
     Suspended: "suspended",
 };
 
-const UserManagement: React.FC = () => {
+const StudentManagement: React.FC = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [isRoleOpen, setIsRoleOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [isDateOpen, setIsDateOpen] = useState(false);
-    const [selectedRole, setSelectedRole] = useState('Roles');
+
     const [selectedStatus, setSelectedStatus] = useState('Status');
     const [selectedDate, setSelectedDate] = useState('Date');
 
@@ -75,29 +73,6 @@ const UserManagement: React.FC = () => {
         setShowAddUserForm(false);
     };
 
-    const toggleRoleDropdown = () => {
-        setIsRoleOpen(!isRoleOpen);
-        setIsStatusOpen(false);
-        setIsDateOpen(false);
-    };
-
-    const toggleStatusDropdown = () => {
-        setIsStatusOpen(!isStatusOpen);
-        setIsRoleOpen(false);
-        setIsDateOpen(false);
-    };
-
-    const toggleDateDropdown = () => {
-        setIsDateOpen(!isDateOpen);
-        setIsRoleOpen(false);
-        setIsStatusOpen(false);
-    };
-
-    const handleSelectRole = (role: string) => {
-        setSelectedRole(role);
-        setIsRoleOpen(false);
-    };
-
     const handleSelectStatus = (status: string) => {
         setSelectedStatus(status);
         setIsStatusOpen(false);
@@ -106,6 +81,16 @@ const UserManagement: React.FC = () => {
     const handleSelectDate = (option: string) => {
         setSelectedDate(option);
         setIsDateOpen(false);
+    };
+
+    const toggleStatusDropdown = () => {
+        setIsStatusOpen(prev => !prev);
+        setIsDateOpen(false);
+    };
+
+    const toggleDateDropdown = () => {
+        setIsDateOpen(prev => !prev);
+        setIsStatusOpen(false);
     };
 
     return (
@@ -132,35 +117,14 @@ const UserManagement: React.FC = () => {
                     {!showAddUserForm && (
                         <div className="dashboard-cards">
                             <div className="cardcourse">
-                                <h3>User Management</h3>
+                                <h3>Student Management</h3>
                                 <div className="user-management-header">
-                                 
                                     <div className="custom-searchbar">
                                         <input type="text" placeholder="Search…" />
                                         <FiSearch className="search-icon" />
                                     </div>
 
-                                  
                                     <div className="filters">
-                                      
-                                        <div className="custom-dropdown">
-                                            <button className="dropdown-toggle" onClick={toggleRoleDropdown}>
-                                                <FaUser className="icon" />
-                                                <span>{selectedRole}</span>
-                                                <FaChevronDown className="chevron" />
-                                            </button>
-                                            {isRoleOpen && (
-                                                <ul className="dropdown-menu">
-                                                    {roles.map((role, index) => (
-                                                        <li key={index} onClick={() => handleSelectRole(role)}>
-                                                            {role}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </div>
-
-                                      
                                         <div className="custom-dropdown">
                                             <button className="dropdown-toggle" onClick={toggleStatusDropdown}>
                                                 <FaSpinner className="icon spin" />
@@ -178,7 +142,6 @@ const UserManagement: React.FC = () => {
                                             )}
                                         </div>
 
-                                       
                                         <div className="custom-dropdown">
                                             <button className="dropdown-toggle" onClick={toggleDateDropdown}>
                                                 <FaCalendarAlt className="icon" />
@@ -197,7 +160,7 @@ const UserManagement: React.FC = () => {
                                         </div>
 
                                         <button className="add-user-btn" onClick={() => setShowAddUserForm(true)}>
-                                            Add User +
+                                            Add Student +
                                         </button>
                                     </div>
                                 </div>
@@ -244,27 +207,19 @@ const UserManagement: React.FC = () => {
                                     <Pagination />
                                 </div>
                             </div>
-
-                            
                         </div>
-
-
-                             
                     )}
 
                     {showAddUserForm && (
-                        <AddUserForm
+                        <AddStudentForm
                             onClose={() => setShowAddUserForm(false)}
                             onCreate={handleCreateUser}
                         />
                     )}
-
                 </div>
-                
             </div>
-            </div>
-       
+        </div>
     );
 };
 
-export default UserManagement;
+export default StudentManagement;

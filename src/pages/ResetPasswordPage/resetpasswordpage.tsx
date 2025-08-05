@@ -5,7 +5,7 @@ import './resetpassword.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ResetPassword: React.FC = () => {
-  const [showCurrent, setShowCurrent] = useState(false);
+ 
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
@@ -27,20 +27,7 @@ const ResetPassword: React.FC = () => {
           <h2>Reset Password</h2>
 
           
-          <label htmlFor="currentPassword">Current Password</label>
-          <div className="password-wrapper">
-            <input
-              type={showCurrent ? 'text' : 'password'}
-              id="currentPassword"
-              className="login-input"
-            />
-            <span
-              className="toggle-icon"
-              onClick={() => setShowCurrent((prev) => !prev)}
-            >
-              {showCurrent ? <FaEyeSlash /> : <FaEye />}
-            </span>
-          </div>
+       
 
           
           <label htmlFor="newPassword">New Password</label>
