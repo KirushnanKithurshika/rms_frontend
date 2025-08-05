@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 import Navbar from '../../components/Navbar/navbar';
-import './LoginPage.css';
+import './loginpage.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const LoginPage: React.FC = () => {
