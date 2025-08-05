@@ -30,7 +30,7 @@ function App() {
       <div className="mt-16">
         <Routes>
 
-          <Route path="/welcomepage" element={<WelcomePage />} />
+          <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="drop" element={<UserDropdown />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
