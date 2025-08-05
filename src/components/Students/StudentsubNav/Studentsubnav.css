@@ -1,0 +1,41 @@
+.rounded-nav-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.rounded-nav {
+  display: flex;
+  list-style: none;
+  background-color: #dce2eb; 
+  border-radius: 25px;
+  padding: 8px 20px;
+  gap: 40px; 
+}
+
+.nav-item {
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 0;
+  color: #0c223f; 
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #1b4b7a;
+}
+
+
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 60%;
+  height: 2px;
+  background-color: #0c223f;
+  border-radius: 2px;
+}

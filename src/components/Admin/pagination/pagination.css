@@ -1,0 +1,90 @@
+.custom-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding: 0 16px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right:100px;
+}
+
+.pagination-label {
+  color: #868788;
+  font-size: 12px;
+}
+
+.pagination-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #7a7b7d;
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 50 L70 110 L130 50' stroke='%230a2558' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 8px;
+  min-width: 60px;
+  transition: border 0.2s ease;
+}
+
+.pagination-select:hover,
+.pagination-select:focus {
+  border-color: #dadada;
+  box-shadow: 0 0 0 2px rgba(10, 37, 88, 0.2);
+}
+
+
+.pagination-count {
+  color: #808182;
+  font-size: 12px;
+}
+
+.pagination-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.page-number,
+.page-btn {
+  border: 1px solid #e0e0e0;
+  background-color: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  text-align: center;
+  line-height: 30px;
+  color: #717274;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.page-number:hover,
+.page-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.page-number.active {
+  background-color: #08264a;
+  color: white;
+  font-weight: bold;
+}
+
+.page-ellipsis {
+  padding: 0 6px;
+  font-size: 10px;
+  color: #818181;
+}

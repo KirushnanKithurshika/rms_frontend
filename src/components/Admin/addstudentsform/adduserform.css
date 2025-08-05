@@ -1,0 +1,413 @@
+.add-user-form-container {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding:20px;
+  gap: 20px;
+  flex: 1 1 200px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.add-user-form-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.add-user-title {
+  text-align: left;
+  margin-top: 0px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0b3054;
+}
+
+.add-user-back-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #0b3054;
+}
+
+.add-user-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.add-user-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-user-full-width {
+  grid-column: span 2;
+}
+.add-user-back-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #0b3054;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.add-user-back-btn:hover {
+  color: #0b3054; 
+  background-color: #dddddd;
+  border-radius: 3px;
+}
+
+.add-user-back-icon {
+  font-size: 14px;
+}
+
+.add-user-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0b3054;
+  margin-bottom: 5px;
+}
+
+.add-user-input,
+.add-user-select {
+  padding: 8px;
+  height:20px;
+  max-width: 500px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.dropdown-icon {
+  transition: transform 0.2s;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+.add-user-form-actions {
+  display: flex;         
+  justify-content: flex-start;
+  gap: 30px; 
+  transition: all 0.2s ease, transform 0.2s ease;
+}
+
+.add-user-create-btn {
+  color: white;
+  background-color: #0b3054;
+  width:100px;
+  border: 2px solid #acaeaf;
+  border-radius: 50px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.add-user-cancel-btn {
+  background: #ccc;
+  color: black;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  width:100px;
+  border: 2px solid #acaeaf;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  
+}
+.add-user-create-btn:hover {
+ 
+  transform: scale(1.05); 
+}
+
+.add-user-cancel-btn:hover {
+
+  transform: scale(1.05); 
+}
+.role-selector {
+  position: relative;
+}
+
+.custom-role-dropdown {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  max-width: 500px;
+  background: white;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.custom-role-dropdown:hover {
+  border-color: #0b3054;
+}
+
+.selected-role {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-user-input:focus,
+.add-user-select:focus {
+  border-color: #0b3054;        
+  outline: none;                  
+  box-shadow: 0 0 4px rgba(11, 48, 84, 0.3);
+  transition: all 0.2s ease;    
+}
+
+
+.custom-role-options {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  z-index: 10;
+  overflow: hidden;
+  animation: dropdownFade 0.2s ease;
+}
+.add-user-file-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.add-user-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b3054;
+}
+
+.add-user-file-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-user-file-input {
+  display: none;
+}
+
+.add-user-file-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 120px;
+  height: 38px;
+  background-color: #fff;
+  border: 1px solid #1352a3;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #0b3054;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.add-user-file-btn:hover {
+  background-color: #f0f8ff;
+  border-color: #0e3773;
+}
+
+.add-user-upload-icon {
+  font-size: 16px;
+  color: #0b3054;
+}
+
+
+.file-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.file-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0b3054;
+  min-width: 80px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #1a73e8;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #666;
+  min-width: 35px;
+  text-align: right;
+}
+
+.success-icon {
+  color: #28a745;
+  font-size: 18px;
+}
+
+
+.add-user-divider {
+  position:relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+
+}
+
+
+.add-user-divider::before {
+  content: "";
+  position: absolute;
+  top:-20px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  z-index: 1;
+}
+
+
+.add-user-divider-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9e6d11;
+  background-color: #fff; 
+
+  z-index: 2;
+}
+
+
+.add-user-divider-arrow {
+  font-size: 12px;
+  color: #0b3054;
+  margin-left: auto;
+  z-index: 2;
+  background-color: #fff; 
+  padding-left: 5px;
+  transition: transform 0.2s ease;
+}
+
+.add-user-divider-arrow.open {
+  transform: rotate(180deg);
+}
+
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.role-option-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.role-option-card:hover {
+  background: #f2f2f2;
+}
+
+.role-option-card.active {
+  background: #0b3054;
+  color: white;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .add-user-form-container {
+    width: 80%;
+    padding: 25px;
+  }
+
+  .add-user-form-grid {
+    grid-template-columns: 1fr; 
+    gap: 12px;
+  }
+
+  .add-user-full-width {
+    grid-column: span 1;
+  }
+
+  .add-user-title {
+    font-size: 16px;
+  }
+
+  .add-user-label {
+    font-size: 12px;
+  }
+
+  .add-user-input,
+  .add-user-select {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .add-user-create-btn,
+  .add-user-cancel-btn {
+    font-size: 12px;
+    padding: 5px 15px;
+  }
+
+ 
+}
+
+
+@media (max-width: 480px) {
+  .add-user-title {
+    font-size: 14px;
+  }
+
+  .add-user-back-btn {
+    font-size: 18px;
+  }
+
+  .add-user-form-container {
+    gap: 15px;
+  }
+}

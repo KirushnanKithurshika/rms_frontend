@@ -1,0 +1,109 @@
+.course-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 0.5px solid #e3e2e2;
+  border-radius: 12px;
+  padding: 10px 14px;
+  max-width: 360px;
+  max-height: 500px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.course-search-container:hover {
+  border-color: #d0d0d0;
+   box-shadow: 0 4px 10px rgba(27, 22, 5, 0.1);
+}
+
+.search-iconLH {
+  color: #0a2558;
+  font-size: 16px;
+  margin-right: 30px;
+}
+
+.selected-courseLH {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  font-size: 13px;
+  color: #0a2558;
+}
+
+.dropdown-iconLH {
+  font-size: 12px;
+  margin-left: 30px;
+  color: #0a2558;
+}
+
+.dropdown-menuLH {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding: 10px 0px;
+  padding:15px 10px;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-top: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  padding: 4px 0;
+}
+
+.dropdown-menuLH li {
+  background-color: #fff;
+  padding: 10px 30px;
+  margin: 0px 10px;
+  font-size: 12px;
+  color: #0a2558;
+  transition: background-color 0.2s;
+}
+
+.dropdown-menuLH li:hover {
+
+  background-color: #e4e4e4;
+  
+}
+@media screen and (max-width: 768px) {
+  .course-search-container {
+    max-width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .search-iconLH {
+    font-size: 14px;
+    margin-right: 20px;
+  }
+
+  .selected-courseLH {
+    font-size: 12px;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .dropdown-iconLH {
+    font-size: 10px;
+    margin-left: 20px;
+  }
+
+  .dropdown-menuLH {
+    font-size: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .dropdown-menuLH li {
+    font-size: 12px;
+    text-align: left;
+    padding: 8px 14px;
+  }
+}

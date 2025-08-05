@@ -1,0 +1,338 @@
+.upload-box {
+    border: 2px dashed #ccc;
+    border-radius: 30px;
+    padding: 40px;
+    max-width: 800px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    margin: 10px 0;
+    position: relative;
+
+}
+
+.upload-box-icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn {
+    background-color: #6aafd4;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background-color: #546e7a;
+}
+
+.upload-box.active {
+    border-color: #0a58ca;
+    background-color: #f9f9f9;
+}
+
+.upload-label {
+    cursor: pointer;
+}
+
+.upload-btn {
+
+    margin-top: 6px;
+    padding: 5px 8px;
+    background-color: #e7e4e4;
+    color: rgb(31, 29, 29);
+    border: none;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.upload-btn:hover {
+    transform: scale(1.02);
+}
+
+.file-input {
+    display: none;
+}
+
+
+.file-name-uploadsection {
+    font-weight: bold;
+    color: #08234C;
+    font-size: 16px;
+}
+
+.dragdrophead {
+    text-align: left;
+    color: #08234C;
+}
+
+.upload-tabs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.tab-btnCA {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.tab-btnCA.active {
+    background-color: #0a2558;
+    color: white;
+}
+
+.tab-btnCA:hover {
+    background-color: #2EA3BD;
+    color: white;
+}
+
+.file-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+
+.back-btn {
+    padding: 8px 16px;
+    background-color: #0a2558;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.file-info-header {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 8px;
+    text-align: right;
+}
+
+.upload-box {
+    border: 2px dashed #ccc;
+    border-radius: 30px;
+    padding: 40px;
+    max-width: 800px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    margin: 10px 0;
+    position: relative;
+}
+
+.upload-box.active {
+    border-color: #0a58ca;
+    background-color: #f9f9f9;
+}
+
+.custom-icon-uploadinterface {
+    color: grey;
+    font-size: 60px;
+    margin-bottom: 12px;
+}
+
+.Uploadarea {
+    max-width: 700px;
+}
+
+.action-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+}
+
+.save-btn,
+.cancel-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    border: #c2c2c2 1px solid;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.save-btn {
+    background-color: #14a704;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #2EA3BD;
+    transform: scale(1.02);
+}
+
+.cancel-btn {
+    background-color: #bb130d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #c9302c;
+    transform: scale(1.02);
+}
+
+.upload-text-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.choosefileP p{
+    color:black;
+}
+
+@media screen and (max-width: 768px) {
+    .upload-box {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .upload-box-icons {
+        top: 5px;
+        right: 5px;
+        gap: 6px;
+        margin-right: 20px;
+    }
+
+    .icon-btn {
+        padding: 4px;
+        font-size: 12px;
+    }
+
+    .custom-icon-uploadinterface {
+        font-size:40px ;
+    }
+
+    .upload-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+
+    .tab-btnCA {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .file-preview {
+        gap: 8px;
+    }
+
+    .file-name-uploadsection{
+        font-size: 14px;
+
+    }
+
+
+    .save-btn,
+    .cancel-btn {
+
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .upload-text-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .dragdrophead{
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .choosefileP {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+}
+@media screen and (max-width: 480px) {
+    .upload-box {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .upload-box-icons {
+        font-size: 10px;
+        top:7px;
+        right: 5px;
+        gap: 6px;
+        margin-right: 20px;
+    }
+
+    .icon-btn {
+        padding: 4px;
+        font-size: 12px;
+    }
+
+    .custom-icon-uploadinterface {
+        font-size: 40px !important;
+    }
+
+    .upload-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+
+    .tab-btnCA {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .file-preview {
+        gap: 8px;
+    }
+
+    .file-name-uploadsection {
+        font-size: 12px;
+    }
+
+
+    .save-btn,
+    .cancel-btn {
+
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .upload-text-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .dragdrophead  {
+        font-size: 13px;
+    }
+
+    .choosefileP {
+        font-size: 12px;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+}

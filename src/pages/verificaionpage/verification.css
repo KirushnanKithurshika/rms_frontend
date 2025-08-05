@@ -1,0 +1,120 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navcon {
+ 
+  flex-shrink: 0;
+}
+
+.verification-container {
+  display: flex;
+  justify-content: center;
+  height: calc(100vh - 150px); 
+  background-color: #f2f2f2;
+  padding-top: 30px;;
+}
+
+.verification-box {
+  height:fit-content;
+  margin-top: 40px;
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+.verificationH{
+  color: #0a2558;
+  margin-bottom: 12px;
+  margin-top: 20px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+
+.verification-box p {
+  font-size: 14px;
+  color: #8d8d8d;
+  text-align: justify;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.otp-input {
+ 
+  padding: 12px;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none; 
+}
+
+.otp-input:hover {
+  border-color: #0a2558;
+  box-shadow: 0 0 5px rgba(10, 37, 88, 0.3);
+}
+
+.otp-input:focus {
+  border-color: #0a2558;
+  box-shadow: 0 0 5px rgba(10, 37, 88, 0.4); 
+  outline: none; 
+}
+
+
+.verify-button {
+  background-color: #0a2558;
+  color: white;
+  padding: 10px 30px;
+  border: solid 2px rgb(176, 176, 176);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.verify-button:hover {
+  background-color: #2EA3BD;
+  color:#ffffff;
+  font-weight: bold;
+}
+@media (max-width: 700px) {
+ .verification-box  {
+   width:80%;
+   margin-top: 30px;
+    padding: 20px;
+    border-radius: 0;
+  }
+
+.otp-input {
+  width:90%;
+}
+.verification-container {
+  display: flex;
+  justify-content: center;
+  align-items:baseline;
+  height: calc(100vh - 150px); /* adjust based on navbar height */
+  background-color: #f2f2f2;
+  padding-top: 30px;
+}
+
+
+.verificationH{
+  color: #0a2558;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+}

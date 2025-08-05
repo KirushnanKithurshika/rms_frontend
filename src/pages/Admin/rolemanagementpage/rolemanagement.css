@@ -1,0 +1,16 @@
+.roles-page-container {
+  display: flex;
+  gap: 20px; 
+  align-items: flex-start; 
+
+}
+
+
+.roles-page-container > div {
+  flex: 1;
+}
+
+
+.roles-page-container > :first-child {
+  flex: 0 0 250px;
+}
