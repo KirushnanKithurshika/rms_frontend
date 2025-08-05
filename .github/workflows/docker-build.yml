@@ -3,7 +3,7 @@ name: Build and Push Frontend Docker Image
 on:
   push:
     branches:
-      - main   # Change if your deploy branch is different
+      - dev_kithu   
   pull_request:
     branches:
       - main
