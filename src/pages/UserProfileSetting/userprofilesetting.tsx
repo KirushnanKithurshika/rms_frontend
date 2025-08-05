@@ -32,12 +32,13 @@ const AccountSettings: React.FC = () => {
       <div className="main-area">
         <div className="dashboard-content">
           <div className="dashboard-cards">
-            <div className="card account-settings-wrapper">
+            <div className="account-settings-wrapper">
 
              
               <div className="account-settings-header">
                 <button className="back-btn"><FaArrowLeft /></button>
-                <span className="account-title">Account Settings</span>
+                <div className="account-title">Account Settings</div>
+                
               </div>
 
              
