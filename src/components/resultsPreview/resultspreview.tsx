@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ResultsPreview.css';
+import './resultspreview.css';
 import Logo from '../../assets/ResultsP_Logo.png';
 
 const dummyData = [

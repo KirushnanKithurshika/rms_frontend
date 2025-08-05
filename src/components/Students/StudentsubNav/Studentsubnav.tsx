@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import "./StudentsubNav.css";
+import "./Studentsubnav.css";
 
 const StudentSubNav: React.FC = () => {
   const [active, setActive] = useState("Home");

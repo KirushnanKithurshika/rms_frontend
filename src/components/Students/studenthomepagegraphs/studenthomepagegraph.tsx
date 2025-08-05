@@ -14,7 +14,7 @@ interface MetricProps {
   color?: string;
 }
 
-const MetricCircle: React.FC<MetricProps> = ({ value, maxValue = 100, text, label, color = "#3bb2e3" }) => {
+const MetricCircle: React.FC<MetricProps> = ({ value, maxValue = 100, text, label, color = "#2EA3BD" }) => {
   return (
     <div className="metric-item">
       <CircularProgressbar
