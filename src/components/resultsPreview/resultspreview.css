@@ -35,7 +35,7 @@ h3 {
 
 .tab.active {
   background-color: #dff2ff;
-  border: 2px solid #1e88e5;
+  border: 1px solid #d8d8d8;
   font-weight: 600;
 }
 
@@ -95,9 +95,12 @@ h3 {
 }
 
 .table-wrapper {
+ .table-wrapper {
   overflow-x: auto;
-  display: flex;
-  justify-content: center;
+  display: block; 
+  width: 100%;
+}
+
 }
 
 
@@ -146,6 +149,7 @@ h3 {
   font-size: 14px;
   font-weight: 600;
   color: #40444e;
+  white-space: nowrap;
 }
 
 .custom-select {
@@ -186,8 +190,8 @@ h3 {
 
 .dropdown-divider {
   border: none;
-  border-top: 3px solid #041748;
-  margin: 20px 0;
+  border-top: 1px solid #041748;
+  margin-bottom: 40px;
 }
 
 
@@ -296,6 +300,15 @@ text-align:center;
 
   .report-logo img {
     width: 120px;
+  }
+.select-container {
+    flex-direction: column;
+    align-items: flex-start; /* Left alignment */
+    gap: 6px;
+  }
+
+  .custom-select {
+    width: 100%; /* Full width on small screens */
   }
 
  
