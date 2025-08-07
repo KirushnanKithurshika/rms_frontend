@@ -188,8 +188,8 @@
 
 
  .navbar-logo {
-  height: 60px;
-  width: fit-content;
+ max-height: 50px;
+    max-width: 130px;
  
 }
 }
@@ -210,8 +210,8 @@
     text-align: center;
   }
 .navbar-logo {
-  height: 80px;
-  width: 100%;
+ max-height: 50px;
+    max-width: 130px;
  
 }
   .navbar-center {
@@ -249,8 +249,8 @@
 
 
  .navbar-logo {
-  height: 70px;
-  width: fit-content;
+    max-height: 50px;
+    max-width: 130px;
  
 }
 }
