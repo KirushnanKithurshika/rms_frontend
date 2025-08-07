@@ -130,8 +130,8 @@
 
 
 .navbar-logo {
-    max-height: 50px;
-    max-width: 130px;
+    max-height: 60px;
+    max-width: 200px;
  
 }
 }
@@ -184,7 +184,7 @@
 
 
  .navbar-logo {
- max-height: 50px;
+ max-height: 60px;
     max-width: 130px;
  
 }
@@ -207,7 +207,7 @@
   }
 .navbar-logo {
     max-height: 50px;
-    max-width: 130px;
+    max-width: 200px;
  
 }
   .navbar-center {
