@@ -75,8 +75,9 @@
     font-size: 0.75rem;
   }
 
-   .navbar-logo {
-    max-height: 50px;
-    max-width: 200px;
-  }
+ .navbar-logo {
+  height: 50px;
+  width: auto; 
+  object-fit: contain;
+}
 }
