@@ -5,7 +5,22 @@
   align-items: flex-start; 
   padding-top: 120px; 
 }
+.login-form {
+  display: block;          /* override any global form { display:flex } */
+  width: 100%;
+}
 
+/* Keep labels on their own line */
+.login-box label {
+  display: block;
+  margin: 12px 0 6px;
+}
+
+/* Make inputs full width */
+.login-box .login-input {
+  width: 100%;
+  box-sizing: border-box;
+}
 .login-box {
  height:fit-content;
   margin-top: 40px;

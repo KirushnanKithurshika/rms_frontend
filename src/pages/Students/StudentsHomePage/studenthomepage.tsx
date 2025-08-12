@@ -24,9 +24,9 @@ const StudentDashboard = () => {
         <StudentSubNav/>
 
         <div className="subnav-divider"></div>
-        <div className="dashboard-cards">
+        <div className="dashboard-cards-students">
           
-          <div className="card">
+          <div className="card-students">
              <StudentMetrics/>
           </div>
          
