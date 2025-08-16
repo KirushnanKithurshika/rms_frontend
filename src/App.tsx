@@ -30,7 +30,6 @@ function App() {
           {/* Public */}
           <Route path="/" element={<WelcomePage />} />
           <Route path="/drop" element={<UserDropdown />} />
-
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
