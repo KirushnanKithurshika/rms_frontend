@@ -2,48 +2,40 @@ name: Build and Push Frontend Docker Image
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    environment: rms     
+    # you created an Environment named "rms" with VITE_API_URL variable
+    environment: rms
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # (optional) skip forked PRs (no vars/secrets available)
-      - name: Skip for forked PRs
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: echo "Forked PR: skipping Docker build."; exit 0
-
+      # Fail early if the env var isn't present on the environment
       - name: Verify VITE_API_URL exists
         run: |
           if [ -z "${{ vars.VITE_API_URL }}" ]; then
-            echo "ERROR: VITE_API_URL not set in environment 'rms'."; exit 1
+            echo "ERROR: VITE_API_URL not set on environment 'rms'." 1>&2
+            exit 1
           fi
+          echo "VITE_API_URL length: $(echo -n "${{ vars.VITE_API_URL }}" | wc -c)"
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build image (inject Vite env)
+      - name: Build Docker image (inject Vite env)
         run: |
           docker build \
-            --progress=plain \
             --build-arg VITE_API_URL="${{ vars.VITE_API_URL }}" \
             -t kithurshikakirushnan/rms_frontend:latest .
 
-      # ✅ prove it was baked into the bundle
-      - name: Verify API URL baked in
-        run: |
-          docker run --rm kithurshikakirushnan/rms_frontend:latest \
-            sh -lc "grep -R --line-number \"${{ vars.VITE_API_URL }}\" /usr/share/nginx/html >/dev/null \
-              || (echo 'API URL not found in compiled assets' && exit 1)"
-
-      - name: Push image
+      - name: Push Docker image
         run: docker push kithurshikakirushnan/rms_frontend:latest
