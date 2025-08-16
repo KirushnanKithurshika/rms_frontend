@@ -1,12 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./verification.css";
-import { AuthContext } from "../../context/authContext";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type LocState = { username?: string };
 
+// Map a role string to a home route
 const roleHome = (role?: string) => {
   const r = role?.toUpperCase?.();
   if (r === "ADMIN") return "/admin/dashboard";
@@ -18,45 +18,52 @@ const roleHome = (role?: string) => {
 const TwoStepVerification: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { verifyOtp } = useContext(AuthContext);
 
+  // username comes from previous screen or sessionStorage
   const fromState = (location.state as LocState | undefined)?.username ?? "";
   const [username] = useState<string>(
     fromState || sessionStorage.getItem("pending_username") || ""
   );
 
   const [otp, setOtp] = useState("");
+  const [showOtp, setShowOtp] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // 👇 new state for visibility toggle
-  const [showOtp, setShowOtp] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(value);
   };
 
-  const handleVerify = async () => {
+  // 🔒 Pure-frontend “verify”: just check presence & 6 digits, then navigate.
+  const handleVerify = () => {
     setError(null);
+
     const u = username.trim();
     const code = otp.trim();
-    if (!u) return setError("Missing username. Please log in again.");
-    if (code.length !== 6) return setError("Enter the 6-digit code.");
 
-    try {
-      setSubmitting(true);
-      const user = await verifyOtp(u, code); 
-      navigate(roleHome(user.role), { replace: true });
-    } catch (e: any) {
-      setError(e?.message || "Invalid or expired code. Please try again.");
-    } finally {
-      setSubmitting(false);
+    if (!u) {
+      setError("Missing username. Please log in again.");
+      return;
     }
+    if (code.length !== 6) {
+      setError("Enter the 6-digit code.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    // Choose role to route to (pure UI). If you want to simulate different roles,
+    // put one in sessionStorage.setItem('pending_role', 'STUDENT' | 'ADMIN' | 'LECTURER')
+    const role = sessionStorage.getItem("pending_role") || "STUDENT";
+
+    // Immediate “success” navigation (no API)
+    navigate(roleHome(role), { replace: true });
+    setSubmitting(false);
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === "Enter") handleVerify();
+    if (e.key === "Enter" && !submitting) handleVerify();
   };
 
   return (
@@ -75,7 +82,7 @@ const TwoStepVerification: React.FC = () => {
 
           <div className="otp-wrapper">
             <input
-              type={showOtp ? "text" : "password"} 
+              type={showOtp ? "text" : "password"}
               maxLength={6}
               value={otp}
               onChange={handleChange}
@@ -84,13 +91,16 @@ const TwoStepVerification: React.FC = () => {
               inputMode="numeric"
               autoComplete="one-time-code"
               aria-label="6-digit verification code"
+              disabled={submitting}
             />
 
-           
             <button
               type="button"
               className="eye-button"
-              onClick={() => setShowOtp(!showOtp)}
+              onClick={() => setShowOtp((v) => !v)}
+              disabled={submitting}
+              aria-label={showOtp ? "Hide code" : "Show code"}
+              title={showOtp ? "Hide code" : "Show code"}
             >
               {showOtp ? <FaEyeSlash /> : <FaEye />}
             </button>

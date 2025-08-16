@@ -2,67 +2,22 @@ name: Build and Push Frontend Docker Image
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout source code
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      # Skip forked PRs (GitHub doesn't expose secrets to them)
-      - name: Skip for forked PRs
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: echo "Forked PR – skipping build because secrets are not available." && exit 0
-
-      # Pre-flight checks so we fail with a useful message
-      - name: Pre-flight checks
-        run: |
-          set -eux
-          echo "Node / npm versions:"
-          node -v || true
-          npm -v || true
-          echo "Files present:"
-          ls -al
-          test -f Dockerfile
-          # If you COPY nginx.conf in the Dockerfile, make sure it exists:
-          test -f nginx.conf || echo "NOTE: nginx.conf not found in repo (ok if you don't COPY it)."
-
-      # Make sure the secret exists (we don't print it)
-      - name: Verify VITE_API_URL secret exists
-        run: |
-          if [ -z "${{ secrets.VITE_API_URL }}" ]; then
-            echo "ERROR: Secret VITE_API_URL is not set (Settings → Secrets and variables → Actions)." 1>&2
-            exit 1
-          fi
-          # Show masked length so we know something is there
-          echo "VITE_API_URL (masked) length: $(echo -n '${{ secrets.VITE_API_URL }}' | wc -c)"
-
+      # 2. Log in to Docker Hub
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build Docker image (inject Vite env) with verbose logs
-        run: |
-          set -euxo pipefail
-          docker build \
-            --progress=plain \
-            --build-arg VITE_API_URL="${{ secrets.VITE_API_URL }}" \
-            -t kithurshikakirushnan/rms_frontend:latest .
-
-      # Optional: verify the API URL was baked into the compiled assets
-      - name: Verify API URL baked in
-        run: |
-          set -e
-          docker run --rm kithurshikakirushnan/rms_frontend:latest \
-            sh -lc "grep -R --line-number '${{ secrets.VITE_API_URL }}' /usr/share/nginx/html >/dev/null || (echo 'API URL not found in compiled assets' && exit 1)"
-          echo "OK: API URL found in built assets."
-
-      - name: Push Docker image
-        run: docker push kithurshikakirushnan/rms_frontend:latest

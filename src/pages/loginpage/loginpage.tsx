@@ -1,50 +1,38 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-
-import Navbar from '../../components/Navbar/navbar';
-import './loginpage.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { AuthContext } from '../../context/authContext';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../../components/Navbar/navbar";
+import "./loginpage.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPage: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  
-  useEffect(() => {
-    setSubmitting(false);
-  }, []);
+  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  useEffect(() => setSubmitting(false), []);
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    if (submitting) return; 
+    if (submitting) return;
+
     setError(null);
     setSubmitting(true);
 
-    try {
-      const u = username.trim();
-      const p = password; 
-      await login(u, p);
-      sessionStorage.setItem('pending_username', u);
-      navigate('/verification', { state: { username: u } });
-      
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.error ||
-        err?.response?.data?.message ||
-        err?.message ||
-        'Login failed. Please check your credentials.';
-      setError(msg);
-    } finally {
-     
+    // Simple front-end validation only
+    const u = username.trim();
+    if (!u || !password) {
+      setError("Please enter username and password.");
       setSubmitting(false);
+      return;
     }
+
+    // No API: just persist username and move to verification
+    sessionStorage.setItem("pending_username", u);
+    navigate("/verification", { state: { username: u }, replace: true });
   };
 
   return (
@@ -60,8 +48,8 @@ const LoginPage: React.FC = () => {
           <form className="login-form" onSubmit={handleSubmit} autoComplete="on" noValidate>
             <label htmlFor="username">User Name</label>
             <input
-              type="text"
               id="username"
+              type="text"
               className="login-input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -75,8 +63,8 @@ const LoginPage: React.FC = () => {
             <label htmlFor="password">Password</label>
             <div className="password-wrapper">
               <input
-                type={showPassword ? 'text' : 'password'}
                 id="password"
+                type={showPassword ? "text" : "password"}
                 className="login-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -86,11 +74,11 @@ const LoginPage: React.FC = () => {
               />
               <span
                 className="toggle-icon"
-                onClick={() => { if (!submitting) setShowPassword((prev) => !prev); }}
                 role="button"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 tabIndex={0}
-                style={submitting ? { pointerEvents: 'none', opacity: 0.6 } : undefined}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() => !submitting && setShowPassword((v) => !v)}
+                style={submitting ? { pointerEvents: "none", opacity: 0.6 } : undefined}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
@@ -102,9 +90,9 @@ const LoginPage: React.FC = () => {
               <button
                 className="login-button"
                 type="submit"
-                disabled={submitting }
+                disabled={submitting || !username.trim() || !password}
               >
-                {submitting ? 'Logging in…' : 'Log in'}
+                {submitting ? "Processing…" : "Log in"}
               </button>
             </div>
           </form>
