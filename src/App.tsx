@@ -31,43 +31,42 @@ function App() {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/drop" element={<UserDropdown />} />
 
-          {/* Public-only */}
-          <Route element={<PublicOnly />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
-          </Route>
-
-          {/* OTP step only when pending username exists */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
+          <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/verification" element={<TwoStepVerification />} />
+          <Route path="/account-setting" element={<AccountSettings />} />
+          <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/createcourseui" element={<CreateCourseUI />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/results-preview" element={<ResultsPreviewPage />} />
+          <Route path="/results-analysis" element={<AnalizePage />} />
+          <Route path="/createcourse" element={<CreateCourseForm />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/user-management" element={<UserManagement />} />
+          <Route path="/admin/role-management" element={<RoleManagement />} />
+          <Route path="/admin/student-management" element={<StudentManagement />} />
           <Route element={<RequirePendingOtp />}>
-            <Route path="/verification" element={<TwoStepVerification />} />
+
           </Route>
 
-          {/* Authenticated area */}
           <Route element={<RequireAuth />}>
-            <Route path="/account-setting" element={<AccountSettings />} />
+
 
             {/* Lecturer */}
             <Route element={<RequireRole roles={["LECTURER"]} />}>
-              <Route path="/lecturerhome" element={<LecturerDashboard />} />
-              <Route path="/createcourseui" element={<CreateCourseUI />} />
-              <Route path="/courses" element={<Courses />} />
-              <Route path="/results-preview" element={<ResultsPreviewPage />} />
-              <Route path="/results-analysis" element={<AnalizePage />} />
-              <Route path="/createcourse" element={<CreateCourseForm />} />
+
             </Route>
 
             {/* Admin */}
             <Route element={<RequireRole roles={["ADMIN"]} />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/user-management" element={<UserManagement />} />
-              <Route path="/admin/role-management" element={<RoleManagement />} />
-              <Route path="/admin/student-management" element={<StudentManagement />} />
+
             </Route>
 
             {/* Student */}
             <Route element={<RequireRole roles={["STUDENT"]} />}>
-              <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+
             </Route>
           </Route>
 

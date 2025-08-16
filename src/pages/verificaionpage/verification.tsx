@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./verification.css";
 import { AuthContext } from "../../context/authContext";
+import { FaEye, FaEyeSlash } from "react-icons/fa";  // 👈 add icons
 
 type LocState = { username?: string };
 
@@ -28,6 +29,9 @@ const TwoStepVerification: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 👇 new state for visibility toggle
+  const [showOtp, setShowOtp] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(value);
@@ -42,7 +46,7 @@ const TwoStepVerification: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const user = await verifyOtp(u, code); // builds user from JWT roles
+      const user = await verifyOtp(u, code); 
       navigate(roleHome(user.role), { replace: true });
     } catch (e: any) {
       setError(e?.message || "Invalid or expired code. Please try again.");
@@ -69,17 +73,28 @@ const TwoStepVerification: React.FC = () => {
             registered email or mobile number.
           </p>
 
-          <input
-            type="text"
-            maxLength={6}
-            value={otp}
-            onChange={handleChange}
-            onKeyDown={onKeyDown}
-            className="otp-input"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            aria-label="6-digit verification code"
-          />
+          <div className="otp-wrapper">
+            <input
+              type={showOtp ? "text" : "password"} // 👈 toggle between text/password
+              maxLength={6}
+              value={otp}
+              onChange={handleChange}
+              onKeyDown={onKeyDown}
+              className="otp-input"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              aria-label="6-digit verification code"
+            />
+
+            {/* 👇 eye toggle button */}
+            <button
+              type="button"
+              className="eye-button"
+              onClick={() => setShowOtp(!showOtp)}
+            >
+              {showOtp ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
 
           {error && <div className="error-text">{error}</div>}
 
