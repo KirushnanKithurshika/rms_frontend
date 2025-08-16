@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./verification.css";
 import { AuthContext } from "../../context/authContext";
-import { FaEye, FaEyeSlash } from "react-icons/fa";  // 👈 add icons
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
 type LocState = { username?: string };
 
@@ -75,7 +75,7 @@ const TwoStepVerification: React.FC = () => {
 
           <div className="otp-wrapper">
             <input
-              type={showOtp ? "text" : "password"} // 👈 toggle between text/password
+              type={showOtp ? "text" : "password"} 
               maxLength={6}
               value={otp}
               onChange={handleChange}
@@ -86,7 +86,7 @@ const TwoStepVerification: React.FC = () => {
               aria-label="6-digit verification code"
             />
 
-            {/* 👇 eye toggle button */}
+           
             <button
               type="button"
               className="eye-button"

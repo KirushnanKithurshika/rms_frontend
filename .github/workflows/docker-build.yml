@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: rms   
 
     steps:
       - name: Checkout code
@@ -23,7 +24,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
+            --build-arg VITE_API_URL=${{ vars.VITE_API_URL }} \  # 👈 use env variable
             -t kithurshikakirushnan/rms_frontend:latest .
 
       - name: Push Docker image
