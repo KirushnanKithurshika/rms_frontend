@@ -4,6 +4,10 @@ import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import StudentSubNav from '../../../components/Students/StudentsubNav/Studentsubnav.tsx';
 import './studenthomepage.css';
 import StudentMetrics from '../../../components/Students/studenthomepagegraphs/studenthomepagegraph.tsx';
+import ResultSheet from '../Studentsresultsheet/StudentResultsSheet.tsx';
+import StudentResultsSheet from '../Studentsresultsheet/StudentResultsSheet.tsx';
+
+
 const StudentDashboard = () => {
 
 
@@ -24,10 +28,13 @@ const StudentDashboard = () => {
         <StudentSubNav/>
 
         <div className="subnav-divider"></div>
-        <div className="dashboard-cards">
+        <div className="dashboard-cards-students">
           
-          <div className="card">
+          <div className="card-students">
              <StudentMetrics/>
+          </div>
+          <div>
+        <StudentResultsSheet/>
           </div>
          
           </div>
