@@ -6,7 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type LocState = { username?: string };
 
-// Map a role string to a home route
+
 const roleHome = (role?: string) => {
   const r = role?.toUpperCase?.();
   if (r === "ADMIN") return "/admin/dashboard";
@@ -19,7 +19,7 @@ const TwoStepVerification: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // username comes from previous screen or sessionStorage
+  
   const fromState = (location.state as LocState | undefined)?.username ?? "";
   const [username] = useState<string>(
     fromState || sessionStorage.getItem("pending_username") || ""

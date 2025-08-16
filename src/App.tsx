@@ -20,7 +20,7 @@ import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
 import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
 
-import { RequireAuth, RequireRole, RequirePendingOtp, PublicOnly } from "./routes/guards";
+
 
 function App() {
   return (
@@ -46,31 +46,19 @@ function App() {
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
-          <Route element={<RequirePendingOtp />}>
+       
 
-          </Route>
+  
 
-          <Route element={<RequireAuth />}>
+  
 
 
             {/* Lecturer */}
-            <Route element={<RequireRole roles={["LECTURER"]} />}>
-
-            </Route>
+          
+           
 
             {/* Admin */}
-            <Route element={<RequireRole roles={["ADMIN"]} />}>
-
-            </Route>
-
-            {/* Student */}
-            <Route element={<RequireRole roles={["STUDENT"]} />}>
-
-            </Route>
-          </Route>
-
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+           
         </Routes>
       </div>
     </Router>

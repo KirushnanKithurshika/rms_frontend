@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./adduserform.css";
 import { FaArrowLeft, FaChevronDown, FaUpload, FaCheckCircle } from "react-icons/fa";
 
-import { api } from "../../../context/authContext"; 
-
 interface AddUserFormProps {
   onClose: () => void;
   onCreate?: (user: {
@@ -17,82 +15,43 @@ interface AddUserFormProps {
 
 interface Role {
   id: number;
-  label: string; 
+  label: string;
 }
 
-type CreateUserPayload = {
-  username: string;
-  password: string;
-  roleIds: number[];
-};
-
-
 const FALLBACK_ROLES: Role[] = [
-  { id: 1,  label: "ADMIN" },
-  { id: 2,  label: "LECTURER" },
-  { id: 3,  label: "HOD" },               
-  { id: 4,  label: "DEAN" },
-  { id: 5,  label: "EXAM_CONTROLLER" },
-  { id: 6,  label: "EXAM_OFFICER" },
-  { id: 7,  label: "QA_OFFICER" },         
-  { id: 8,  label: "AR_OFFICER" },         
-  { id: 9,  label: "REGISTRAR" },
+  { id: 1, label: "ADMIN" },
+  { id: 2, label: "LECTURER" },
+  { id: 3, label: "HOD" },
+  { id: 4, label: "DEAN" },
+  { id: 5, label: "EXAM_CONTROLLER" },
+  { id: 6, label: "EXAM_OFFICER" },
+  { id: 7, label: "QA_OFFICER" },
+  { id: 8, label: "AR_OFFICER" },
+  { id: 9, label: "REGISTRAR" },
   { id: 10, label: "LIBRARIAN" },
   { id: 11, label: "SYSTEM_ADMIN" },
   { id: 12, label: "PROGRAM_COORDINATOR" },
 ];
 
 const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
-  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+  const [roles, setRoles] = useState<Role[]>(FALLBACK_ROLES);
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(FALLBACK_ROLES[0].id);
   const [rolesOpen, setRolesOpen] = useState(false);
-  const [rolesLoading, setRolesLoading] = useState(true);
-
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
 
-  
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploaded, setIsUploaded] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
 
- 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-      
-        const res = await api.get<Role[]>("/roles");
-        let list = (res.data || []).filter(r => r.label.toUpperCase() !== "STUDENT");
-        if (!mounted) return;
-        if (list.length === 0) {
-          setRoles(FALLBACK_ROLES);
-          setSelectedRoleId(FALLBACK_ROLES[0].id);
-        } else {
-          setRoles(list);
-          setSelectedRoleId(list[0].id);
-        }
-      } catch {
-        if (!mounted) return;
-        setRoles(FALLBACK_ROLES);
-        setSelectedRoleId(FALLBACK_ROLES[0].id);
-      } finally {
-        if (mounted) setRolesLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
   const selectedRoleLabel =
-    roles.find(r => r.id === selectedRoleId)?.label ?? "Select a role";
+    roles.find((r) => r.id === selectedRoleId)?.label ?? "Select a role";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -100,8 +59,9 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
       setFile(f);
       setIsUploaded(false);
       setUploadProgress(0);
+
       const interval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
             setIsUploaded(true);
@@ -113,32 +73,18 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!username || !password) {
-      alert("Please enter username and password.");
-      return;
-    }
-    if (!selectedRoleId) {
-      alert("Please select a role.");
+  const handleSubmit = () => {
+    if (!username || !password || !selectedRoleId) {
+      alert("Please fill required fields");
       return;
     }
 
-    const payload: CreateUserPayload = {
-      username,
-      password,
-      roleIds: [selectedRoleId],
-    };
+    setSubmitting(true);
 
-    try {
-      setSubmitting(true);
-
-    
-   
-      await api.post("api/auth/register", payload);
-
+    // just simulate success
+    setTimeout(() => {
       onCreate?.({ username, password, roleId: selectedRoleId, fullName, email });
 
-    
       setUsername("");
       setPassword("");
       setFullName("");
@@ -147,13 +93,9 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
       setUploadProgress(0);
       setIsUploaded(false);
 
-      onClose();
-    } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Failed to create user");
-    } finally {
       setSubmitting(false);
-    }
+      onClose();
+    }, 1000);
   };
 
   return (
@@ -166,7 +108,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           <span className="add-user-title">Add Staff User</span>
         </div>
 
-       
+        {/* File Upload */}
         <div className="add-user-file-section">
           <label className="add-user-label">Select File (Excel File)</label>
           <div className="add-user-file-container">
@@ -187,7 +129,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
             <div className="file-progress-container">
               <span className="file-name">{file.name}</span>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
+                <div
+                  className="progress-fill"
+                  style={{ width: `${uploadProgress}%` }}
+                />
               </div>
               <span className="progress-text">{uploadProgress}%</span>
               {isUploaded && <FaCheckCircle className="success-icon" />}
@@ -195,8 +140,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           )}
         </div>
 
-    
-        <div className="add-user-divider" onClick={() => {}}>
+        {/* Manual Form */}
+        <div className="add-user-divider">
           <span className="add-user-divider-title">Add manually</span>
           <FaChevronDown className="add-user-divider-arrow open" />
         </div>
@@ -222,20 +167,18 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
             />
           </div>
 
-       
+          {/* Role Dropdown */}
           <div className="add-user-form-group role-selector">
             <label className="add-user-label">Role</label>
             <div
-              className={`custom-role-dropdown ${rolesLoading ? "disabled" : ""}`}
-              onClick={() => !rolesLoading && setRolesOpen((prev) => !prev)}
+              className="custom-role-dropdown"
+              onClick={() => setRolesOpen((prev) => !prev)}
             >
-              <span className="selected-role">
-                {rolesLoading ? "Loading roles..." : selectedRoleLabel}
-              </span>
+              <span className="selected-role">{selectedRoleLabel}</span>
               <FaChevronDown className={`dropdown-icon ${rolesOpen ? "open" : ""}`} />
             </div>
 
-            {rolesOpen && !rolesLoading && (
+            {rolesOpen && (
               <div className="custom-role-options">
                 {roles.map((r) => (
                   <div
@@ -253,9 +196,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
             )}
           </div>
 
-         
           <div className="add-user-form-group">
-            <label className="add-user-label">Email (optional now)</label>
+            <label className="add-user-label">Email (optional)</label>
             <input
               type="email"
               className="add-user-input"
@@ -265,7 +207,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           </div>
 
           <div className="add-user-form-group add-user-full-width">
-            <label className="add-user-label">Full Name (optional now)</label>
+            <label className="add-user-label">Full Name (optional)</label>
             <input
               type="text"
               className="add-user-input"
@@ -275,12 +217,13 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           </div>
         </div>
 
+        {/* Actions */}
         <div className="add-user-form-actions">
           <button
             type="button"
             className="add-user-create-btn"
             onClick={handleSubmit}
-            disabled={submitting || rolesLoading || !selectedRoleId}
+            disabled={submitting || !selectedRoleId}
           >
             {submitting ? "Creating..." : "Create"}
           </button>
