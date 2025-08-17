@@ -19,6 +19,7 @@ import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
 import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
 import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
+import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
 
 
 
@@ -46,7 +47,7 @@ function App() {
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
-       
+       <Route path="/StudentResultsSheet" element={<StudentResultsSheet/>}/>
 
   
 
