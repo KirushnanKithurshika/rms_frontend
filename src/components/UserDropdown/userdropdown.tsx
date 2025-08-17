@@ -1,34 +1,40 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 import "./userdropdown.css";
 
 const UserDropdown: React.FC = () => {
-  const go = (path: string) => () => {
-    console.log("Navigate to:", path);
-    // replace with navigate(path) if you wire up routing
-  };
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    console.log("Logout clicked");
-    // replace with actual logout + navigation
+    // TODO: clear your auth (token, context, etc.)
+    // localStorage.removeItem("token");  // example
+    // await api.post('/auth/logout')     // if you have an API
+
+    navigate("/login", { replace: true });
   };
 
   return (
-    <div className="dropdown-menuuser">
-      <div className="dropdown-itemuser" onClick={go("/account-setting")}>
+    <div className="dropdown-menuuser" role="menu" aria-label="User menu">
+      <Link to="/account-setting" className="dropdown-itemuser" role="menuitem">
         <FaUser className="dropdown-iconuser" />
         <span>My Account</span>
-      </div>
+      </Link>
 
-      <div className="dropdown-itemuser" onClick={go("/preferences")}>
+      <Link to="/preferences" className="dropdown-itemuser" role="menuitem">
         <FaCog className="dropdown-iconuser" />
         <span>Preferences</span>
-      </div>
+      </Link>
 
-      <div className="dropdown-itemuser" onClick={handleLogout}>
+      <button
+        type="button"
+        className="dropdown-itemuser"
+        onClick={handleLogout}
+        role="menuitem"
+      >
         <FaSignOutAlt className="dropdown-iconuser" />
         <span>Logout</span>
-      </div>
+      </button>
     </div>
   );
 };

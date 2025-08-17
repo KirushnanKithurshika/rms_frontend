@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import StudentSubNav from '../../../components/Students/StudentsubNav/Studentsubnav.tsx';
-import './studenthomepage.css';
+import './studentscoursesinterface.css';
 import StudentMetrics from '../../../components/Students/studenthomepagegraphs/studenthomepagegraph.tsx';
 import ResultsTabsButtomSection from '../../../components/Students/StudentHomePageButtonSection/studenthomebuttonsection.tsx';
+import SemesterCourses from '../../../components/Students/StudentCourseInterface/studentcourses.tsx';
 
 
-const StudentDashboard = () => {
+const StudentCoursesPage = () => {
 
 
   return (
@@ -28,10 +29,9 @@ const StudentDashboard = () => {
         <div className="subnav-divider"></div>
         <div className="dashboard-cards-students">
           
-          <div className="card-students">
-             <StudentMetrics/>
-          </div>
-<div className='SHP'><ResultsTabsButtomSection/></div>
+         <SemesterCourses/>
+
+
           <div>
         
           </div>
@@ -43,4 +43,4 @@ const StudentDashboard = () => {
   );
 };
 
-export default StudentDashboard;
+export default StudentCoursesPage;
