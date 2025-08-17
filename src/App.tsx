@@ -20,6 +20,8 @@ import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
 import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
 import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
+import StudentCourses from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
 
 
 
@@ -47,19 +49,19 @@ function App() {
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
-       <Route path="/StudentResultsSheet" element={<StudentResultsSheet/>}/>
-
-  
-
-  
+          <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
+          <Route path="/student-courses" element={<StudentCoursesPage/>} />
 
 
-            {/* Lecturer */}
-          
-           
 
-            {/* Admin */}
-           
+
+
+          {/* Lecturer */}
+
+
+
+          {/* Admin */}
+
         </Routes>
       </div>
     </Router>

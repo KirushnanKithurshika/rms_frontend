@@ -1,51 +1,47 @@
 import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import "./Studentsubnav.css";
 
+const links = [
+  { label: "Home",                 to: "/student/student-dashboard" },
+  { label: "Courses",              to: "/student-courses" }, // if your route is /student/courses, change it here
+  { label: "Academic Summary",     to: "/student/academic-summary" },
+  { label: "Transcript",           to: "/student/transcript" },
+  { label: "Student Verification", to: "/student/verification" },
+];
+
 const StudentSubNav: React.FC = () => {
-  const [active, setActive] = useState("Home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const tabs = [
-    "Home",
-    "Courses",
-    "Academic Summary",
-    "Transcript",
-    "Student Verification",
-  ];
-
   return (
-    <div className="rounded-nav-container">
-
-      <div className="hamburger" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+    <nav className="rounded-nav-container" aria-label="Student secondary navigation">
+      <button
+        className="hamburger"
+        type="button"
+        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isMenuOpen}
+        aria-controls="student-subnav"
+        onClick={() => setIsMenuOpen(s => !s)}
+      >
         {isMenuOpen ? <FaTimes /> : <FaBars />}
-      </div>
+      </button>
 
-      <ul className={`rounded-nav ${isMenuOpen ? "open" : ""}`}>
-        {tabs.map((tab) => (
-          <li
-            key={tab}
-            className={active === tab ? "nav-item active" : "nav-item"}
-            onClick={() => {
-              setActive(tab);
-              setIsMenuOpen(false); 
-            }}
-          >
-            {tab}
+      <ul id="student-subnav" className={`rounded-nav ${isMenuOpen ? "open" : ""}`}>
+        {links.map(({ label, to }) => (
+          <li key={to}>
+            <NavLink
+              to={to}
+              end                 /* <- exact match so ONLY one is active */
+              className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {label}
+            </NavLink>
           </li>
         ))}
       </ul>
-
-
-
-
-
-
-
-
-
-      <div></div>
-    </div>
+    </nav>
   );
 };
 
