@@ -18,7 +18,7 @@ const ResultsTabsButtomSection: React.FC = () => {
 
       {/* Tabs + Search */}
       <div className="results-toolbar">
-        <div className="tabs">
+        <div className="tabs-SH">
           <button
             className={`tab ${active === "CA" ? "active" : ""}`}
             onClick={() => setActive("CA")}
