@@ -1,0 +1,139 @@
+/* container */
+.results-wrap {
+ height:100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* title */
+.results-title {
+  margin: 0 0 12px 0;
+  color: #123a64;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* toolbar: tabs left, search right */
+.results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 14px;
+  flex-wrap: wrap;             /* allow stacking on small screens */
+}
+
+/* ---- TABS ---- */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* two equal halves */
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #d9dadd;         /* inactive bar color */
+  flex: 1 1 520px;             /* grow to take the left space */
+  max-width: 300px;            /* don’t get too tiny next to search */
+}
+
+.tab {
+  appearance: none;
+  border: 0;
+  background: #d9dadd;         /* matches bar color for inactive */
+  color: #20354a;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 12px;
+  line-height: 40px;           /* vertically center text */
+  text-align: center;
+  white-space: nowrap;
+  transition: opacity .15s ease;
+}
+.tab:not(.active):hover { opacity: .9; }
+.tab:focus-visible { outline: 2px solid #0ea5b5; outline-offset: 2px; }
+.tab.active { background: #24a7b7; color: #fff; } /* teal active like screenshot */
+
+/* ---- SEARCH (icon inside input) ---- */
+.search {
+  position: relative;         
+  height: 40px;
+  flex: 0 0 260px;             /* fixed-ish width on desktop */
+  min-width: 220px;
+  max-width: 340px;
+  border: 1px solid #cfd3da;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.search-input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: none;
+  font-size: 14px;
+  padding: 0 44px 0 12px;      /* room for the icon on the right */
+  min-width: 0;
+}
+
+.search-icon-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.search-icon { font-size: 16px; color: #20354a; opacity: .85; }
+
+/* ---- SEMESTER BAND ---- */
+.semester-band {
+  margin-top: 12px;
+  background: #082a54;         /* deep navy */
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 2px;
+}
+.results-sheet-host {
+  width: 100%;
+  display: flex;
+  justify-content: center;   /* ⬅ horizontal centering */
+  align-items: flex-start;    /* keep content at top */
+  margin-top: 16px;           /* space above the sheet */
+}
+
+/* optional: on very small screens, give a little side padding */
+@media (max-width: 600px) {
+  .results-sheet-host {
+    padding: 0 8px;
+  }
+}
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .results-toolbar { gap: 12px; }
+
+  /* stack and make both full-width */
+  .tabs {
+    flex-basis: 100%;
+    min-width: 0;
+    order: 1;
+  }
+  .search {
+    flex-basis: 100%;
+    min-width: 0;
+    order: 2;
+  }
+}
+
+@media (max-width: 420px) {
+  .tab { font-size: 13px; }
+  .search { height: 38px; }
+  .search-icon { font-size: 15px; }
+}
