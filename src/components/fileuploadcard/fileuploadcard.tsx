@@ -1,41 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { FaCheckCircle, FaFileCsv } from 'react-icons/fa';
-import './fileuploadcard.css';
-
+import React, { useEffect, useState } from "react";
+import { FaCheckCircle, FaFileCsv } from "react-icons/fa";
+import "./fileuploadcard.css";
 
 interface FileUploadProps {
   fileName: string;
+  /** optional: ms between increments */
+  tickMs?: number;
+  /** optional: percent to add each tick */
+  stepPct?: number;
+  /** optional: callback when progress hits 100% */
+  onComplete?: () => void;
 }
 
-const FileUploadCard: React.FC<FileUploadProps> = ({ fileName }) => {
+const FileUploadCard: React.FC<FileUploadProps> = ({
+  fileName,
+  tickMs = 300,
+  stepPct = 5,
+  onComplete,
+}) => {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const id = window.setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
+        const next = Math.min(100, prev + stepPct);
+        if (next === 100) {
+          window.clearInterval(id);
           setIsComplete(true);
-          return 100;
+          onComplete?.();
         }
-        return prev + 5;
+        return next;
       });
-    }, 300);
-    return () => clearInterval(interval);
-  }, []);
+    }, tickMs);
+
+    return () => window.clearInterval(id);
+  }, [tickMs, stepPct, onComplete]);
 
   return (
     <div className="upload-section-down">
       <FaFileCsv className="file-icon" size={60} />
+
       <div className="upload-details">
-        <div className="file-name">{fileName}</div>
-        <div className="progress-bar-container">
-          <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+        <div className="file-name" title={fileName}>
+          {fileName}
         </div>
+
+        <div
+          className="progress-bar-container"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progress}
+          aria-label="File upload progress"
+        >
+          {/* Use a UNIQUE class to avoid clashes with Bootstrap's .progress-bar */}
+          <div
+            className="upload-progress-bar"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
         <div className="progress-footer">
           {!isComplete ? (
-            <span className="uploading">Uploading.........</span>
+            <span className="uploading">Uploading…</span>
           ) : (
             <span className="upload-complete">Uploaded</span>
           )}
