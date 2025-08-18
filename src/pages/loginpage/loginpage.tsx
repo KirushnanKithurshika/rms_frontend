@@ -85,16 +85,21 @@ const LoginPage: React.FC = () => {
             </div>
 
             {error && <div className="error-text">{error}</div>}
-
             <div className="button-wrapper">
               <button
                 className="login-button"
-                type="submit"
-                disabled={submitting || !username.trim() || !password}
+                type="button"
+                onClick={() => {
+                 
+                 
+                  navigate("/verification");
+                }}
+                disabled={submitting}
               >
                 {submitting ? "Processing…" : "Log in"}
               </button>
             </div>
+
           </form>
 
           <div>
