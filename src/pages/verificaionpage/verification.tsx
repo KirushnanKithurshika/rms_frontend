@@ -74,10 +74,10 @@ const TwoStepVerification: React.FC = () => {
 
       <div className="verification-container">
         <div className="verification-box">
-          <span className="verificationH">Two Step Verification</span>
+          <span className="verificationH">Verification</span>
           <p>
             For added security, enter the verification code sent to your
-            registered email or mobile number.
+            registered email.
           </p>
 
           <div className="otp-wrapper">
