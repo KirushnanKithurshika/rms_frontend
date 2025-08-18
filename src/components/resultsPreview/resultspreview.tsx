@@ -20,31 +20,34 @@ const ResultsPreview: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'CA' | 'FE'>('CA');
   const [selectedCourse, setSelectedCourse] = useState(courses[0]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const course = courses.find(c => c.code === e.target.value);
-    if (course) {
-      setSelectedCourse(course);
-    }
+    const course = courses.find((c) => c.code === e.target.value);
+    if (course) setSelectedCourse(course);
   };
 
   return (
     <div className="results-preview-container">
       <div className="course-select-header">
         <h3>Results Preview</h3>
+
         <div className="select-container">
           <label className="select-label">Select Course:</label>
-          <select className="custom-select">
-            <option value="EC7201">EC7201 - Information Security</option>
-            <option value="EC7202">EC7202 - Cryptography</option>
-
+          <select
+            className="custom-select"
+            value={selectedCourse.code}
+            onChange={handleCourseChange}
+          >
+            {courses.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.code} - {c.name}
+              </option>
+            ))}
           </select>
         </div>
-        <hr className="dropdown-divider" />
 
+        <hr className="dropdown-divider" />
       </div>
 
       <div className="tabs">
@@ -101,7 +104,7 @@ const ResultsPreview: React.FC = () => {
               </thead>
               <tbody>
                 {dummyData.map((student, idx) => (
-                  <tr key={idx}>
+                  <tr key={student.id}>
                     <td>{idx + 1}</td>
                     <td>{student.id}</td>
                     <td>{student.name}</td>
@@ -109,6 +112,58 @@ const ResultsPreview: React.FC = () => {
                     <td>{student.quiz1}</td>
                     <td>{student.quiz2}</td>
                     <td>{student.total}</td>
+                    <td>{student.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <footer className="print-footer">
+            Printed on: {new Date().toLocaleDateString()}
+          </footer>
+        </div>
+      )}
+
+      {activeTab === 'FE' && (
+        <div className="report-card">
+          <div className="report-header">
+            <div className="report-section">
+              <h4>{selectedCourse.name}</h4>
+              <p>Final Exam (Total 60%)</p>
+            </div>
+            <div className="report-logo">
+              <img src={Logo} alt="Logo" />
+            </div>
+            <div className="report-section previewh-text">
+              <p>
+                2024<br />
+                22nd Batch<br />
+                Department: Computer Engineering<br />
+                Module Code: {selectedCourse.code}
+              </p>
+            </div>
+          </div>
+
+          <div className="table-wrapper">
+            <table className="results-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Final Exam (60)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dummyData.map((student, idx) => (
+                  <tr key={student.id}>
+                    <td>{idx + 1}</td>
+                    <td>{student.id}</td>
+                    <td>{student.name}</td>
+                    {/* placeholder FE mark derived from total just for preview */}
+                    <td>{Math.max(0, Number(student.total) - 40)}</td>
                     <td>{student.status}</td>
                   </tr>
                 ))}
