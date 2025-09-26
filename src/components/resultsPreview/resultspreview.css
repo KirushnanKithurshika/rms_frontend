@@ -1,10 +1,9 @@
-
 .rp-container {
   padding: 20px;
   font-family: 'Segoe UI', sans-serif;
   background-color: #fff;
   color: #0a2558;
- 
+
   margin: 0 auto;
 }
 
@@ -16,7 +15,10 @@
   text-align: left;
 }
 
-.rp-header { display: block; }
+.rp-header {
+  display: block;
+}
+
 .rp-divider {
   border: none;
   border-top: 1px solid #041748;
@@ -39,7 +41,7 @@
 
 .rp-select {
   appearance: none;
-  width:400px;
+  width: 400px;
   padding: 10px 36px 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -82,7 +84,7 @@
 
 .rp-tab:hover {
   border-color: #bcbcbc;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 
 .rp-tab.is-active {
@@ -91,11 +93,15 @@
   font-weight: 600;
 }
 
-.rp-print-btn { margin-left: auto; }
+.rp-print-btn {
+  margin-left: auto;
+  background-color: #0a2558;
+  color: #fff;
+}
 
 /* ======= Card ======= */
 .rp-card {
-     max-width: 794px;  
+  max-width: 794px;
   border: 1px solid #d6d6d6;
   padding: 16px;
   border-radius: 10px;
@@ -104,7 +110,7 @@
 }
 
 .rp-card-header {
-  
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -112,7 +118,10 @@
   margin-bottom: 18px;
 }
 
-.rp-card-header > div { flex: 1; min-width: 0; }
+.rp-card-header>div {
+  flex: 1;
+  min-width: 0;
+}
 
 .rp-section h4 {
   text-align: left;
@@ -121,6 +130,7 @@
   color: #0a2558;
   font-weight: 700;
 }
+
 .rp-section p {
   text-align: left;
   margin: 0 0 6px;
@@ -128,12 +138,16 @@
   color: #0a2558;
   font-weight: 600;
 }
+
 .rp-section.rp-right p {
   text-align: right;
   font-weight: 700;
 }
 
-.rp-logo { text-align: center; }
+.rp-logo {
+  text-align: center;
+}
+
 .rp-logo img {
   width: 160px;
   height: auto;
@@ -192,12 +206,26 @@
 
 @media screen and (max-width: 768px) {
 
-  
-  .rp-container { padding: 12px; }
-  .rp-title { font-size: 16px; margin-top: 0; }
 
-  .rp-tabs { flex-direction: column; gap: 8px; }
-  .rp-tab { width: 100%; text-align: center; padding: 10px; }
+  .rp-container {
+    padding: 12px;
+  }
+
+  .rp-title {
+    font-size: 16px;
+    margin-top: 0;
+  }
+
+  .rp-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rp-tab {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
 
   .rp-card-header {
     flex-direction: column;
@@ -205,13 +233,28 @@
     align-items: stretch;
   }
 
-  .rp-section h4 { text-align: center; font-size: 15px; }
-  .rp-section p { text-align: center; font-size: 12px; }
-  .rp-section.rp-right p { text-align: center; }
+  .rp-section h4 {
+    text-align: center;
+    font-size: 15px;
+  }
 
-  .rp-logo img { width: 120px; }
+  .rp-section p {
+    text-align: center;
+    font-size: 12px;
+  }
 
-  .rp-table { font-size: 12px; min-width: 600px; }
+  .rp-section.rp-right p {
+    text-align: center;
+  }
+
+  .rp-logo img {
+    width: 120px;
+  }
+
+  .rp-table {
+    font-size: 12px;
+    min-width: 600px;
+  }
 
   .rp-select-row {
     flex-direction: column;
@@ -219,13 +262,16 @@
     gap: 6px;
   }
 
-  .rp-select { width: 100%; }
+  .rp-select {
+    width: 100%;
+  }
 }
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 0; /* full use of sheet */
+    margin: 0;
+    /* full use of sheet */
   }
 
   body {
@@ -247,10 +293,13 @@
   /* Card should take full A4 width */
   .rp-card {
     display: block !important;
-    width: 210mm !important;    /* full A4 width */
-    height: auto !important;    /* grow with content */
+    width: 210mm !important;
+    /* full A4 width */
+    height: auto !important;
+    /* grow with content */
     margin: 0 !important;
-    padding: 10mm !important;   /* document-style margins inside */
+    padding: 10mm !important;
+    /* document-style margins inside */
     box-sizing: border-box !important;
     border: 1px solid #000 !important;
     box-shadow: none !important;
@@ -259,13 +308,16 @@
 
   /* Table stretches with card */
   .rp-table {
-    width: 100% !important;     /* take all available space */
-    min-width: 0 !important;    /* remove fixed 700px constraint */
+    width: 100% !important;
+    /* take all available space */
+    min-width: 0 !important;
+    /* remove fixed 700px constraint */
     max-width: 100% !important;
     table-layout: fixed !important;
   }
 
-  .rp-table th, .rp-table td {
+  .rp-table th,
+  .rp-table td {
     word-wrap: break-word;
   }
 
@@ -275,13 +327,3 @@
     display: none !important;
   }
 }
-
-
-
-
-
-
-
-
-
-

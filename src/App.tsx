@@ -22,6 +22,7 @@ import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage"
 import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
 import StudentCourses from "./pages/Students/StudentsCourse/studentscourseinterface";
 import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
 
 
 
@@ -51,6 +52,7 @@ function App() {
           <Route path="/admin/student-management" element={<StudentManagement />} />
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage/>} />
+          <Route path="/student/transcript" element={<StudentTranscript/>} />
 
 
 
