@@ -4,10 +4,8 @@ import "./Studentsidebar.css";
 import {
   FaChevronLeft,
   FaChevronRight,
-  FaHome,
   FaFileAlt,
   FaShareSquare,
-  FaCreditCard,
   FaSpinner,
   FaReceipt,
 } from "react-icons/fa";
@@ -59,14 +57,6 @@ const StudentSidebar: React.FC = () => {
           >
             <FaShareSquare className="sidebar-icon" />
             {sidebarState === "expanded" && <span>Request Transcript</span>}
-          </NavLink>
-
-          <NavLink
-            to="/student/transcript/payment"
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
-          >
-            <FaCreditCard className="sidebar-icon" />
-            {sidebarState === "expanded" && <span>Payment</span>}
           </NavLink>
 
           <NavLink

@@ -1,8 +1,10 @@
 .student-sidebar {
-  position: relative;
-  max-height: 75vh; 
+  position:sticky;       
+  top: 0;                
+  height: 100vh;         
   width: 280px;
   overflow-x: hidden;
+  overflow-y: auto;     
   background-color: #ffffff;
   padding-top: 10px;
   border: 1px solid #ffffff;
@@ -10,6 +12,7 @@
   font-family: 'Segoe UI', sans-serif;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: width 0.3s ease;
+  z-index: 100;           
 }
 
 
@@ -46,9 +49,13 @@
 
 
 @media (max-width: 768px) {
+  .student-sidebar {
+top:0;
+  }
 
   .student-sidebar.hidden .sidebar-toggle-btn {
   margin-top: 0px;
+  
  
 }
 
