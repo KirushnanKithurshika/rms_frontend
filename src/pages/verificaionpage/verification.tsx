@@ -53,11 +53,10 @@ const TwoStepVerification: React.FC = () => {
 
     setSubmitting(true);
 
-    // Choose role to route to (pure UI). If you want to simulate different roles,
-    // put one in sessionStorage.setItem('pending_role', 'STUDENT' | 'ADMIN' | 'LECTURER')
+  
     const role = sessionStorage.getItem("pending_role") || "STUDENT";
 
-    // Immediate “success” navigation (no API)
+   
     navigate(roleHome(role), { replace: true });
     setSubmitting(false);
   };

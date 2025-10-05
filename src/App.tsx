@@ -23,6 +23,9 @@ import StudentResultsSheet from "./components/Students/Studentsresultsheet/Stude
 import StudentCourses from "./pages/Students/StudentsCourse/studentscourseinterface";
 import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
 import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
+import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
+import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
+import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 
 
 
@@ -51,8 +54,11 @@ function App() {
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
-          <Route path="/student-courses" element={<StudentCoursesPage/>} />
-          <Route path="/student/transcript" element={<StudentTranscript/>} />
+          <Route path="/student-courses" element={<StudentCoursesPage />} />
+          <Route path="/student/transcript" element={<StudentTranscript />} />
+          <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
+          <Route path="/student/transcript/status" element={<TranscripStatus/>} />
+
 
 
 

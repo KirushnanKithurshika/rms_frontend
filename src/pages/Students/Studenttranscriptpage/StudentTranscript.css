@@ -1,7 +1,6 @@
 .main-area-students-transcript {
   display: flex;
   flex: 1;
-  height: calc(100vh - 110px);
   background-color: #e4e4e4;
   overflow: hidden;
 }
@@ -13,6 +12,7 @@
 }
 
 .card-students-trsnscript {
+
   margin: 10px;
   width: 100%;
   background-color: #fff;
@@ -21,6 +21,7 @@
   padding: 1.5rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+ 
 
 }
 
