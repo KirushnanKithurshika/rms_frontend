@@ -5,7 +5,22 @@
   align-items: flex-start; 
   padding-top: 120px; 
 }
+.login-form {
+  display: block;          /* override any global form { display:flex } */
+  width: 100%;
+}
 
+/* Keep labels on their own line */
+.login-box label {
+  display: block;
+  margin: 12px 0 6px;
+}
+
+/* Make inputs full width */
+.login-box .login-input {
+  width: 100%;
+  box-sizing: border-box;
+}
 .login-box {
  height:fit-content;
   margin-top: 40px;
@@ -126,6 +141,39 @@
   cursor: pointer;
   color: #666;
   font-size: 18px;
+}
+/* Error message style */
+.error-text {
+  background-color: #ffe6e6;      /* light red background */
+  color: #b30000;                 /* dark red text */
+  border: 1px solid #ff9999;      /* soft red border */
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+
+.success-text {
+  background-color: #e6ffed;     
+  color: #006622;               
+  border: 1px solid #99ffbb;     
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 

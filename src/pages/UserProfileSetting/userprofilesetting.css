@@ -1,8 +1,14 @@
 .account-settings-wrapper {
-
+  text-align: left;
   margin: 0 auto;
-  padding: 50px;
+  padding: 30px;
   font-family: "Segoe UI", sans-serif;
+  flex: 1 1 200px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
 }
 
 .account-settings-header {
@@ -12,7 +18,7 @@
 }
 
 .back-btn {
-  margin-right: 40px;
+  margin-right: 10px;
  background: none;
   border: none;
   font-size: 14px;
@@ -31,11 +37,11 @@
 }
 
 .account-title {
-  text-align: center;
+  text-align:left;
   margin-top: 0px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  color: #0b3054;
+  color: #102d5b;
 }
 
 .profile-header {
@@ -90,7 +96,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #0b3054;
+  color: #000000;
 }
 
 .profile-id {

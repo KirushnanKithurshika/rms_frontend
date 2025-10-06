@@ -1,79 +1,96 @@
+/* Card container */
 .upload-section-down {
-    margin-top:30px;
-    border: 1px solid #ccc;
-    display: flex;
-    padding: 16px;
-    align-items: center;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    max-width: 650px;
-    gap: 16px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  max-width: 650px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
 }
 
+/* CSV icon */
 .file-icon {
-    color: #4caf50;
-    flex-shrink: 0;
+  color: #4caf50;
+  flex-shrink: 0;
 }
 
+/* Right column */
 .upload-details {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
+/* File name */
 .file-name {
-    text-align: left;
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 6px;
-    color: #0a2558;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #0a2558;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* Progress bar wrapper */
 .progress-bar-container {
-    height: 10px;
-    background-color: #e0e0e0;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 8px;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
 }
 
-.progress-bar {
-    height: 100%;
-    background-color: #1e88e5;
-    transition: width 0.3s ease;
+/* The actual bar — use UNIQUE class + !important to beat globals */
+.upload-section-down .upload-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #2294c5 !important; /* solid green */
+  /* Or gradient:
+     background: linear-gradient(90deg, #16a34a, #22c55e) !important; */
+  transition: width 0.3s ease;
+  border-radius: 10px;
 }
 
+/* Footer row */
 .progress-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #666;
-    font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #666;
+  font-size: 12px;
 }
 
+/* Status text */
 .uploading {
-    font-style: italic;
-    color: #999;
+  font-style: italic;
+  color: #999;
 }
 
 .upload-complete {
-    color: #14a704;
-    font-weight: 500;
+  color: #14a704;
+  font-weight: 600;
 }
 
+/* Percent value */
 .progress-text {
-    margin-left: auto;
-    margin-right: 8px;
+  margin-left: auto;
+  margin-right: 8px;
 }
 
+/* Check icon */
 .check-icon {
-    color: green;
+  color: #16a34a;
+  font-size: 18px;
 }
-
 
 @media (max-width: 600px) {
   .upload-section-down {
-   
     padding: 12px;
     max-width: 100%;
     gap: 12px;
@@ -91,15 +108,11 @@
 
   .progress-bar-container {
     height: 6px;
+  }
 
-}
-
-.progress-bar {
+  .upload-section-down .upload-progress-bar {
     height: 6px;
-    background-color: #1e88e5;
-    transition: width 0.3s ease;
-}
- 
+  }
 
   .check-icon {
     font-size: 16px;

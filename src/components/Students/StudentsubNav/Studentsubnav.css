@@ -1,41 +1,76 @@
 .rounded-nav-container {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 80px;
+  position: relative;
 }
+
 
 .rounded-nav {
   display: flex;
   list-style: none;
-  background-color: #dce2eb; 
+  background-color: #dce2eb;
   border-radius: 25px;
   padding: 8px 20px;
-  gap: 40px; 
+  gap: 100px;
 }
 
+
+.hamburger {
+  display: none;
+  font-size: 14px;
+  color: #77797b;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+
 .nav-item {
+  display: block;
+  text-decoration: none;      
   cursor: pointer;
   font-size: 14px;
-  padding: 8px 0;
-  color: #0c223f; 
+  padding: 5px 0;
+  color: #0c223f;
   position: relative;
   transition: color 0.3s ease;
 }
 
-.nav-item:hover {
-  color: #1b4b7a;
+.nav-item:hover { color: #0b5180; }
+
+
+.nav-item.active {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
 }
 
 
-.nav-item.active::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  right: 0;
-  margin: auto;
-  width: 60%;
-  height: 2px;
-  background-color: #0c223f;
-  border-radius: 2px;
+.nav-item.active::after { content: none; }
+
+
+@media (max-width: 768px) {
+  .rounded-nav {
+    position: absolute;   
+    top: 20px;
+    right: 10px;
+    background: #fff;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: none;
+    width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+
+  .rounded-nav.open { display: flex; }
+
+  .hamburger {
+    display: block;
+    margin-left: auto;
+  }
 }

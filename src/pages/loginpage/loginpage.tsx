@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
-import Navbar from '../../components/Navbar/navbar';
-import './LoginPage.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Navbar from "../../components/Navbar/navbar";
+import "./LoginPage.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import api from "../../services/api.tsx";
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");       // <-- add
-  const [password, setPassword] = useState("");       // <-- add
-  const [loading, setLoading] = useState(false);      // <-- add
+  const [username, setUsername] = useState(""); // <-- add
+  const [password, setPassword] = useState(""); // <-- add
+  const [loading, setLoading] = useState(false); // <-- add
   const [error, setError] = useState<string | null>(null); // <-- add
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     setError(null);
@@ -79,10 +79,18 @@ const LoginPage: React.FC = () => {
             </span>
           </div>
 
-          {error && <p className="error" style={{ color: "crimson" }}>{error}</p>}
+          {error && (
+            <p className="error" style={{ color: "crimson" }}>
+              {error}
+            </p>
+          )}
 
           <div className="button-wrapper">
-            <button className="login-button" onClick={handleLogin} disabled={loading}>
+            <button
+              className="login-button"
+              onClick={handleLogin}
+              disabled={loading}
+            >
               {loading ? "Logging in..." : "Log in"}
             </button>
           </div>

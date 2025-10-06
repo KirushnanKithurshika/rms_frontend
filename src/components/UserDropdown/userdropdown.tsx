@@ -13,8 +13,8 @@ const UserDropdown: React.FC = () => {
   };
 
   return (
-    <div className="dropdown-menuuser">
-      <div className="dropdown-itemuser" onClick={() => alert("My Account clicked")}>
+    <div className="dropdown-menuuser" role="menu" aria-label="User menu">
+      <Link to="/account-setting" className="dropdown-itemuser" role="menuitem">
         <FaUser className="dropdown-iconuser" />
         <span>My Account</span>
       </div>
@@ -27,7 +27,7 @@ const UserDropdown: React.FC = () => {
       <div className="dropdown-itemuser" onClick={handleLogout}>
         <FaSignOutAlt className="dropdown-iconuser" />
         <span>Logout</span>
-      </div>
+      </button>
     </div>
   );
 };

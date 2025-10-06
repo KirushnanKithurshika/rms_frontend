@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import CreateCourseForm from "./components/createcourseform/createcourseform";
 import "./App.css";
+import "./App.css";
 import WelcomePage from "./pages/Intropage/welcomepage";
 import LoginPage from "./pages/loginpage/loginpage";
 import TwoStepVerification from "./pages/verificaionpage/verification"; // if your folder is "verificationpage", fix this path
@@ -83,8 +84,8 @@ function App() {
           <Route path="/createcourse" element={<CreateCourseForm />} />
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/account-setting" element={<AccountSettings />} />
           {/* alias so navigate('/dashboard') works for any authed user */}
@@ -107,3 +108,4 @@ function App() {
 }
 
 export default App;
+
