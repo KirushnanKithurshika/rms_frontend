@@ -55,6 +55,7 @@ const TwoStepVerification: React.FC = () => {
       // navigate("/admin/dashboard", { replace: true });
     } catch (e: any) {
       const msg = e?.response?.data?.message || e?.response?.data?.error || "Invalid or expired code.";
+      console.log("msg:", msg);
       setError(msg);
       console.error("OTP verify error:", e);
     } finally {
@@ -68,7 +69,7 @@ const TwoStepVerification: React.FC = () => {
 
       <div className="verification-container">
         <div className="verification-box">
-          <span className="verificationH">Two Step Verification</span>
+          <span className="verificationH"> Verification</span>
           <p>For added security, please enter the verification code sent to your registered email or mobile number to complete the login process.</p>
 
           {username && (

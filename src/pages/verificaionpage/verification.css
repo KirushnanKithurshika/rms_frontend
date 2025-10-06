@@ -20,7 +20,7 @@ html, body, #root {
   justify-content: center;
   height: calc(100vh - 150px); 
   background-color: #f2f2f2;
-  padding-top: 30px;;
+  padding-top: 100px;;
 }
 
 .verification-box {
@@ -54,7 +54,8 @@ html, body, #root {
 .otp-input {
  
   padding: 12px;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
   text-align: center;
   letter-spacing: 8px;
   border: 1px solid #ccc;
@@ -73,6 +74,27 @@ html, body, #root {
   border-color: #0a2558;
   box-shadow: 0 0 5px rgba(10, 37, 88, 0.4); 
   outline: none; 
+}
+.otp-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.otp-input {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.eye-button {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #444;
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
 
@@ -105,9 +127,9 @@ html, body, #root {
   display: flex;
   justify-content: center;
   align-items:baseline;
-  height: calc(100vh - 150px); /* adjust based on navbar height */
+  height: calc(100vh - 150px); 
   background-color: #f2f2f2;
-  padding-top: 30px;
+  padding-top: 100px;
 }
 
 
@@ -117,4 +139,6 @@ html, body, #root {
   margin-top: 10px;
   font-size: 16px;
 }
+
+
 }
