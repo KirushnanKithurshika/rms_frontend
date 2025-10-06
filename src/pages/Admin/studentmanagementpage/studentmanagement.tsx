@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import AdminSidebar from '../../../components/Admin/adminsidebar/adminsidebar.tsx';
@@ -17,36 +17,8 @@ import AddStudentForm from '../../../components/Admin/addstudentsform/addstudent
 
 const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];
 const dateOptions = ['Newest', 'Oldest', 'Joined This Month', 'Joined Last 30 Days'];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const users = [
-    {
-        name: "John Smith",
-        email: "john.smith@gmail.com",
-        username: "eg20204023",
-        status: "Active",
-        role: "Admin",
-        joined: "March 12, 2023",
-        active: "1 minute ago",
-    },
-    {
-        name: "Olivia Bennett",
-        email: "ollyben@gmail.com",
-        username: "eg20204025",
-        status: "Inactive",
-        role: "User",
-        joined: "June 27, 2022",
-        active: "1 month ago",
-    },
-    {
-        name: "John Smith",
-        email: "john.smith@gmail.com",
-        username: "eg20204023",
-        status: "Banned",
-        role: "Admin",
-        joined: "March 12, 2023",
-        active: "1 minute ago",
-    },
-];
 
 const statusColors: Record<string, string> = {
     Active: "active",
@@ -92,6 +64,35 @@ const StudentManagement: React.FC = () => {
         setIsDateOpen(prev => !prev);
         setIsStatusOpen(false);
     };
+
+    const [Student, setStudent] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const statusColorMap: Record<string, string> = {
+        ACTIVE: "#4caf50",      // green
+        DROPOUT: "#ff9800",     // orange
+        SUSPENDED: "#f44336",   // red
+        GRADUATED: "#2196f3",   // blue
+    };
+    useEffect(() => {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        fetch(`${API_BASE_URL}/v1/students`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setStudent(Array.isArray(data.data) ? data.data : []);
+                setLoading(false);
+            })
+            .catch(() => {
+                setStudent([]);
+                setLoading(false);
+            });
+    }, []);
 
     return (
         <div className="admin-dashboard-container">
@@ -170,35 +171,63 @@ const StudentManagement: React.FC = () => {
                                         <thead>
                                             <tr>
                                                 <th>Full Name</th>
-                                                <th>Email</th>
+                                                <th>Reg No</th>
                                                 <th>Username</th>
+                                                <th>Phone No</th>
+                                                <th>Gender</th>
+                                                <th>DOB</th>
+                                                <th>Batch</th>
+                                                <th>Department</th>
+                                                <th>Address</th>
                                                 <th>Status</th>
-                                                <th>Role</th>
-                                                <th>Joined Date</th>
-                                                <th>Last Active</th>
-                                                <th>Actions</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {users.map((u, i) => (
-                                                <tr key={i}>
-                                                    <td>{u.name}</td>
-                                                    <td>{u.email}</td>
-                                                    <td>{u.username}</td>
-                                                    <td>
-                                                        <span className={`status-badge ${statusColors[u.status]}`}>
-                                                            {u.status}
-                                                        </span>
-                                                    </td>
-                                                    <td>{u.role}</td>
-                                                    <td>{u.joined}</td>
-                                                    <td>{u.active}</td>
-                                                    <td className="actions">
-                                                        <MdEdit className="icon edit-icon" />
-                                                        <MdDelete className="icon delete-icon" />
-                                                    </td>
+                                            {loading ? (
+                                                <tr>
+                                                    <td colSpan={9}> loading...</td>
                                                 </tr>
-                                            ))}
+                                            ) : Student.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={9}> No data available</td>
+                                                </tr>
+                                            ) : (
+                                                Student.map((student, i) => (
+                                                    <tr key={student.id || i}>
+                                                        <td>{student.firstName} {student.lastName}</td>
+                                                        <td>{student.registrationNumber}</td>
+                                                        <td>{student.email}</td>
+                                                        <td>{student.phoneNumber}</td>
+                                                        <td>{student.gender}</td>
+                                                        <td>{student.dateOfBirth}</td>
+                                                        <td>{student.batch?.name}</td>
+                                                        <td>{student.department?.departmentName}</td>
+                                                        <td>{student.address?.city}</td>
+                                                        <td>
+                                                            <span
+                                                                style={{
+                                                                    color: "#fff",
+                                                                    backgroundColor: statusColorMap[student.studentStatus] || "#757575",
+                                                                    padding: "2px 10px",
+                                                                    borderRadius: "12px",
+                                                                    fontWeight: 500,
+                                                                    fontSize: "0.95em",
+                                                                    display: "inline-block",
+                                                                    minWidth: "80px",
+                                                                    textAlign: "center"
+                                                                }}
+                                                            >
+                                                                {student.studentStatus}
+                                                            </span>
+                                                        </td>
+                                                        <td className='action'>
+                                                            <MdEdit className="icon edit-icon" />
+                                                            <MdDelete className="icon delete-icon" />
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
