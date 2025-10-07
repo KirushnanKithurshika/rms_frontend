@@ -7,9 +7,7 @@ const UserDropdown: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // TODO: clear your auth (token, context, etc.)
-    // localStorage.removeItem("token");  // example
-    // await api.post('/auth/logout')     // if you have an API
+    
 
     navigate("/login", { replace: true });
   };

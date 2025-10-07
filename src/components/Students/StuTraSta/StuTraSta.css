@@ -1,21 +1,71 @@
-/* Wrapper */
+:root {
+    --tl-dot: 24px;
+
+    --tl-line-w: 2px;
+
+    --tl-line: #c9d3e3;
+
+    --tl-overlap: 18px;
+}
+
+
+.tl-track {
+    position: relative;
+}
+
+
+.tl-connector {
+    display: none;
+}
+
+
+.tl-track::before,
+.tl-track::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--tl-line-w);
+    background: var(--tl-line);
+}
+
+
+.tl-track::before {
+    top: calc(-1 * var(--tl-overlap));
+    bottom: calc(50% + var(--tl-dot) / 2);
+}
+
+
+.tl-track::after {
+    top: calc(50% + var(--tl-dot) / 2);
+    bottom: calc(-1 * var(--tl-overlap));
+}
+
+
+.tl .tl-row-3:first-child .tl-track::before {
+    display: none;
+}
+
+.tl .tl-row-3:last-child .tl-track::after {
+    display: none;
+}
+
 .tl {
     display: grid;
     gap: 36px;
-    /* generous spacing like your mock */
+
     max-width: 640px;
-    /* room for left & right text */
+
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* Loading */
+
 .tl-loading {
     color: #6b7a99;
     font-size: 14px;
     padding: 8px 0;
 }
 
-/* 3-column row: LEFT | SPINE | RIGHT */
 .tl-row-3 {
     display: grid;
     grid-template-columns: 1fr 28px 1fr;
@@ -40,7 +90,7 @@
     place-items: center;
     font-size: 14px;
     box-shadow: 0 0 0 2px #fff inset;
-    /* white outline like the screenshot */
+
 }
 
 .tl-connector {
@@ -50,7 +100,6 @@
     margin-top: 6px;
 }
 
-/* Left / Right columns */
 .tl-side {
     opacity: 0;
     pointer-events: none;
@@ -63,7 +112,7 @@
 
 .tl-left {
     text-align: right;
-    /* titles hug the spine */
+
     padding-right: 6px;
 }
 
@@ -72,7 +121,7 @@
     padding-left: 6px;
 }
 
-/* Content block (kept compact like mock) */
+
 .tl-content {
     display: inline-flex;
     flex-direction: column;
@@ -133,9 +182,6 @@
     background: #e02424;
 }
 
-/* red */
-
-/* Mobile: collapse to right side only (spine + right) */
 @media (max-width: 560px) {
     .tl {
         max-width: 100%;
