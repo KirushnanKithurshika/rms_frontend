@@ -23,26 +23,18 @@ import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
 import UserManagement from "./pages/Admin/usermanagement/usermanagement";
 import RoleManagement from "./pages/Admin/rolemanagementpage/rolemanagement";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
+import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
+import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
+import StudentCourses from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
+import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
+import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
+import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
+import ApprovalPage from "./pages/Approval/Approval";
 
-// Shared / user
-import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
-import UserDropdown from "./components/UserDropdown/userdropdown";
 
-// ---------- Guards ----------
-import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
-import LandingRedirect from "./routes/LandingRedirect";
 
-// ---------- Fallback ----------
-const NotAuthorized = () => (
-  <div style={{ padding: "2rem", textAlign: "center" }}>
-    <h2>403 – Not Authorized</h2>
-    <p>You don’t have permission to access this page.</p>
-  </div>
-);
-
-// ==========================================================
-// APP ROUTES
-// ==========================================================
 function App() {
   return (
     <div className="mt-16">
@@ -82,16 +74,27 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
-          <Route
-            path="/admin/student-management"
-            element={<StudentManagement />}
-          />
-        </Route>
+          <Route path="/admin/student-management" element={<StudentManagement />} />
+          <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
+          <Route path="/student-courses" element={<StudentCoursesPage />} />
+          <Route path="/student/transcript" element={<StudentTranscript />} />
+          <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
+          <Route path="/student/transcript/status" element={<TranscripStatus />} />
+          <Route path="/approval" element={<ApprovalPage />} />
 
-        {/* ------------------ FALLBACK ------------------ */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </div>
+
+
+
+
+          {/* Lecturer */}
+
+
+
+          {/* Admin */}
+
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
