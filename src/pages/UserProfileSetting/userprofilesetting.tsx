@@ -48,6 +48,8 @@ const AccountSettings: React.FC = () => {
                 <button 
                   className="back-btn"
                   onClick={() => navigate("/lecturerhome")}
+                  title="Go back"
+                  aria-label="Go back"
                 >
                   <FaArrowLeft />
                 </button>

@@ -18,27 +18,37 @@ const UserDropdown: React.FC = () => {
     navigate('/login');
   };
   return (
-    <div className="dropdown-menuuser">
-      <Link to = "/account-setting" className = "dropdown-itemuseraccount">
-      <div className="dropdown-itemuser" onClick={() => alert("My Account clicked")}>
+    <div className="dropdown-menuuser" role="menu">
+      {/* My Account */}
+      <Link
+        to="/account-setting"
+        className="dropdown-itemuser"
+        onClick={() => alert("My Account clicked")}
+        role="menuitem"
+      >
         <FaUser className="dropdown-iconuser" />
         <span>My Account</span>
-      </div>
-      </Link>
-      <div className="dropdown-itemuser" onClick={() => alert("Preferences clicked")}>
-        <FaCog className="dropdown-iconuser" />
-        <span>Preferences</span>
       </Link>
 
-      <button
-        type="button"
+      {/* Preferences */}
+      <div
+        className="dropdown-itemuser"
+        onClick={() => alert("Preferences clicked")}
+        role="menuitem"
+      >
+        <FaCog className="dropdown-iconuser" />
+        <span>Preferences</span>
+      </div>
+
+      {/* Logout */}
+      <div
         className="dropdown-itemuser"
         onClick={handleLogout}
         role="menuitem"
       >
         <FaSignOutAlt className="dropdown-iconuser" />
         <span>Logout</span>
-      </button>
+      </div>
     </div>
   );
 };
