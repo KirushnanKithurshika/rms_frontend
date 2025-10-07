@@ -16,9 +16,9 @@ type ApprovalRow = {
 
 /* Demo data */
 const demoRows: ApprovalRow[] = [
-  { id: "1", name: "John Smith",  batch: "E2020", department: "Electrical" },
+  { id: "1", name: "John Smith", batch: "E2020", department: "Electrical" },
   { id: "2", name: "Anika Perera", batch: "E2019", department: "Computer" },
-  { id: "3", name: "Ruwan Silva",  batch: "E2021", department: "Mechanical" },
+  { id: "3", name: "Ruwan Silva", batch: "E2021", department: "Mechanical" },
 ];
 
 const ApprovalPage = () => {

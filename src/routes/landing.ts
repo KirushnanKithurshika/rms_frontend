@@ -12,7 +12,10 @@ const LANDING_RULES: Array<{ anyOf: string[]; path: string }> = [
   },
 
   // Student landing – privileges students uniquely have
-  { anyOf: ["VIEW_RESULT", "VIEW_TRANSCRIPT"], path: "/student/dashboard" },
+  {
+    anyOf: ["VIEW_RESULT", "VIEW_TRANSCRIPT"],
+    path: "/student/student-dashboard",
+  },
 ];
 
 // Fallback if nothing matches

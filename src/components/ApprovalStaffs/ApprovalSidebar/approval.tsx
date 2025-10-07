@@ -4,8 +4,8 @@ import { NavLink } from "react-router-dom";
 import {
   FaChevronLeft,
   FaChevronRight,
-  FaClipboardCheck, 
-  FaReceipt,         
+  FaClipboardCheck,
+  FaReceipt,
 } from "react-icons/fa";
 
 type SidebarState = "expanded" | "collapsed" | "hidden";
@@ -15,15 +15,21 @@ const ApprovalSidebar: React.FC = () => {
 
   const handleToggle = () => {
     setSidebarState((prev) =>
-      prev === "expanded" ? "collapsed" : prev === "collapsed" ? "hidden" : "expanded"
+      prev === "expanded"
+        ? "collapsed"
+        : prev === "collapsed"
+        ? "hidden"
+        : "expanded"
     );
   };
 
- 
   const BASE = "/staff/approvals";
 
   return (
-    <aside className={`student-sidebar ${sidebarState}`} aria-label="Approvals sidebar">
+    <aside
+      className={`student-sidebar ${sidebarState}`}
+      aria-label="Approvals sidebar"
+    >
       <button
         className="sidebar-toggle-btn"
         aria-label="Toggle sidebar"
@@ -32,7 +38,6 @@ const ApprovalSidebar: React.FC = () => {
         {sidebarState === "hidden" ? <FaChevronRight /> : <FaChevronLeft />}
       </button>
 
-      
       {sidebarState !== "expanded" && (
         <div className="mobile-sidebar-backdrop" onClick={handleToggle} />
       )}
@@ -44,16 +49,19 @@ const ApprovalSidebar: React.FC = () => {
           <NavLink
             to={BASE}
             end
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
           >
             <FaClipboardCheck className="sidebar-icon" />
             {sidebarState === "expanded" && <span>Approval Requests</span>}
           </NavLink>
 
-        
           <NavLink
             to={`${BASE}/history`}
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
           >
             <FaReceipt className="sidebar-icon" />
             {sidebarState === "expanded" && <span>History</span>}
