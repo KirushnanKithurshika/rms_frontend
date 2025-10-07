@@ -79,7 +79,7 @@ const LoginPage: React.FC = () => {
             </span>
           </div>
 
-          {error && <p className="error" style={{ color: "crimson" }}>{error}</p>}
+          {error && <p className="error-text" style={{ color: "crimson" }}>{error}</p>}
 
           <div className="button-wrapper">
             <button className="login-button" onClick={handleLogin} disabled={loading}>

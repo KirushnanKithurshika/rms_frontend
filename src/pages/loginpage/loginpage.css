@@ -53,6 +53,33 @@
   box-shadow: 0 0 5px rgba(10, 37, 88, 0.3);
 }
 
+.error-text {
+  background-color: #ffe6e6;      /* light red background */
+  color: #b30000;                 /* dark red text */
+  border: 1px solid #ff9999;      /* soft red border */
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+
+.success-text {
+  background-color: #e6ffed;     
+  color: #006622;               
+  border: 1px solid #99ffbb;     
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
 
 
 .login-button {

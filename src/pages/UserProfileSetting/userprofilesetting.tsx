@@ -36,7 +36,7 @@ const AccountSettings: React.FC = () => {
 
              
               <div className="account-settings-header">
-                <button className="back-btn"><FaArrowLeft /></button>
+                <button className="back-btn" title="Go Back" aria-label="Go Back"><FaArrowLeft /></button>
                 <span className="account-title">Account Settings</span>
               </div>
 
@@ -99,6 +99,8 @@ const AccountSettings: React.FC = () => {
                   <button
                     className="collapse-btn"
                     onClick={() => setShowPasswordSection(!showPasswordSection)}
+                    aria-label={showPasswordSection ? "Collapse password section" : "Expand password section"}
+                    title={showPasswordSection ? "Collapse password section" : "Expand password section"}
                   >
                     <FaChevronDown className={showPasswordSection ? "rotate" : " "} />
                   </button>
@@ -156,6 +158,7 @@ const AccountSettings: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                  
                 )}
               </div>
 
