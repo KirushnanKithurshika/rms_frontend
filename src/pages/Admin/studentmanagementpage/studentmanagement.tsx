@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
+import '../../../index.css';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import AdminSidebar from '../../../components/Admin/adminsidebar/adminsidebar.tsx';
-
+import { ArrowsAltOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
     FaChevronDown,
     FaSpinner,
     FaCalendarAlt,
 } from 'react-icons/fa';
-
-import { MdEdit, MdDelete } from "react-icons/md";
 import { FiSearch } from 'react-icons/fi';
 import Pagination from '../../../components/Admin/pagination/pagination.tsx';
 
@@ -18,6 +17,7 @@ import AddStudentForm from '../../../components/Admin/addstudentsform/addstudent
 const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];
 const dateOptions = ['Newest', 'Oldest', 'Joined This Month', 'Joined Last 30 Days'];
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { Popconfirm, message } from "antd";
 
 
 const statusColors: Record<string, string> = {
@@ -36,13 +36,18 @@ const StudentManagement: React.FC = () => {
     const [selectedStatus, setSelectedStatus] = useState('Status');
     const [selectedDate, setSelectedDate] = useState('Date');
 
-    const [showAddUserForm, setShowAddUserForm] = useState(false);
+    // const [showAddUserForm, setShowAddUserForm] = useState(false);
+    const [showForm, setShowForm] = useState(false);
+    const [formMode, setFormMode] = useState<'create' | 'view' | 'edit'>('create');
+    const [selectStudentId, setSelectStudentId] = useState<number | null>(null);
 
     const handleBackdropClick = () => setSidebarOpen(false);
+    const [messageApi, contextHolder] = message.useMessage();
 
     const handleCreateUser = (user: any) => {
         console.log("New User:", user);
-        setShowAddUserForm(false);
+        // setShowAddUserForm(false);
+        setShowForm(false);
     };
 
     const handleSelectStatus = (status: string) => {
@@ -67,6 +72,7 @@ const StudentManagement: React.FC = () => {
 
     const [Student, setStudent] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const statusColorMap: Record<string, string> = {
         ACTIVE: "#4caf50",      // green
@@ -74,28 +80,67 @@ const StudentManagement: React.FC = () => {
         SUSPENDED: "#f44336",   // red
         GRADUATED: "#2196f3",   // blue
     };
-    useEffect(() => {
+    const token = localStorage.getItem('token');
+    const fetchStudents = async () => {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        fetch(`${API_BASE_URL}/v1/students`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                setStudent(Array.isArray(data.data) ? data.data : []);
-                setLoading(false);
-            })
-            .catch(() => {
-                setStudent([]);
-                setLoading(false);
+        try {
+            const res = await fetch(`${API_BASE_URL}/v1/students`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
             });
+            const data = await res.json();
+            setStudent(Array.isArray(data.data) ? data.data : []);
+        } catch (error) {
+            setStudent([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchStudents();
     }, []);
+
+    const handleDeleteStudent = async (id: number) => {
+        if (!token) {
+            message.error("You are not authenticated.");
+            messageApi.error("You are not authenticated.");
+            return;
+        }
+        try {
+            setDeletingId(id);
+            const res = await fetch(`${API_BASE_URL}/v1/students/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                message.error(data?.message || "Failed to delete student");
+                messageApi.error(data?.message || "Failed to delete student");
+                return;
+            }
+
+            // success: remove from table optimistically
+            setStudent((prev) => prev.filter((s) => (s.id ?? s.studentId) !== id));
+            message.success(data?.message || "Student deleted");
+            messageApi.success(data?.message || "Student deleted");
+        } catch (err: any) {
+            message.error(err?.message || "Failed to delete student");
+            messageApi.error(err?.message || "Failed to delete student");
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     return (
         <div className="admin-dashboard-container">
+            {contextHolder}
             <div className="nav">
                 <Navbarin />
             </div>
@@ -115,7 +160,7 @@ const StudentManagement: React.FC = () => {
                 </div>
 
                 <div className="dashboard-content">
-                    {!showAddUserForm && (
+                    {!showForm && (
                         <div className="dashboard-cards">
                             <div className="cardcourse">
                                 <h3>Student Management</h3>
@@ -160,7 +205,7 @@ const StudentManagement: React.FC = () => {
                                             )}
                                         </div>
 
-                                        <button className="add-user-btn" onClick={() => setShowAddUserForm(true)}>
+                                        <button className="add-user-btn" onClick={() => { setFormMode('create'); setSelectStudentId(null); setShowForm(true); }}>
                                             Add Student +
                                         </button>
                                     </div>
@@ -221,9 +266,51 @@ const StudentManagement: React.FC = () => {
                                                                 {student.studentStatus}
                                                             </span>
                                                         </td>
-                                                        <td className='action'>
-                                                            <MdEdit className="icon edit-icon" />
-                                                            <MdDelete className="icon delete-icon" />
+                                                        <td className="action py-2">
+                                                            <div className="flex items-center justify-center gap-3">
+                                                                <button
+                                                                    className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 hover:scale-110"
+                                                                    title="View Details"
+                                                                    onClick={() => {
+                                                                        setFormMode('view');
+                                                                        setSelectStudentId(student.id);
+                                                                        setShowForm(true);
+                                                                    }}
+                                                                >
+                                                                    <ArrowsAltOutlined className="text-lg" />
+                                                                </button>
+
+                                                                <button
+                                                                    className="p-2 rounded-full bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition-all duration-200 hover:scale-110"
+                                                                    title="Edit"
+                                                                    onClick={() => {
+                                                                        setFormMode('edit');
+                                                                        setSelectStudentId(student.id ?? student.studentId);
+                                                                        setShowForm(true);
+                                                                    }}
+                                                                >
+                                                                    <EditOutlined className="text-lg" />
+                                                                </button>
+
+
+                                                                <Popconfirm
+                                                                    title="Delete student?"
+                                                                    description="This action cannot be undone."
+                                                                    okText="Delete"
+                                                                    okButtonProps={{ danger: true, loading: deletingId === (student.id ?? student.studentId) }}
+                                                                    cancelText="Cancel"
+                                                                    onConfirm={() => handleDeleteStudent(student.id ?? student.studentId)}
+                                                                >
+                                                                    <button
+                                                                        className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 disabled:opacity-50"
+                                                                        title="Delete"
+                                                                        disabled={deletingId === (student.id ?? student.studentId)}
+                                                                    >
+                                                                        <DeleteOutlined className="text-lg" />
+                                                                    </button>
+                                                                </Popconfirm>
+
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))
@@ -239,12 +326,24 @@ const StudentManagement: React.FC = () => {
                         </div>
                     )}
 
-                    {showAddUserForm && (
+                    {showForm && (
                         <AddStudentForm
-                            onClose={() => setShowAddUserForm(false)}
-                            onCreate={handleCreateUser}
+                            mode={formMode}
+                            studentId={selectStudentId ?? undefined}
+                            onClose={() => setShowForm(false)}
+                            onCreate={(payload) => {
+                                setShowForm(false);
+                                fetchStudents(); // refresh after create
+                            }}
+                            onUpdate={() => {
+                                setShowForm(false);
+                                fetchStudents(); // refresh after edit
+                                messageApi.success("Student updated successfully");
+                            }}
                         />
                     )}
+
+
                 </div>
             </div>
         </div>

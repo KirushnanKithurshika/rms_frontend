@@ -4,48 +4,60 @@ import "./adduserform.css";
 import { FaArrowLeft, FaUpload, FaCheckCircle } from "react-icons/fa";
 import { Form, Input, Button, Select, DatePicker, Radio, message } from "antd";
 import dayjs from "dayjs";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+type Gender = "MALE" | "FEMALE";
 
+type StudentRegisterRequest = {
+  firstName: string;
+  lastName: string;
+  registrationNumber: string;
+  email: string;
+  phoneNumber: string;
+  departmentId: number;
+  batchId: number;
+  gender: Gender;
+  dateOfBirth: string;
+  address: {
+    lane1: string;
+    lane2?: string;
+    city: string;
+    district: string;
+    postalCode: string;
+  };
+};
 
 interface AddStudentFormProps {
+  mode: 'create' | 'view' | 'edit';
+  studentId?: number;
   onClose: () => void;
-  onCreate: (student: StudentRegisterRequest) => void;
+  onCreate?: (student: StudentRegisterRequest) => void;
+  onUpdate?: () => void;
 }
 
-// state
-
-
-
-
-
-const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) => {
-
-
+const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClose, onCreate }) => {
+  const [form] = Form.useForm();
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploaded, setIsUploaded] = useState(false);
-
-  const [form] = Form.useForm();
   const [batchOptions, setBatchOptions] = useState<{ label: string; value: number }[]>([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
-
   const [departmentSelectionOptions, setDepartmentSelectionOptions] = useState<{ label: string; value: number }[]>([]);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
-
-  const [handleSubmit, setHandleSubmit] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  // effect: fetch batches with Authorization header
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!token) {
-      console.warn("No auth token found");
+      messageApi.error("You are not authenticated");
       return;
     }
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    const fetchData = async () => {
+    const fetchDropdownData = async () => {
       try {
         setLoadingBatches(true);
         setLoadingDepartments(true);
@@ -59,16 +71,10 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
         const departments = Array.isArray(deptRes.data?.data) ? deptRes.data.data : [];
 
         setBatchOptions(
-          batches.map((b: any) => ({
-            label: b.name,
-            value: b.id
-          }
-          )));
+          batches.map((b: any) => ({ label: b.name, value: b.id }))
+        );
         setDepartmentSelectionOptions(
-          departments.map((d: any) => ({
-            label: d.departmentName,
-            value: d.departmentId
-          }))
+          departments.map((d: any) => ({ label: d.departmentName, value: d.departmentId }))
         );
       } catch (error) {
         console.error("Failed to load dropdown data:", error);
@@ -80,8 +86,54 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
       }
     };
 
-    fetchData();
-  }, [API_BASE_URL]);
+    fetchDropdownData();
+  }, [messageApi]);
+
+  useEffect(() => {
+    if (mode !== 'view' || !studentId) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      messageApi.error("You are not authenticated");
+      return;
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const fetchStudent = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/v1/students/${studentId}`, { headers });
+        const s = res?.data?.data;
+        if (!s) return messageApi.error("Student not found");
+
+        form.setFieldsValue({
+          firstName: s.firstName,
+          lastName: s.lastName,
+          registrationNumber: s.registrationNumber,
+          email: s.email,
+          phoneNumber: s.phoneNumber,
+          gender: s.gender,
+          dateOfBirth: s.dateOfBirth ? dayjs(s.dateOfBirth, "YYYY-MM-DD") : undefined,
+          departmentId: s.department?.departmentId,
+          batchId: s.batch?.id,
+          studentStatus: s.studentStatus,
+          address: {
+            lane1: s.address?.lane1,
+            lane2: s.address?.lane2,
+            city: s.address?.city,
+            district: s.address?.district,
+            postalCode: s.address?.postalCode,
+          },
+        });
+      } catch (e: any) {
+        messageApi.error(e?.response?.data?.message || "Failed to retrieve student");
+      }
+    };
+
+    fetchStudent();
+  }, [mode, studentId, form, messageApi]);
+
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
@@ -102,55 +154,115 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
     }, 200);
   };
 
-  const handleFinish = async (values: any) => {
-    const payload: StudentRegisterRequest = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      registrationNumber: values.registrationNumber,
-      email: values.email,
-      phoneNumber: values.phoneNumber,
-      departmentId: values.departmentId,
-      batchId: values.batchId,
-      gender: values.gender as Gender,
-      dateOfBirth: values.dateOfBirth ? (values.dateOfBirth as dayjs.Dayjs).format("YYYY-MM-DD") : "",
-      address: {
-        lane1: values.address?.lane1 || "",
-        lane2: values.address?.lane2 || "",
-        city: values.address?.city || "",
-        district: values.address?.district || "",
-        postalCode: values.address?.postalCode || "",
-      },
-    };
+  // const handleFinish = async (values: any) => {
+  //   if (mode !== 'create') return;
 
+  //   const payload: StudentRegisterRequest = {
+  //     firstName: values.firstName,
+  //     lastName: values.lastName,
+  //     registrationNumber: values.registrationNumber,
+  //     email: values.email,
+  //     phoneNumber: values.phoneNumber,
+  //     departmentId: values.departmentId,
+  //     batchId: values.batchId,
+  //     gender: values.gender,
+  //     dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format("YYYY-MM-DD") : "",
+  //     address: values.address,
+  //   };
+
+
+  //   if (!token) return messageApi.error("You are not authenticated");
+
+  //   try {
+  //     setSubmitting(true);
+  //     await axios.post(`${API_BASE_URL}/v1/students`, payload, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     messageApi.success("Student registered successfully");
+  //     form.resetFields();
+  //     onCreate?.(payload);
+  //   } catch (err: any) {
+  //     const msg = err?.response?.data?.message || err?.message || "Failed to register student";
+  //     messageApi.error(msg);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+  type StudentUpdateRequest = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    departmentId: number;
+    gender: Gender;
+    dateOfBirth: string; // YYYY-MM-DD
+  };
+
+  const handleFinish = async (values: any) => {
     const token = localStorage.getItem("token");
     if (!token) {
       messageApi.error("You are not authenticated");
       return;
     }
 
+    const isCreate = mode === "create";
+    const isEdit = mode === "edit";
+    let payload: StudentRegisterRequest | StudentUpdateRequest;
+
+    if (isCreate) {
+      payload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        registrationNumber: values.registrationNumber,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        departmentId: values.departmentId,
+        batchId: values.batchId,
+        gender: values.gender,
+        dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
+        address: values.address,
+      };
+    } else {
+      payload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        departmentId: values.departmentId,
+        gender: values.gender,
+        dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
+      };
+    }
     try {
-      setHandleSubmit(true);
-      await axios.post(`${API_BASE_URL}/v1/students`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      message.success("Student registered successfully");
-      form.resetFields();
-      // (optional) close modal/page
-      // onClose();
+      setSubmitting(true);
+
+      if (isCreate) {
+        await axios.post(`${API_BASE_URL}/v1/students`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        messageApi.success("Student registered successfully");
+        form.resetFields();
+        onCreate?.(payload as StudentRegisterRequest);
+      }
+
+      if (mode === 'edit' && studentId) {
+        await axios.put(`${API_BASE_URL}/v1/students/${studentId}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        messageApi.success("Student updated successfully");
+        onUpdate?.(); // call parent callback to refresh
+      }
     } catch (err: any) {
-      console.error("Student create failed:", err);
-      const apiMsg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to register student";
-      messageApi.open({ type: "error", content: apiMsg, duration: 3 });
+      const msg = err?.response?.data?.message || err?.message || "Operation failed";
+      messageApi.error(msg);
     } finally {
-      setHandleSubmit(false);
+      setSubmitting(false);
     }
   };
 
 
-  return (
+  return <div>{contextHolder}{
     <div className="dashboard-cards">
       {contextHolder}
       <div className="add-user-form-container">
@@ -205,6 +317,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
           onFinish={handleFinish}
           requiredMark="optional"
           className="add-user-form-grid"
+          disabled={mode === 'view'}
         >
           <div className="add-user-two-col">
             <Form.Item
@@ -230,7 +343,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
               name="registrationNumber"
               rules={[{ required: true, message: "Please enter registration number" }]}
             >
-              <Input placeholder="eg: EG/20XX/XXXX" />
+              <Input placeholder="eg: EG/20XX/XXXX" disabled={mode !== 'create'} />
             </Form.Item>
 
             <Form.Item
@@ -339,48 +452,35 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
             >
               <Input placeholder="Postal code" />
             </Form.Item>
+
+            {mode === 'view' && (
+              <Form.Item label="Status" name="studentStatus">
+                <Input disabled />
+              </Form.Item>
+            )}
           </div>
         </Form>
 
         {/* Actions */}
         <div className="add-user-form-actions">
-          <Button
-            type="primary"
-            onClick={() => form.submit()}
-            loading={handleSubmit}
-            className="add-user-create-btn"
-          >
-            Create
-          </Button>
+          {mode === 'view' ? null :
+            <Button
+              type="primary"
+              onClick={() => form.submit()}
+              loading={submitting}
+              className="add-user-create-btn"
+            >
+              Create
+            </Button>
+          }
+
           <Button onClick={onClose} className="add-user-cancel-btn">
-            Cancel
+            {mode === 'view' ? 'Close' : 'Cancel'}
           </Button>
         </div>
       </div>
     </div>
-  );
+  }</div>;
 };
 
 export default AddStudentForm;
-
-
-type Gender = "MALE" | "FEMALE";
-
-type StudentRegisterRequest = {
-  firstName: string;
-  lastName: string;
-  registrationNumber: string;
-  email: string;
-  phoneNumber: string;
-  departmentId: number;
-  batchId: number;
-  gender: Gender;
-  dateOfBirth: string; // YYYY-MM-DD
-  address: {
-    lane1: string;
-    lane2?: string;
-    city: string;
-    district: string;
-    postalCode: string;
-  };
-};
