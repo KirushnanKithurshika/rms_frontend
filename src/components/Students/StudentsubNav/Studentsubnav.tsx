@@ -4,10 +4,10 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import "./Studentsubnav.css";
 
 const links = [
-  { label: "Home",                 to: "/student/student-dashboard" },
-  { label: "Courses",              to: "/student-courses" }, // if your route is /student/courses, change it here
-  { label: "Academic Summary",     to: "/student/academic-summary" },
-  { label: "Transcript",           to: "/student/transcript" },
+  { label: "Home", to: "/student/student-dashboard" },
+  { label: "Courses", to: "/student-courses" }, // if your route is /student/courses, change it here
+  { label: "Academic Summary", to: "/student/academic-summary" },
+  { label: "Transcript", to: "/student/transcript" },
   { label: "Student Verification", to: "/student/verification" },
 ];
 
@@ -32,7 +32,7 @@ const StudentSubNav: React.FC = () => {
           <li key={to}>
             <NavLink
               to={to}
-              end                 /* <- exact match so ONLY one is active */
+              end={to !== "/student/transcript"}   // <-- exact for others, NOT for Transcript
               className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}
               onClick={() => setIsMenuOpen(false)}
             >

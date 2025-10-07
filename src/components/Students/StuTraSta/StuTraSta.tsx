@@ -7,7 +7,6 @@ import {
 } from "react-icons/fa";
 import "./StuTraSta.css";
 
-/* ───────────────────────── Types ───────────────────────── */
 type StepStatus = "done" | "current" | "pending" | "rejected";
 type TimelineStep = {
   id: string;
@@ -30,7 +29,6 @@ type TranscriptStatusApi = {
   dean: { state: "pending" | "approved"; updatedAt?: string | null };
 };
 
-/* ─────────────── Demo data (renders immediately) ─────────────── */
 const DEMO: TranscriptStatusApi = {
   id: "DEMO-1",
   applicationReceivedAt: "2024-05-12T10:12:00Z",
@@ -40,7 +38,6 @@ const DEMO: TranscriptStatusApi = {
   dean: { state: "pending" },
 };
 
-/* ───────────────────── helpers / mapping ───────────────────── */
 function formatDate(iso?: string | null) {
   if (!iso) return undefined;
   const d = new Date(iso);
@@ -125,11 +122,10 @@ function buildSteps(data: TranscriptStatusApi): TimelineStep[] {
   return steps;
 }
 
-/* ───────────────────── Row (3-column) ───────────────────── */
 function Row({
   step,
   isLast,
-  side, // "left" | "right"
+  side, 
 }: {
   step: TimelineStep;
   isLast: boolean;
@@ -151,7 +147,6 @@ function Row({
 
   const Content = (
     <div className="tl-content">
-      {/* show date for all non-pending states to match your mock */}
       {step.date && <div className="tl-date">{step.date}</div>}
       <div className={`tl-title ${step.status === "pending" ? "is-muted" : ""}`}>
         {step.title}
@@ -164,12 +159,12 @@ function Row({
 
   return (
     <div className="tl-row-3">
-      {/* LEFT column */}
+   
       <div className={`tl-side tl-left ${side === "left" ? "show" : ""}`}>
         {side === "left" && Content}
       </div>
 
-      {/* CENTER track */}
+
       <div className="tl-track">
         <div className={`tl-icon ${iconClass}`} aria-hidden>
           {Icon}
@@ -177,7 +172,7 @@ function Row({
         {!isLast && <div className="tl-connector" />}
       </div>
 
-      {/* RIGHT column */}
+   
       <div className={`tl-side tl-right ${side === "right" ? "show" : ""}`}>
         {side === "right" && Content}
       </div>
@@ -185,9 +180,9 @@ function Row({
   );
 }
 
-/* ───────────────────── Public component ───────────────────── */
+
 type Props = {
-  transcriptId?: string; // optional: use built-in demo if not provided
+  transcriptId?: string; 
   mockData?: TranscriptStatusApi;
   pollMs?: number;
   endpoint?: (id: string) => string;
@@ -204,12 +199,11 @@ const TranscriptStatusTimeline: React.FC<Props> = ({
   );
   const [error, setError] = useState<string | null>(null);
 
-  // adopt new mockData at runtime
+ 
   useEffect(() => {
     if (mockData) setData(mockData);
   }, [mockData]);
 
-  // fetch only if transcriptId exists AND no mockData
   useEffect(() => {
     if (!transcriptId || mockData) return;
     let timer: number | undefined;
