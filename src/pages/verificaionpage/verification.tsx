@@ -43,7 +43,8 @@ const TwoStepVerification: React.FC = () => {
     const res = await dispatch(verifyOtpThunk({ username: uiUsername, otp }));
 
     if (verifyOtpThunk.fulfilled.match(res)) {
-      navigate("/dashboard", { replace: true });
+      // navigate("/dashboard", { replace: true });
+      navigate("/landing", { replace: true });
     }
   };
 

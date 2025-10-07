@@ -3,7 +3,27 @@ import type { AuthState, LoginPayload, VerifyOtpPayload } from "./types";
 import api from "../../services/api";
 import { showSuccess, showError } from "../../utils/toast";
 
-// Define a reusable type for all API responses
+type JwtClaims = {
+  sub?: string;
+  roles?: string[];
+  authorities?: string[];
+  userId?: number;
+  iat?: number;
+  exp?: number;
+};
+
+function decodeJwt(token: string | null): JwtClaims | null {
+  if (!token) return null;
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+    return JSON.parse(atob(payload)) as JwtClaims;
+  } catch {
+    return null;
+  }
+}
+
+// Define reusable API response type
 type ApiResponse<T> = {
   status: "success" | "error";
   message?: string;
@@ -11,6 +31,10 @@ type ApiResponse<T> = {
   statusCode?: string;
   type?: string;
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                  THUNKS                                   */
+/* -------------------------------------------------------------------------- */
 
 export const loginThunk = createAsyncThunk<
   void,
@@ -45,18 +69,17 @@ export const verifyOtpThunk = createAsyncThunk<
   try {
     const res = await api.post<ApiResponse<string>>("/auth/verify-otp", body);
 
-    if (res.data.status === "success") {
-      showSuccess(res.data.message || "OTP verified successfully!");
-    } else {
-      // If backend sends status=error, reject here
+    if (res.data.status !== "success") {
       const msg = res.data.message || "OTP verification failed!";
       showError(msg);
       return rejectWithValue(msg);
     }
-    const token = res?.data?.data;
-    // console.log("login response:", res);
+
+    const token = res.data.data;
     if (!token)
       return rejectWithValue("Verification failed: no token received.");
+
+    showSuccess(res.data.message || "OTP verified successfully!");
     return token;
   } catch (e: any) {
     const msg =
@@ -64,7 +87,6 @@ export const verifyOtpThunk = createAsyncThunk<
       e?.response?.data?.error ||
       "Invalid or expired code.";
     showError(msg);
-    // ✅ MUST return a rejection (not undefined)
     return rejectWithValue(msg);
   }
 });
@@ -85,6 +107,7 @@ export const logoutThunk = createAsyncThunk<
         return null;
       }
     })();
+
     const username = sub || pendingUsername || "";
     await api
       .post("/auth/logout", null, { params: { username } })
@@ -96,12 +119,37 @@ export const logoutThunk = createAsyncThunk<
   }
 });
 
+/* -------------------------------------------------------------------------- */
+/*                              STATE INITIALIZER                             */
+/* -------------------------------------------------------------------------- */
+
+// ✅ Restore user automatically if token exists in localStorage
+const storedToken = localStorage.getItem("token");
+let restoredUser = null;
+
+if (storedToken) {
+  const claims = decodeJwt(storedToken);
+  if (claims) {
+    restoredUser = {
+      id: claims.userId ?? undefined,
+      username: claims.sub || "",
+      roles: claims.roles || [],
+      authorities: claims.authorities || [],
+    };
+  }
+}
+
 const initialState: AuthState = {
-  status: "idle",
-  token: localStorage.getItem("token"),
+  status: storedToken ? "authenticated" : "idle",
+  token: storedToken,
   pendingUsername: localStorage.getItem("pendingUsername"),
   error: null,
+  currentUser: restoredUser,
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                   SLICE                                   */
+/* -------------------------------------------------------------------------- */
 
 const slice = createSlice({
   name: "auth",
@@ -118,6 +166,7 @@ const slice = createSlice({
     },
   },
   extraReducers: (b) => {
+    /* ---------------------------- LOGIN HANDLERS ---------------------------- */
     b.addCase(loginThunk.pending, (s) => {
       s.status = "loading";
       s.error = null;
@@ -130,6 +179,7 @@ const slice = createSlice({
       s.error = a.payload || "Login failed";
     });
 
+    /* --------------------------- VERIFY OTP HANDLERS --------------------------- */
     b.addCase(verifyOtpThunk.pending, (s) => {
       s.status = "loading";
       s.error = null;
@@ -141,12 +191,23 @@ const slice = createSlice({
       localStorage.setItem("token", a.payload);
       s.pendingUsername = null;
       localStorage.removeItem("pendingUsername");
+
+      const claims = decodeJwt(a.payload);
+      const id = claims?.userId ?? undefined;
+      const roles = claims?.roles || [];
+      const authorities = claims?.authorities || [];
+      const username = claims?.sub || "";
+
+      // console.log("✅ Decoded JWT after OTP:", { id, username, roles, authorities });
+
+      s.currentUser = { id, username, roles, authorities };
     });
     b.addCase(verifyOtpThunk.rejected, (s, a) => {
       s.status = "error";
       s.error = a.payload || "OTP verification failed";
     });
 
+    /* ----------------------------- LOGOUT HANDLERS ----------------------------- */
     b.addCase(logoutThunk.fulfilled, (s) => {
       s.status = "idle";
       s.token = null;
@@ -155,6 +216,7 @@ const slice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("pendingUsername");
       sessionStorage.clear();
+      s.currentUser = null;
     });
     b.addCase(logoutThunk.rejected, (s) => {
       s.status = "idle";
@@ -163,6 +225,7 @@ const slice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("pendingUsername");
       sessionStorage.clear();
+      s.currentUser = null;
     });
   },
 });

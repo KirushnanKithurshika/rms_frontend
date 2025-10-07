@@ -30,6 +30,7 @@ import UserDropdown from "./components/UserDropdown/userdropdown";
 
 // ---------- Guards ----------
 import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
+import LandingRedirect from "./routes/LandingRedirect";
 
 // ---------- Fallback ----------
 const NotAuthorized = () => (
@@ -63,6 +64,7 @@ function App() {
         <Route element={<RequireAuth />}>
           {/* Generic pages (accessible to all logged-in users) */}
           <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="/landing" element={<LandingRedirect />} />
           <Route path="/drop" element={<UserDropdown />} />
           <Route path="/account-setting" element={<AccountSettings />} />
 
