@@ -52,7 +52,7 @@
 
 /* Cards */
 .dashboard-cards {
-  min-height: 480px;
+
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;

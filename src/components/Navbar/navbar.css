@@ -75,5 +75,9 @@
     font-size: 0.75rem;
   }
 
-  
+ .navbar-logo {
+  height: 50px;
+  width: auto; 
+  object-fit: contain;
+}
 }

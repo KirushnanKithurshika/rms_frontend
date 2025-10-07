@@ -12,7 +12,7 @@ import {
 import { MdEdit, MdDelete } from "react-icons/md";
 import { FiSearch } from 'react-icons/fi';
 import Pagination from '../../../components/Admin/pagination/pagination.tsx';
-import AddUserForm from '../../../components/Admin/adduserform/adduserform.tsx';
+
 import AddStudentForm from '../../../components/Admin/addstudentsform/addstudentsform.tsx';
 
 const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];
@@ -117,7 +117,7 @@ const StudentManagement: React.FC = () => {
                     {!showAddUserForm && (
                         <div className="dashboard-cards">
                             <div className="cardcourse">
-                                <h3>Student Management</h3>
+                                <h3 className='user-management-header'>Student Management</h3>
                                 <div className="user-management-header">
                                     <div className="custom-searchbar">
                                         <input type="text" placeholder="Search…" />

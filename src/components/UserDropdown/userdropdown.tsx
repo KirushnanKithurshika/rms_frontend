@@ -28,11 +28,17 @@ const UserDropdown: React.FC = () => {
       <div className="dropdown-itemuser" onClick={() => alert("Preferences clicked")}>
         <FaCog className="dropdown-iconuser" />
         <span>Preferences</span>
-      </div>
-      <div className="dropdown-itemuser" onClick={() => alert("Logging out...")}>
+      </Link>
+
+      <button
+        type="button"
+        className="dropdown-itemuser"
+        onClick={handleLogout}
+        role="menuitem"
+      >
         <FaSignOutAlt className="dropdown-iconuser" />
         <span>Logout</span>
-      </div>
+      </button>
     </div>
   );
 };

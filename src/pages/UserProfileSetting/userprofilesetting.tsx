@@ -1,27 +1,36 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbarin from '../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
 import { FaArrowLeft, FaChevronDown, FaCamera, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./userprofilesetting.css";
 
 const AccountSettings: React.FC = () => {
+  const navigate = useNavigate();
+
   const [showPasswordSection, setShowPasswordSection] = useState(true);
   const [profileImage, setProfileImage] = useState(
     "https://cdn-icons-png.flaticon.com/512/847/847969.png"
   );
 
-  
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
       setProfileImage(imageUrl);
     }
+  };
+
+  const handleSave = () => {
+    alert("Profile saved successfully!");
+  };
+
+  const handleCancel = () => {
+    navigate("/lecturerhome");
   };
 
   return (
@@ -32,15 +41,20 @@ const AccountSettings: React.FC = () => {
       <div className="main-area">
         <div className="dashboard-content">
           <div className="dashboard-cards">
-            <div className="card account-settings-wrapper">
+            <div className="account-settings-wrapper">
 
-             
+              {/* Header with Back Button */}
               <div className="account-settings-header">
-                <button className="back-btn" title="Go Back" aria-label="Go Back"><FaArrowLeft /></button>
-                <span className="account-title">Account Settings</span>
+                <button 
+                  className="back-btn"
+                  onClick={() => navigate("/lecturerhome")}
+                >
+                  <FaArrowLeft />
+                </button>
+                <div className="account-title">Account Settings</div>
               </div>
 
-             
+              {/* Profile Picture Section */}
               <div className="profile-header">
                 <div className="profile-picture-wrapper">
                   <img src={profileImage} alt="Profile" className="profile-picture" />
@@ -61,6 +75,7 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
 
+              {/* Basic Info Form */}
               <div className="form-grid">
                 <div className="form-group">
                   <label>User Name</label>
@@ -93,6 +108,7 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
 
+              {/* Password Management Section */}
               <div className="password-section">
                 <div className="password-header">
                   <h4>Password Management</h4>
@@ -102,13 +118,14 @@ const AccountSettings: React.FC = () => {
                     aria-label={showPasswordSection ? "Collapse password section" : "Expand password section"}
                     title={showPasswordSection ? "Collapse password section" : "Expand password section"}
                   >
-                    <FaChevronDown className={showPasswordSection ? "rotate" : " "} />
+                    <FaChevronDown className={showPasswordSection ? "rotate" : ""} />
                   </button>
                 </div>
 
                 {showPasswordSection && (
                   <div className="password-grid">
                     
+                    {/* Current Password */}
                     <div className="form-group password-input-wrapper">
                       <label>Current Password</label>
                       <div className="password-field">
@@ -125,6 +142,7 @@ const AccountSettings: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* New Password */}
                     <div className="form-group password-input-wrapper">
                       <label>New Password</label>
                       <div className="password-field">
@@ -141,7 +159,7 @@ const AccountSettings: React.FC = () => {
                       </div>
                     </div>
 
-                 
+                    {/* Confirm New Password */}
                     <div className="form-group password-input-wrapper full-width">
                       <label>Confirm New Password</label>
                       <div className="password-field">
@@ -162,10 +180,10 @@ const AccountSettings: React.FC = () => {
                 )}
               </div>
 
-             
+              {/* Action Buttons */}
               <div className="button-row">
-                <button className="save-btn">Save</button>
-                <button className="cancel-btn">Cancel</button>
+                <button className="save-btn" onClick={handleSave}>Save</button>
+                <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
               </div>
 
             </div>

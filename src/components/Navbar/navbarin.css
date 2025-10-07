@@ -95,11 +95,7 @@
     width: 100%;
     margin-bottom: 10px;
   }
-.navbar-logo {
-  height: 80px;
-  width: 100%;
- 
-}
+
   .navbar-center {
     font-size: 12px;
    
@@ -133,10 +129,10 @@
   }
 
 
- .navbar-logo {
-  height: 70px;
-  width: fit-content;
- 
+.navbar-logo {
+  height: 50px;
+  width: auto; 
+  object-fit: contain;
 }
 }
 
@@ -187,10 +183,10 @@
   }
 
 
- .navbar-logo {
+.navbar-logo {
   height: 60px;
-  width: fit-content;
- 
+  width: auto; 
+  object-fit: contain;
 }
 }
 
@@ -210,9 +206,9 @@
     text-align: center;
   }
 .navbar-logo {
-  height: 80px;
-  width: 100%;
- 
+  height: 50px;
+  width: auto; 
+  object-fit: contain;
 }
   .navbar-center {
     font-size: 12px;
@@ -248,9 +244,5 @@
   }
 
 
- .navbar-logo {
-  height: 70px;
-  width: fit-content;
- 
-}
+
 }

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import CreateCourseForm from "./components/createcourseform/createcourseform";
 import "./App.css";
 import WelcomePage from "./pages/Intropage/welcomepage";
@@ -18,10 +18,60 @@ import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
 import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
 import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
+import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
+import StudentCourses from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
+import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
+import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
+import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
+import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
 
 
 function App() {
   return (
+    <Router>
+      <div className="mt-16">
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/drop" element={<UserDropdown />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
+          <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/verification" element={<TwoStepVerification />} />
+          <Route path="/account-setting" element={<AccountSettings />} />
+          <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/createcourseui" element={<CreateCourseUI />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/results-preview" element={<ResultsPreviewPage />} />
+          <Route path="/results-analysis" element={<AnalizePage />} />
+          <Route path="/createcourse" element={<CreateCourseForm />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/user-management" element={<UserManagement />} />
+          <Route path="/admin/role-management" element={<RoleManagement />} />
+          <Route path="/admin/student-management" element={<StudentManagement />} />
+          <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
+          <Route path="/student-courses" element={<StudentCoursesPage />} />
+          <Route path="/student/transcript" element={<StudentTranscript />} />
+          <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
+          <Route path="/student/transcript/status" element={<TranscripStatus/>} />
+
+
+
+
+
+
+          {/* Lecturer */}
+
+
+
+          {/* Admin */}
+
+        </Routes>
+      </div>
+    </Router>
     <div className="mt-16">
       <Routes>
         {/* default landing: redirect to login (or to dashboard if authed) */}
@@ -66,3 +116,4 @@ function App() {
 }
 
 export default App;
+

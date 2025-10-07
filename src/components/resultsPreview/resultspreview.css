@@ -1,303 +1,329 @@
-.results-preview-container {
+.rp-container {
   padding: 20px;
   font-family: 'Segoe UI', sans-serif;
   background-color: #fff;
   color: #0a2558;
-  max-width: 794px;
 
+  margin: 0 auto;
 }
 
-/* Header */
-h3 {
+.rp-title {
   font-size: 20px;
   color: #0a2558;
- margin-top: -10px;
+  margin-top: -10px;
   margin-bottom: 16px;
-  text-align:left;
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  justify-content:left;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.tab {
-  padding: 10px 24px;
-  border: 1px solid #ccc;
-  background-color: white;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.tab.active {
-  background-color: #dff2ff;
-  border: 2px solid #1e88e5;
-  font-weight: 600;
-}
-
-
-.report-card {
-  border: 1px solid #999;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #fff;
-}
-
-
-.report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-}
-
-.report-header > div {
-  flex: 1;
-}
-
-.report-section h4 {
- text-align: left;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #0a2558;
-  font-weight: bold;
-}
-.report-section p {
   text-align: left;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #0a2558;
-  font-weight: bold;
-}
-.previewh-text p{
-  font-size: 14px;
-  color: #0a2558;
-  font-weight: bold;
-  text-align: right;
 }
 
-.report-logo {
-  text-align: center;
-  font-size: 13px;
-  color: #0a2558;
-  font-weight: 500;
+.rp-header {
+  display: block;
 }
 
-.report-logo img {
-  width: 160px;
-  height: auto;
-  margin-bottom: 6px;
+.rp-divider {
+  border: none;
+  border-top: 1px solid #041748;
+  margin-bottom: 24px;
 }
 
-.table-wrapper {
-  overflow-x: auto;
-  display: flex;
-  justify-content: center;
-}
-
-
-.results-table {
-  overflow-x: auto;
-  width: 100%;
-  max-width: 744px;
-  border-collapse: collapse;
-  font-size: 14px;
-  min-width: 700px;
-}
-
-.results-table th,
-.results-table td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
-}
-
-.results-table th {
-  background-color: #0a2558;
-  color: white;
-  font-weight: 600;
-}
-
-.results-table td {
-  background-color: #fff;
-  color: #0a2558;
-}
-
-.print-footer{
-    color:#797979 ;
-    font-size:12px;
-    text-align: left;
-}
-
-.select-container {
+.rp-select-row {
   display: flex;
   align-items: center;
-  font-family: 'Segoe UI', sans-serif;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
-.select-label {
+.rp-select-label {
   font-size: 14px;
   font-weight: 600;
   color: #40444e;
+  white-space: nowrap;
 }
 
-.custom-select {
+.rp-select {
   appearance: none;
-  width: 250px;
+  width: 400px;
   padding: 10px 36px 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
-  background-color: white;
+  background-color: #fff;
   color: #0a2558;
   background-image: url("data:image/svg+xml,%3Csvg fill='navy' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 14px;
   cursor: pointer;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Focus color */
-.custom-select:focus {
+.rp-select:focus {
   outline: none;
-  border-color: #939496;
+  border-color: #8aa7ff;
+  box-shadow: 0 0 0 3px rgba(63, 131, 248, 0.15);
 }
 
-.custom-select option {
-  padding: 10px;
-  background-color: #ffffff;
+/* ======= Tabs ======= */
+.rp-tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.rp-tab {
+  padding: 10px 24px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rp-tab:hover {
+  border-color: #bcbcbc;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.rp-tab.is-active {
+  background-color: #dff2ff;
+  border: 1px solid #d8d8d8;
+  font-weight: 600;
+}
+
+.rp-print-btn {
+  margin-left: auto;
+  background-color: #0a2558;
+  color: #fff;
+}
+
+/* ======= Card ======= */
+.rp-card {
+  max-width: 794px;
+  border: 1px solid #d6d6d6;
+  padding: 16px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(10, 37, 88, 0.04);
+}
+
+.rp-card-header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.rp-card-header>div {
+  flex: 1;
+  min-width: 0;
+}
+
+.rp-section h4 {
+  text-align: left;
+  margin: 0 0 6px;
+  font-size: 16px;
   color: #0a2558;
-  border:1px solid #939496;
+  font-weight: 700;
+}
+
+.rp-section p {
+  text-align: left;
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #0a2558;
+  font-weight: 600;
+}
+
+.rp-section.rp-right p {
+  text-align: right;
+  font-weight: 700;
+}
+
+.rp-logo {
+  text-align: center;
+}
+
+.rp-logo img {
+  width: 160px;
+  height: auto;
+  margin-bottom: 6px;
+}
+
+/* ======= Table ======= */
+.rp-table-wrap {
+  overflow-x: auto;
+  display: block;
+  width: 100%;
+}
+
+.rp-table {
+  width: 100%;
+  max-width: 744px;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 700px;
+  background-color: #fff;
+}
+
+.rp-table th,
+.rp-table td {
+  border: 1px solid #d6d6d6;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.rp-table th {
+  background-color: #0a2558;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.rp-table tbody tr:nth-child(even) td {
+  background-color: #f9fbff;
+}
+
+.rp-table td {
+  color: #0a2558;
+  font-weight: 500;
+  background-color: #fff;
+}
+
+/* Footer text in card */
+.rp-print-footer {
+  color: #797979;
   font-size: 12px;
+  text-align: left;
+  margin-top: 10px;
 }
-
-
-.custom-select option:hover {
-  background-color: #6b6a6a;
-}
-
-.dropdown-divider {
-  border: none;
-  border-top: 3px solid #041748;
-  margin: 20px 0;
-}
-
-
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .report-card,
-  .report-card * {
-    visibility: visible;
-  }
-
-  .report-card {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 0;
-    border: none !important;
-  }
-
-  .tabs,
-  .print-btn {
-    display: none !important;
-  }
-
-  .results-preview-container h3 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
-  .results-table th,
-  .results-table td {
-    font-size: 12px;
-    color:black,
-  }
-
-  .report-logo img {
-    max-width: 140px;
-  }
-
-  .print-footer {
-    display: block;
-    text-align:left;
-    margin-top: 20px;
-    font-size: 12px;
-    color: #000;
-  }
-}
-
 
 
 @media screen and (max-width: 768px) {
 
-  .results-preview-container {
-    padding: 10px;
+
+  .rp-container {
+    padding: 12px;
   }
 
-  h3 {
-    font-size: 14px;
+  .rp-title {
+    font-size: 16px;
+    margin-top: 0;
   }
 
-  .tabs {
+  .rp-tabs {
     flex-direction: column;
     gap: 8px;
   }
 
-  .tab {
+  .rp-tab {
     width: 100%;
     text-align: center;
-    padding: 8px;
+    padding: 10px;
   }
-.report-section p{
-text-align:center;
-  margin-bottom: 6px;
-  font-size: 12px;
-  color: #0a2558;
-  font-weight: bold;
-}
 
-.report-section h4{
-  text-align: center;
-
-}
-  .report-header {
+  .rp-card-header {
     flex-direction: column;
     gap: 10px;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .report-header > div {
-    width: 100%;
+  .rp-section h4 {
+    text-align: center;
+    font-size: 15px;
   }
 
-  .previewh-text {
-    text-align:center;
+  .rp-section p {
+    text-align: center;
     font-size: 12px;
   }
 
-  .results-table {
+  .rp-section.rp-right p {
+    text-align: center;
+  }
+
+  .rp-logo img {
+    width: 120px;
+  }
+
+  .rp-table {
     font-size: 12px;
     min-width: 600px;
   }
 
-  .report-logo img {
-    width: 120px;
+  .rp-select-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 
- 
+  .rp-select {
+    width: 100%;
+  }
+}
 
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+    /* full use of sheet */
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Show only Results Preview */
+  .rp-container,
+  .rp-container * {
+    visibility: visible !important;
+  }
+
+  /* Card should take full A4 width */
+  .rp-card {
+    display: block !important;
+    width: 210mm !important;
+    /* full A4 width */
+    height: auto !important;
+    /* grow with content */
+    margin: 0 !important;
+    padding: 10mm !important;
+    /* document-style margins inside */
+    box-sizing: border-box !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Table stretches with card */
+  .rp-table {
+    width: 100% !important;
+    /* take all available space */
+    min-width: 0 !important;
+    /* remove fixed 700px constraint */
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .rp-table th,
+  .rp-table td {
+    word-wrap: break-word;
+  }
+
+  /* Hide UI controls */
+  .rp-header,
+  .rp-tabs {
+    display: none !important;
+  }
 }

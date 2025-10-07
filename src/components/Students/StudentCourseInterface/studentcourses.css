@@ -1,0 +1,107 @@
+/* container */
+.sc-wrap {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  color: #0c223f;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+
+/* search on the right */
+.sc-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.sc-search {
+  position: relative;
+  width: 260px;
+  height: 36px;
+  border: 1px solid #d2d7de;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+.sc-input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  font-size: 14px;
+  padding: 0 44px 0 12px;
+}
+.sc-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.sc-ico { font-size: 15px; color: #5a6573; }
+
+/* semester block */
+.sc-card {
+  margin-top: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.sc-head {
+  background: #0a2558;  /* dark navy bar like your screenshot */
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+/* table */
+.sc-table-wrap { width: 100%; overflow-x: auto; }
+.sc-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.sc-table thead th {
+  background: #e9edf3;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.sc-table td {
+  font-size: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  color: #14233a;
+}
+
+.sc-center { text-align: center; }
+
+/* column widths close to the screenshot */
+.sc-table th:nth-child(1),
+.sc-table td:nth-child(1) { width: 22%; }
+.sc-table th:nth-child(2),
+.sc-table td:nth-child(2) { width: 38%; }
+.sc-table th:nth-child(3),
+.sc-table td:nth-child(3) { width: 15%; }
+.sc-table th:nth-child(4),
+.sc-table td:nth-child(4) { width: 25%; }
+
+/* responsive */
+@media (max-width: 760px) {
+  .sc-search { width: 100%; }
+  .sc-toolbar { justify-content: stretch; }
+}

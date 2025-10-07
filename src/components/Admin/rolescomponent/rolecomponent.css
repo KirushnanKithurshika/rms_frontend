@@ -142,3 +142,24 @@
   background-color: #ccc;
   color: black;
 }
+/* rolecomponent.css additions */
+.error-text {
+  margin-top: 8px;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.success-text {
+  margin-top: 8px;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
