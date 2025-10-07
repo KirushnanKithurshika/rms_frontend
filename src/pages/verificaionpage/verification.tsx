@@ -34,13 +34,17 @@ const TwoStepVerification: React.FC = () => {
 
   const handleVerify = async () => {
     setError(null);
-    if (!username) return setError("Missing username/email. Please login again.");
+    if (!username)
+      return setError("Missing username/email. Please login again.");
     if (otp.length !== 6) return setError("Enter the 6-digit code.");
 
     try {
       setLoading(true);
       // no Authorization header thanks to interceptor guard
-      const res = await api.post<ApiResponse<string>>("/auth/verify-otp", { username, otp });
+      const res = await api.post<ApiResponse<string>>("/auth/verify-otp", {
+        username,
+        otp,
+      });
       console.log("verify-otp response:", res.data);
 
       const token = res.data?.data;
@@ -54,7 +58,10 @@ const TwoStepVerification: React.FC = () => {
       // If you only have /admin/dashboard, use that instead:
       // navigate("/admin/dashboard", { replace: true });
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.response?.data?.error || "Invalid or expired code.";
+      const msg =
+        e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        "Invalid or expired code.";
       console.log("msg:", msg);
       setError(msg);
       console.error("OTP verify error:", e);
@@ -65,12 +72,17 @@ const TwoStepVerification: React.FC = () => {
 
   return (
     <div className="page-wrapper">
-      <div className="navcon"><Navbar /></div>
+      <div className="navcon">
+        <Navbar />
+      </div>
 
       <div className="verification-container">
         <div className="verification-box">
           <span className="verificationH"> Verification</span>
-          <p>For added security, please enter the verification code sent to your registered email or mobile number to complete the login process.</p>
+          <p>
+            For added security, please enter the verification code sent to your
+            registered email or mobile number to complete the login process.
+          </p>
 
           {username && (
             <p style={{ fontSize: 12, opacity: 0.7, marginTop: -6 }}>
@@ -87,7 +99,11 @@ const TwoStepVerification: React.FC = () => {
             inputMode="numeric"
           />
 
-          {error && <p style={{ color: "crimson", marginTop: 8, fontSize: 14 }}>{error}</p>}
+          {error && (
+            <p style={{ color: "crimson", marginTop: 8, fontSize: 14 }}>
+              {error}
+            </p>
+          )}
 
           <button
             className="verify-button"

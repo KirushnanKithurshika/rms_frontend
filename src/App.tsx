@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import CreateCourseForm from "./components/createcourseform/createcourseform";
 import "./App.css";
 import WelcomePage from "./pages/Intropage/welcomepage";
@@ -26,26 +31,26 @@ import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptAppl
 import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 
-
-
 function App() {
   return (
-      <div className="mt-16">
-        <Routes>
-          
-          <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
-          <Route path="/student-courses" element={<StudentCoursesPage />} />
-          <Route path="/student/transcript" element={<StudentTranscript />} />
-          <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
-          <Route path="/student/transcript/status" element={<TranscripStatus/>} />
+    <div className="mt-16">
+      <Routes>
+        <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
+        <Route path="/student-courses" element={<StudentCoursesPage />} />
+        <Route path="/student/transcript" element={<StudentTranscript />} />
+        <Route
+          path="/student/transcript/request"
+          element={<StudentTranscriptRequestForm />}
+        />
+        <Route
+          path="/student/transcript/status"
+          element={<TranscripStatus />}
+        />
 
+        {/* Lecturer */}
 
-          {/* Lecturer */}
+        {/* Admin */}
 
-
-          {/* Admin */}
-
-       
         {/* default landing: redirect to login (or to dashboard if authed) */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
@@ -67,7 +72,10 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/user-management" element={<UserManagement />} />
         <Route path="/admin/role-management" element={<RoleManagement />} />
-        <Route path="/admin/student-management" element={<StudentManagement />} />
+        <Route
+          path="/admin/student-management"
+          element={<StudentManagement />}
+        />
 
         {/* alias so navigate('/dashboard') works */}
         <Route path="/dashboard" element={<AdminDashboard />} />
@@ -80,12 +88,13 @@ function App() {
         {/* catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
 
-
-        <Route path="/student/student-dashboard" element={<StudentDashboard />} />
+        <Route
+          path="/student/student-dashboard"
+          element={<StudentDashboard />}
+        />
       </Routes>
     </div>
   );
 }
 
 export default App;
-

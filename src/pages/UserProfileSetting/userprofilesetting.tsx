@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbarin from '../../components/Navbar/navbarin.tsx';
-import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
-import { FaArrowLeft, FaChevronDown, FaCamera, FaEye, FaEyeSlash } from "react-icons/fa";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbarin from "../../components/Navbar/navbarin.tsx";
+import BreadcrumbNav from "../../components/breadcrumbnav/breadcrumbnav.tsx";
+import {
+  FaArrowLeft,
+  FaChevronDown,
+  FaCamera,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
 import "./userprofilesetting.css";
 
 const AccountSettings: React.FC = () => {
@@ -35,17 +41,20 @@ const AccountSettings: React.FC = () => {
 
   return (
     <div className="lec-dashboard-container">
-      <div className="nav"><Navbarin /></div>
-      <div className="breadcrumb"><BreadcrumbNav /></div>
+      <div className="nav">
+        <Navbarin />
+      </div>
+      <div className="breadcrumb">
+        <BreadcrumbNav />
+      </div>
 
       <div className="main-area">
         <div className="dashboard-content">
           <div className="dashboard-cards">
             <div className="account-settings-wrapper">
-
               {/* Header with Back Button */}
               <div className="account-settings-header">
-                <button 
+                <button
                   className="back-btn"
                   onClick={() => navigate("/lecturerhome")}
                   title="Go back"
@@ -59,7 +68,11 @@ const AccountSettings: React.FC = () => {
               {/* Profile Picture Section */}
               <div className="profile-header">
                 <div className="profile-picture-wrapper">
-                  <img src={profileImage} alt="Profile" className="profile-picture" />
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="profile-picture"
+                  />
                   <label htmlFor="profile-upload" className="camera-icon">
                     <FaCamera />
                   </label>
@@ -81,32 +94,57 @@ const AccountSettings: React.FC = () => {
               <div className="form-grid">
                 <div className="form-group">
                   <label>User Name</label>
-                  <input type="text" value="kithurshika" disabled className="input disabled-input" />
+                  <input
+                    type="text"
+                    value="kithurshika"
+                    disabled
+                    className="input disabled-input"
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Email</label>
-                  <input type="email" placeholder="Enter Email" className="input" />
+                  <input
+                    type="email"
+                    placeholder="Enter Email"
+                    className="input"
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Full Name</label>
-                  <input type="text" placeholder="Enter Full Name" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Full Name"
+                    className="input"
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Department</label>
-                  <input type="text" placeholder="Enter Department" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Department"
+                    className="input"
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Address</label>
-                  <input type="text" placeholder="Enter Address" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Address"
+                    className="input"
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Contact Number</label>
-                  <input type="text" placeholder="Enter Contact Number" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Contact Number"
+                    className="input"
+                  />
                 </div>
               </div>
 
@@ -117,27 +155,38 @@ const AccountSettings: React.FC = () => {
                   <button
                     className="collapse-btn"
                     onClick={() => setShowPasswordSection(!showPasswordSection)}
-                    aria-label={showPasswordSection ? "Collapse password section" : "Expand password section"}
-                    title={showPasswordSection ? "Collapse password section" : "Expand password section"}
+                    aria-label={
+                      showPasswordSection
+                        ? "Collapse password section"
+                        : "Expand password section"
+                    }
+                    title={
+                      showPasswordSection
+                        ? "Collapse password section"
+                        : "Expand password section"
+                    }
                   >
-                    <FaChevronDown className={showPasswordSection ? "rotate" : ""} />
+                    <FaChevronDown
+                      className={showPasswordSection ? "rotate" : ""}
+                    />
                   </button>
                 </div>
 
                 {showPasswordSection && (
                   <div className="password-grid">
-                    
                     {/* Current Password */}
                     <div className="form-group password-input-wrapper">
                       <label>Current Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showCurrentPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showCurrentPassword ? "text" : "password"}
+                          className="input"
                         />
-                        <span 
-                          className="eye-icon" 
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        <span
+                          className="eye-icon"
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                         >
                           {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
@@ -148,12 +197,12 @@ const AccountSettings: React.FC = () => {
                     <div className="form-group password-input-wrapper">
                       <label>New Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showNewPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          className="input"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowNewPassword(!showNewPassword)}
                         >
                           {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -165,29 +214,33 @@ const AccountSettings: React.FC = () => {
                     <div className="form-group password-input-wrapper full-width">
                       <label>Confirm New Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showConfirmPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          className="input"
                         />
-                        <span 
-                          className="eye-icon" 
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        <span
+                          className="eye-icon"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                         >
                           {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                       </div>
                     </div>
                   </div>
-                  
                 )}
               </div>
 
               {/* Action Buttons */}
               <div className="button-row">
-                <button className="save-btn" onClick={handleSave}>Save</button>
-                <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+                <button className="save-btn" onClick={handleSave}>
+                  Save
+                </button>
+                <button className="cancel-btn" onClick={handleCancel}>
+                  Cancel
+                </button>
               </div>
-
             </div>
           </div>
         </div>

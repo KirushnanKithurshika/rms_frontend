@@ -16,7 +16,8 @@ const StudentTranscript = () => {
   const lastUpdated = "2025-09-25 14:05";
 
   const handleApply = () => navigate("/student/transcript/apply");
-  const handleOpen = () => navigate(`/student/transcript/view?id=${transcriptId}`);
+  const handleOpen = () =>
+    navigate(`/student/transcript/view?id=${transcriptId}`);
   const handleDownload = () => {
     // e.g., window.open(`/api/transcripts/${transcriptId}/pdf`, "_blank");
   };
@@ -38,8 +39,8 @@ const StudentTranscript = () => {
 
           <div className="card-students-trsnscript">
             <TranscriptAvailability
-              status="available"                   // "available" | "processing" | "notApplied"
-              imageSrc={readyImg}                 // or use: "/images/transcript-ready.png"
+              status="available" // "available" | "processing" | "notApplied"
+              imageSrc={readyImg} // or use: "/images/transcript-ready.png"
               onApply={handleApply}
               onOpen={handleOpen}
               onDownload={handleDownload}
