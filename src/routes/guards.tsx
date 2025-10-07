@@ -1,37 +1,82 @@
 // src/routes/guards.tsx
-import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import React, { useMemo } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { useAppSelector } from "../app/hooks"; // <- typed hooks
+import { selectToken } from "../features/auth/selectors"; // <- from auth slice
 
-type Claims = { exp?: number; roles?: string[] };
+type Claims = {
+  exp?: number;
+  roles?: string[];
+  sub?: string;
+};
 
-function isAuthed() {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
+// ---- helpers ----
+function parseClaims(token: string | null): Claims | null {
+  if (!token) return null;
   try {
-    const { exp } = jwtDecode<Claims>(token);
-    return !exp || Date.now() / 1000 < exp;
+    return jwtDecode<Claims>(token);
   } catch {
-    return false;
+    return null;
   }
 }
 
-function hasRole(required: string[]) {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
-  try {
-    const { roles = [] } = jwtDecode<Claims>(token);
-    return required.some(r => roles.includes(r));
-  } catch {
-    return false;
-  }
+function isTokenValid(token: string | null): boolean {
+  const claims = parseClaims(token);
+  if (!claims) return false;
+  const { exp } = claims;
+  // valid if no exp (rare) or current time < exp
+  return !exp || Date.now() / 1000 < exp;
 }
 
+function hasAnyRole(token: string | null, required: string[]): boolean {
+  const claims = parseClaims(token);
+  if (!claims) return false;
+  const roles = claims.roles || [];
+  return required.some((r) => roles.includes(r));
+}
+
+// ---- Guards ----
+
+// Blocks unauthenticated users.
 export function RequireAuth() {
-  return isAuthed() ? <Outlet /> : <Navigate to="/login" replace />;
+  const reduxToken = useAppSelector(selectToken);
+  // fall back to localStorage so refreshes still work before slice hydrates
+  const token = reduxToken ?? localStorage.getItem("token");
+  const location = useLocation();
+
+  const ok = useMemo(() => isTokenValid(token), [token]);
+  if (!ok) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+  return <Outlet />;
 }
 
+// Blocks users who lack required roles.
 export function RequireRole({ roles }: { roles: string[] }) {
-  if (!isAuthed()) return <Navigate to="/login" replace />;
-  return hasRole(roles) ? <Outlet /> : <Navigate to="/not-authorized" replace />;
+  const reduxToken = useAppSelector(selectToken);
+  const token = reduxToken ?? localStorage.getItem("token");
+  const location = useLocation();
+
+  const authed = useMemo(() => isTokenValid(token), [token]);
+  if (!authed) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+  const allowed = useMemo(() => hasAnyRole(token, roles), [token, roles]);
+  return allowed ? <Outlet /> : <Navigate to="/not-authorized" replace />;
+}
+
+// Keeps authenticated users away from pages like /login or /verification.
+export function RequireAnonymous() {
+  const reduxToken = useAppSelector(selectToken);
+  const token = reduxToken ?? localStorage.getItem("token");
+  const authed = useMemo(() => isTokenValid(token), [token]);
+  return authed ? <Navigate to="/dashboard" replace /> : <Outlet />;
+}
+
+// Optional tiny helpers you may export/use elsewhere
+export function getUserRoles(): string[] {
+  const token = localStorage.getItem("token");
+  const claims = parseClaims(token);
+  return claims?.roles ?? [];
 }

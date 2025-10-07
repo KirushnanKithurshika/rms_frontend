@@ -2,30 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./verification.css";
-import api from "../../services/api";
 
-type ApiResponse<T> = {
-  status: string;
-  statusCode?: string;
-  message?: string;
-  type?: string;
-  data: T; // JWT in 'data'
-};
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { verifyOtpThunk, resetError } from "../../features/auth/authSlice";
+import {
+  selectAuthError,
+  selectAuthStatus,
+  selectPendingUsername,
+} from "../../features/auth/selectors";
+import { showError, showSuccess } from "../../utils/toast";
 
 const TwoStepVerification: React.FC = () => {
   const [otp, setOtp] = useState("");
-  const [username, setUsername] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [uiUsername, setUiUsername] = useState("");
+
+  const dispatch = useAppDispatch();
+  const status = useAppSelector(selectAuthStatus);
+  const error = useAppSelector(selectAuthError);
+  const pendingUsername = useAppSelector(selectPendingUsername);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const fromState = (location.state as any)?.username;
-    const stored = localStorage.getItem("pendingUsername");
-    setUsername(fromState || stored || "");
-  }, [location.state]);
+    setUiUsername(fromState || pendingUsername || "");
+  }, [location.state, pendingUsername]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -33,47 +35,34 @@ const TwoStepVerification: React.FC = () => {
   };
 
   const handleVerify = async () => {
-    setError(null);
-    if (!username) return setError("Missing username/email. Please login again.");
-    if (otp.length !== 6) return setError("Enter the 6-digit code.");
+    if (!uiUsername)
+      return showError("Username missing — please log in again.");
+    if (otp.length !== 6) return showError("Please enter a valid 6-digit OTP.");
 
-    try {
-      setLoading(true);
-      // no Authorization header thanks to interceptor guard
-      const res = await api.post<ApiResponse<string>>("/auth/verify-otp", { username, otp });
-      console.log("verify-otp response:", res.data);
+    dispatch(resetError());
+    const res = await dispatch(verifyOtpThunk({ username: uiUsername, otp }));
 
-      const token = res.data?.data;
-      if (!token) return setError("Verification failed: no token received.");
-
-      localStorage.setItem("token", token);
-      localStorage.removeItem("pendingUsername");
-
-      // Go to dashboard (use the route that actually exists in App.tsx)
+    if (verifyOtpThunk.fulfilled.match(res)) {
       navigate("/dashboard", { replace: true });
-      // If you only have /admin/dashboard, use that instead:
-      // navigate("/admin/dashboard", { replace: true });
-    } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.response?.data?.error || "Invalid or expired code.";
-      setError(msg);
-      console.error("OTP verify error:", e);
-    } finally {
-      setLoading(false);
     }
   };
 
+  const loading = status === "loading";
+
   return (
     <div className="page-wrapper">
-      <div className="navcon"><Navbar /></div>
+      <div className="navcon">
+        <Navbar />
+      </div>
 
       <div className="verification-container">
         <div className="verification-box">
           <span className="verificationH">Two Step Verification</span>
-          <p>For added security, please enter the verification code sent to your registered email or mobile number to complete the login process.</p>
+          <p>Enter the 6-digit code sent to your email.</p>
 
-          {username && (
+          {uiUsername && (
             <p style={{ fontSize: 12, opacity: 0.7, marginTop: -6 }}>
-              Verifying: <b>{username}</b>
+              Verifying: <b>{uiUsername}</b>
             </p>
           )}
 
@@ -86,12 +75,16 @@ const TwoStepVerification: React.FC = () => {
             inputMode="numeric"
           />
 
-          {error && <p style={{ color: "crimson", marginTop: 8, fontSize: 14 }}>{error}</p>}
+          {error && (
+            <p style={{ color: "crimson", marginTop: 8, fontSize: 14 }}>
+              {error}
+            </p>
+          )}
 
           <button
             className="verify-button"
             onClick={handleVerify}
-            disabled={loading || otp.length !== 6 || !username}
+            disabled={loading}
           >
             {loading ? "Verifying..." : "Verify"}
           </button>

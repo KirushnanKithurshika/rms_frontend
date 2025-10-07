@@ -4,41 +4,39 @@ import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./LoginPage.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import api from "../../services/api.tsx";
+
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  loginThunk,
+  setPendingUsername,
+  resetError,
+} from "../../features/auth/authSlice";
+import {
+  selectAuthError,
+  selectAuthStatus,
+} from "../../features/auth/selectors";
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState(""); // <-- add
   const [password, setPassword] = useState(""); // <-- add
-  const [loading, setLoading] = useState(false); // <-- add
-  const [error, setError] = useState<string | null>(null); // <-- add
+  const dispatch = useAppDispatch();
+  const status = useAppSelector(selectAuthStatus);
+  const error = useAppSelector(selectAuthError);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    setError(null);
-    setLoading(true);
-    // ensure no stale token goes with /auth/login
-    localStorage.removeItem("token");
+  const loading = status === "loading";
 
-    try {
-      // adjust keys if your backend expects { email, password }
-      const res = await api.post("/auth/login", { username, password });
-      // if login returns nothing but triggers OTP, that’s fine
-      localStorage.setItem("pendingUsername", username);
+  const handleLogin = async () => {
+    if (!username || !password) return;
+    dispatch(resetError());
+    dispatch(setPendingUsername(username));
+
+    const res = await dispatch(loginThunk({ username, password }));
+    if (loginThunk.fulfilled.match(res)) {
       navigate("/verification", { state: { username } });
-    } catch (e: any) {
-      // Friendly error
-      const msg =
-        e?.response?.data?.message ||
-        e?.response?.data?.error ||
-        "Login failed. Check username/password.";
-      setError(msg);
-      console.error("Login error:", e);
-    } finally {
-      setLoading(false);
     }
   };
-
   return (
     <div className="page-wrapper">
       <div className="navcon">
