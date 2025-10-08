@@ -30,6 +30,7 @@ import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTra
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
+import RequireAuth from './routes/RequireAuth';
 
 function App() {
   return (
