@@ -1,0 +1,33 @@
+/* Responsive filter grid: Search | Action | Entity | Date | Buttons */
+.audit-filters {
+  display: grid;
+  grid-template-columns: 1fr 180px 220px 280px auto;
+  gap: 12px;
+  align-items: end;
+}
+
+/* Collapse to single column on small screens */
+@media (max-width: 992px) {
+  .audit-filters {
+    grid-template-columns: 1fr;
+  }
+  .audit-filter-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+/* Large Name search input like the screenshot */
+.audit-search .ant-input-prefix {
+  margin-right: 10px;
+}
+.audit-search-label {
+  font-weight: 600;
+  color: #1f1f1f;
+}
+.audit-search input {
+  padding-left: 0; /* rely on prefix spacing */
+}
+
+
+

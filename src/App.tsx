@@ -44,6 +44,7 @@ import UserDropdown from "./components/UserDropdown/userdropdown";
 // ---------- Guards ----------
 import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
 import LandingRedirect from "./routes/LandingRedirect";
+import AuditLog from "./pages/AuditLog/AuditLog";
 
 // ---------- Fallback ----------
 const NotAuthorized = () => (
@@ -123,7 +124,9 @@ function App() {
               path="/admin/student-management"
               element={<StudentManagement />}
             />
+            <Route path="/admin/audit-logs" element={<AuditLog />} />
           </Route>
+
 
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
