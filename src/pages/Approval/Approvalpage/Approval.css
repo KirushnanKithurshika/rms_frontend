@@ -5,23 +5,25 @@
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
 
 
+
 }
 
 .main-area-approval {
     display: flex;
     flex: 1;
     background-color: #e4e4e4;
-    overflow: hidden;
-}
-
-.dashboard-content-approval {
-    margin-top: 100px;
-    flex: 1;
-
     overflow-y: auto;
 }
 
+.dashboard-content-approval {
+    display: flex;
+    margin-top: 100px;
+    flex: 1;
+    overflow-y: hidden;
+}
+
 .card-approval {
+    height: fit-content;
     margin: 10px;
     width: 100%;
     background-color: #fff;
@@ -37,18 +39,19 @@
 @media (max-width: 768px) {
 
 
-.main-area-approval{
-    display: block;
-    position: relative;
-    height: 100%;
-    margin: 10px;
-  }
+    .main-area-approval {
+        display: block;
+        position: relative;
+        height: 100%;
+        margin: 10px;
+    }
 
-  .card-approval {
-    height:100%;
-    width: auto;
-    flex: none;
-  }
+    .card-approval {
+
+        width: auto;
+        flex: none;
+    }
+
     .sidebar-approval {
         position: fixed;
         top: 90px;

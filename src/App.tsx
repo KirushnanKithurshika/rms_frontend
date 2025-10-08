@@ -26,13 +26,14 @@ import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTra
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
-import ApprovalPage from "./pages/Approval/Approval";
+import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 
 
 
 function App() {
   return (
     <Router>
+
       <div className="mt-16">
         <Routes>
           {/* Public */}
@@ -59,7 +60,7 @@ function App() {
           <Route path="/student/transcript" element={<StudentTranscript />} />
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
-          <Route path="/approval" element={<ApprovalPage />} />
+          <Route path="/approval-requests" element={<ApprovalPage />} />
 
 
 

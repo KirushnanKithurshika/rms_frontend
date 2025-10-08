@@ -20,7 +20,7 @@ const ApprovalSidebar: React.FC = () => {
   };
 
  
-  const BASE = "/staff/approvals";
+
 
   return (
     <aside className={`student-sidebar ${sidebarState}`} aria-label="Approvals sidebar">
@@ -42,7 +42,7 @@ const ApprovalSidebar: React.FC = () => {
           <div className="sidebar-divider" />
 
           <NavLink
-            to={BASE}
+            to={`/approval-requests`}
             end
             className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
           >
@@ -52,7 +52,7 @@ const ApprovalSidebar: React.FC = () => {
 
         
           <NavLink
-            to={`${BASE}/history`}
+            to={`/history`}
             className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
           >
             <FaReceipt className="sidebar-icon" />
