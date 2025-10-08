@@ -1,10 +1,9 @@
-/* ======= Container & Header (namespaced) ======= */
 .rp-container {
   padding: 20px;
   font-family: 'Segoe UI', sans-serif;
   background-color: #fff;
   color: #0a2558;
-  max-width: 794px;   /* ~A4 width at 96dpi */
+
   margin: 0 auto;
 }
 
@@ -16,14 +15,16 @@
   text-align: left;
 }
 
-.rp-header { display: block; }
+.rp-header {
+  display: block;
+}
+
 .rp-divider {
   border: none;
   border-top: 1px solid #041748;
   margin-bottom: 24px;
 }
 
-/* ======= Select Row ======= */
 .rp-select-row {
   display: flex;
   align-items: center;
@@ -40,7 +41,7 @@
 
 .rp-select {
   appearance: none;
-  width: 260px;
+  width: 400px;
   padding: 10px 36px 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -83,7 +84,7 @@
 
 .rp-tab:hover {
   border-color: #bcbcbc;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 
 .rp-tab.is-active {
@@ -92,10 +93,15 @@
   font-weight: 600;
 }
 
-.rp-print-btn { margin-left: auto; }
+.rp-print-btn {
+  margin-left: auto;
+  background-color: #0a2558;
+  color: #fff;
+}
 
 /* ======= Card ======= */
 .rp-card {
+  max-width: 794px;
   border: 1px solid #d6d6d6;
   padding: 16px;
   border-radius: 10px;
@@ -104,6 +110,7 @@
 }
 
 .rp-card-header {
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -111,7 +118,10 @@
   margin-bottom: 18px;
 }
 
-.rp-card-header > div { flex: 1; min-width: 0; }
+.rp-card-header>div {
+  flex: 1;
+  min-width: 0;
+}
 
 .rp-section h4 {
   text-align: left;
@@ -120,6 +130,7 @@
   color: #0a2558;
   font-weight: 700;
 }
+
 .rp-section p {
   text-align: left;
   margin: 0 0 6px;
@@ -127,12 +138,16 @@
   color: #0a2558;
   font-weight: 600;
 }
+
 .rp-section.rp-right p {
   text-align: right;
   font-weight: 700;
 }
 
-.rp-logo { text-align: center; }
+.rp-logo {
+  text-align: center;
+}
+
 .rp-logo img {
   width: 160px;
   height: auto;
@@ -188,83 +203,29 @@
   margin-top: 10px;
 }
 
-/* ======= Print (NAMESPACED — won’t affect other pages) ======= */
-@media print {
-  @page { size: A4 portrait; margin: 12mm; }
-  /* Hide only this component’s controls */
-  .rp-container .rp-tabs,
-  .rp-container .rp-print-btn,
-  .rp-container .rp-header,
-  .rp-container .rp-divider,
-  .rp-container .rp-select-row {
-    display: none !important;
-  }
 
-  .rp-container {
-    max-width: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .rp-container,
-  .rp-container * {
-    visibility: visible !important;
-  }
-
-  .rp-card {
-    position: static !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .rp-table th,
-  .rp-table td {
-    font-size: 12px;
-    color: #000;
-    border-color: #999 !important;
-  }
-
-  /* Keep header color in print */
-  .rp-table th {
-    background-color: #0a2558 !important;
-    color: #fff !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .rp-logo img { max-width: 140px; }
-
-  .rp-print-footer {
-    display: block;
-    text-align: left;
-    margin-top: 16px;
-    font-size: 12px;
-    color: #000;
-  }
-
-  /* Avoid splitting rows across pages */
-  .rp-table,
-  .rp-table thead,
-  .rp-table tbody,
-  .rp-table tr,
-  .rp-table td,
-  .rp-table th {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-}
-
-/* ======= Responsive ======= */
 @media screen and (max-width: 768px) {
 
-  
-  .rp-container { padding: 12px; }
-  .rp-title { font-size: 16px; margin-top: 0; }
 
-  .rp-tabs { flex-direction: column; gap: 8px; }
-  .rp-tab { width: 100%; text-align: center; padding: 10px; }
+  .rp-container {
+    padding: 12px;
+  }
+
+  .rp-title {
+    font-size: 16px;
+    margin-top: 0;
+  }
+
+  .rp-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rp-tab {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
 
   .rp-card-header {
     flex-direction: column;
@@ -272,13 +233,28 @@
     align-items: stretch;
   }
 
-  .rp-section h4 { text-align: center; font-size: 15px; }
-  .rp-section p { text-align: center; font-size: 12px; }
-  .rp-section.rp-right p { text-align: center; }
+  .rp-section h4 {
+    text-align: center;
+    font-size: 15px;
+  }
 
-  .rp-logo img { width: 120px; }
+  .rp-section p {
+    text-align: center;
+    font-size: 12px;
+  }
 
-  .rp-table { font-size: 12px; min-width: 600px; }
+  .rp-section.rp-right p {
+    text-align: center;
+  }
+
+  .rp-logo img {
+    width: 120px;
+  }
+
+  .rp-table {
+    font-size: 12px;
+    min-width: 600px;
+  }
 
   .rp-select-row {
     flex-direction: column;
@@ -286,5 +262,68 @@
     gap: 6px;
   }
 
-  .rp-select { width: 100%; }
+  .rp-select {
+    width: 100%;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+    /* full use of sheet */
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Show only Results Preview */
+  .rp-container,
+  .rp-container * {
+    visibility: visible !important;
+  }
+
+  /* Card should take full A4 width */
+  .rp-card {
+    display: block !important;
+    width: 210mm !important;
+    /* full A4 width */
+    height: auto !important;
+    /* grow with content */
+    margin: 0 !important;
+    padding: 10mm !important;
+    /* document-style margins inside */
+    box-sizing: border-box !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Table stretches with card */
+  .rp-table {
+    width: 100% !important;
+    /* take all available space */
+    min-width: 0 !important;
+    /* remove fixed 700px constraint */
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .rp-table th,
+  .rp-table td {
+    word-wrap: break-word;
+  }
+
+  /* Hide UI controls */
+  .rp-header,
+  .rp-tabs {
+    display: none !important;
+  }
 }

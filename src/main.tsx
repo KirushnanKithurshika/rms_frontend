@@ -1,14 +1,19 @@
-// src/main.tsx
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
 import { BrowserRouter } from "react-router-dom";
-import "./index.css";
 import App from "./App";
+import "./index.css";
+import { ToastContainer } from "react-toastify";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>
 );

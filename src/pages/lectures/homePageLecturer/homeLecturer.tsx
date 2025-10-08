@@ -1,29 +1,56 @@
-import { useState } from 'react';
-import Navbarin from '../../../components/Navbar/navbarin.tsx';
-import './homeLecturer.css';
-import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
-import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx'
-import DonutChart from '../../../components/graphs/passfailgraph/passfailgraph.tsx'
-import MarksRangeBarChart from '../../../components/graphs/marksrangegraph/marksrange.tsx'
+import { useEffect, useState } from "react";
+import Navbarin from "../../../components/Navbar/navbarin.tsx";
+import "./homeLecturer.css";
+import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar.tsx";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
+import CourseSearchBarlechome from "../../../components/SearchDropdown/searchdropdown.tsx";
+import DonutChart from "../../../components/graphs/passfailgraph/passfailgraph.tsx";
+import MarksRangeBarChart from "../../../components/graphs/marksrangegraph/marksrange.tsx";
+import { useAppSelector } from "../../../app/hooks.ts";
+import {
+  selectUsername,
+  selectUserId,
+  selectUserRoles,
+  selectPrivileges,
+} from "../../../features/auth/selectors.ts";
 const LecturerDashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  //     // ✅ move these hooks inside the component
+  // const username = useAppSelector(selectUsername);
+  // const userId = useAppSelector(selectUserId);
+  // const roles = useAppSelector(selectUserRoles);
+  // const previleges=useAppSelector(selectPrivileges);
+
+  // // ✅ log them when component mounts or updates
+  // useEffect(() => {
+  //   console.log("🔹 AdminDashboard loaded");
+  //   console.log("Username:", username);
+  //   console.log("User ID:", userId);
+  //   console.log("Roles:", roles);
+  //   console.log("Privileges:", previleges);
+  // }, [username, userId, roles, previleges]);
 
   const handleBackdropClick = () => setSidebarOpen(false);
 
   return (
     <div className="lec-dashboard-container">
-      <div className='nav'> <Navbarin /></div>
+      <div className="nav">
+        {" "}
+        <Navbarin />
+      </div>
 
-      <div className='breadcrumb'>
+      <div className="breadcrumb">
         <BreadcrumbNav />
       </div>
 
-   
-      <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={handleBackdropClick}></div>
+      <div
+        className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`}
+        onClick={handleBackdropClick}
+      ></div>
 
       <div className="main-area">
-        <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}>
+        <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
           <LectureSidebar />
         </div>
 
@@ -46,11 +73,9 @@ const LecturerDashboard = () => {
           <div className="analytics-section">
             <div className="analytics-header">
               <h3>Analytics Latest Updates</h3>
-              <div className='searchbarlecturer'>
+              <div className="searchbarlecturer">
                 <CourseSearchBarlechome />
               </div>
-
-
             </div>
             <div className="analytics-graphs-container">
               <div className="graph-card">
@@ -63,12 +88,7 @@ const LecturerDashboard = () => {
                 <MarksRangeBarChart />
               </div>
             </div>
-
-
-
-
           </div>
-
         </div>
       </div>
     </div>

@@ -163,7 +163,7 @@ const StudentManagement: React.FC = () => {
                     {!showForm && (
                         <div className="dashboard-cards">
                             <div className="cardcourse">
-                                <h3>Student Management</h3>
+                                <h3 className='user-management-header'>Student Management</h3>
                                 <div className="user-management-header">
                                     <div className="custom-searchbar">
                                         <input type="text" placeholder="Search…" />

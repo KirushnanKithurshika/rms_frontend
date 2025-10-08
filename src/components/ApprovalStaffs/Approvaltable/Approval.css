@@ -1,0 +1,139 @@
+.ar-table-wrap {
+    width: 100%;
+}
+
+.ar-table-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+    overflow: hidden;
+}
+
+
+.ar-table-head {
+    background: #0a3f58;
+    color: #fff;
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+
+.ar-scroll-x {
+    overflow-x: auto;
+}
+
+
+.ar-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 620px;
+    }
+
+.ar-table thead th {
+    background: #979ca6;
+    color: #fff;
+    text-align: left;
+    font-weight: 700;
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #0a2558;
+}
+
+.ar-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    font-size: 14px;
+    color: #0a223f;
+}
+
+.ar-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.ar-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ar-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.ar-name {
+    font-weight: 600;
+}
+
+
+.ar-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #eef2f7;
+    color: #0a2558;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.ar-dept {
+    color: #0a2558;
+    font-weight: 600;
+}
+
+
+.ar-actions-col {
+    width: 160px;
+}
+
+.ar-actions {
+    text-align: right;
+}
+
+.ar-btn-approve {
+    appearance: none;
+    border: 0;
+    background: #dc2626;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, .25);
+    transition: transform .04s ease, filter .2s ease, box-shadow .2s ease;
+}
+
+.ar-btn-approve:hover {
+    filter: brightness(0.95);
+}
+
+.ar-btn-approve:active {
+    transform: translateY(1px);
+}
+
+.ar-btn-approve:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+
+.ar-loading,
+.ar-empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 16px 8px;
+}
+@media (max-width: 520px) {
+    .ar-actions {
+        text-align: left;
+        padding-top: 6px;
+    }
+
+    .ar-actions-col {
+        width: auto;
+    }
+}

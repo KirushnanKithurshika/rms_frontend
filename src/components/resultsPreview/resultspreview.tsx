@@ -28,6 +28,7 @@ const ResultsPreview: React.FC = () => {
   };
 
   return (
+    
     <div className="rp-container">
       <div className="rp-header">
         <h3 className="rp-title">Results Preview</h3>

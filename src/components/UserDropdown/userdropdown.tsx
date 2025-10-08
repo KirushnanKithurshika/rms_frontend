@@ -3,13 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 import "./userdropdown.css";
 import { logout } from "../../services/auth";
+import { useAppDispatch } from "../../app/hooks";
+import { logoutThunk } from "../../features/auth/authSlice";
+import { showSuccess, showError } from "../../utils/toast";
 
 const UserDropdown: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const handleLogout = async () => {
-    await logout(); // clear token (and optional server call)
-    navigate("/login", { replace: true }); // send to login
+    // Dispatch Redux async thunk — it will clear token & session
+    await dispatch(logoutThunk());
+    showSuccess("Logout Success..");
+
+    // Redirect user to login page
+    navigate("/login", { replace: true });
   };
 
   return (

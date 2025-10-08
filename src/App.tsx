@@ -1,111 +1,136 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import CreateCourseForm from "./components/createcourseform/createcourseform";
+// src/App.tsx
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
-import "./App.css";
+
+// ---------- Pages ----------
 import WelcomePage from "./pages/Intropage/welcomepage";
 import LoginPage from "./pages/loginpage/loginpage";
-import TwoStepVerification from "./pages/verificaionpage/verification"; // if your folder is "verificationpage", fix this path
-import UserDropdown from "./components/UserDropdown/userdropdown";
+import TwoStepVerification from "./pages/verificaionpage/verification";
+import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
+import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
+
+// Lecturer
 import LecturerDashboard from "./pages/lectures/homePageLecturer/homeLecturer";
 import CreateCourseUI from "./pages/lectures/createcourse/createcourse";
 import Courses from "./pages/lectures/courses/courses";
 import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
 import AnalizePage from "./pages/lectures/analysepage/analysepage";
+import CreateCourseForm from "./components/createcourseform/createcourseform";
+
+// Admin
 import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
 import UserManagement from "./pages/Admin/usermanagement/usermanagement";
 import RoleManagement from "./pages/Admin/rolemanagementpage/rolemanagement";
-import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
-import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
-import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
 
-// ---- inline guards (no extra files needed) ----
-type Claims = { exp?: number; roles?: string[]; authorities?: string[] };
+// Students
+import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
+import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
+import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
+import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
+import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
+import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 
-const isAuthed = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
-  try {
-    const { exp } = jwtDecode<Claims>(token);
-    return !exp || Date.now() / 1000 < exp;
-  } catch {
-    return false;
-  }
-};
+// Shared / user
+import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
+import UserDropdown from "./components/UserDropdown/userdropdown";
 
-const hasAny = (required: string[]) => {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
-  try {
-    const { roles = [], authorities = [] } = jwtDecode<Claims>(token);
-    const haystack = new Set([...(roles || []), ...(authorities || [])]);
-    return required.some((r) => haystack.has(r));
-  } catch {
-    return false;
-  }
-};
+// ---------- Guards ----------
+import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
+import LandingRedirect from "./routes/LandingRedirect";
 
-const RequireAuth = () => (isAuthed() ? <Outlet /> : <Navigate to="/login" replace />);
-
-const RequireRole = ({ roles }: { roles: string[] }) =>
-  !isAuthed()
-    ? <Navigate to="/login" replace />
-    : hasAny(roles)
-      ? <Outlet />
-      : <Navigate to="/not-authorized" replace />;
-
-// very small inline page; optional
+// ---------- Fallback ----------
 const NotAuthorized = () => (
-  <div style={{ padding: 24 }}>
-    <h2>403 – Not authorized</h2>
-    <p>You don’t have permission to view this page.</p>
+  <div style={{ padding: "2rem", textAlign: "center" }}>
+    <h2>403 – Not Authorized</h2>
+    <p>You don’t have permission to access this page.</p>
   </div>
 );
 
-// ------------------------------------------------
-
+// ==========================================================
+// APP ROUTES
+// ==========================================================
 function App() {
   return (
     <div className="mt-16">
-      <Routes>
-        {/* public / auth flow */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/welcomepage" element={<WelcomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/verification" element={<TwoStepVerification />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
-        <Route path="/not-authorized" element={<NotAuthorized />} />
+      <div className="mt-16">
+        <Routes>
+          {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/welcomepage" element={<WelcomePage />} />
+          <Route path="/not-authorized" element={<NotAuthorized />} />
 
-        {/* any logged-in user */}
-        <Route element={<RequireAuth />}>
-          <Route path="/drop" element={<UserDropdown />} />
-          <Route path="/createcourse" element={<CreateCourseForm />} />
-          <Route path="/lecturerhome" element={<LecturerDashboard />} />
-          <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/results-preview" element={<ResultsPreviewPage />} />
-          <Route path="/results-analysis" element={<AnalizePage />} />
-          <Route path="/account-setting" element={<AccountSettings />} />
-          {/* alias so navigate('/dashboard') works for any authed user */}
-          <Route path="/dashboard" element={<AdminDashboard />} />
-        </Route>
+          {/* Login, verification, reset - accessible only if NOT logged in */}
+          <Route element={<RequireAnonymous />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/verification" element={<TwoStepVerification />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route
+              path="/reset-password-mail"
+              element={<ResetPasswordEmail />}
+            />
+          </Route>
 
-        {/* ADMIN-only area */}
-        <Route element={<RequireRole roles={["ADMIN"]} />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/user-management" element={<UserManagement />} />
-          <Route path="/admin/role-management" element={<RoleManagement />} />
-          <Route path="/admin/student-management" element={<StudentManagement />} />
-        </Route>
+          {/* ------------------ AUTHENTICATED AREA ------------------ */}
+          <Route element={<RequireAuth />}>
+            {/* Generic pages (accessible to all logged-in users) */}
+            <Route path="/dashboard" element={<AdminDashboard />} />
+            <Route path="/landing" element={<LandingRedirect />} />
+            <Route path="/drop" element={<UserDropdown />} />
+            <Route path="/account-setting" element={<AccountSettings />} />
 
-        {/* catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+            {/* Lecturer routes */}
+            <Route path="/lecturerhome" element={<LecturerDashboard />} />
+            <Route path="/createcourse" element={<CreateCourseForm />} />
+            <Route path="/createcourseui" element={<CreateCourseUI />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/results-preview" element={<ResultsPreviewPage />} />
+            <Route path="/results-analysis" element={<AnalizePage />} />
+
+            {/* Student routes */}
+            <Route
+              path="/student/student-dashboard"
+              element={<StudentDashboard />}
+            />
+            <Route
+              path="/StudentResultsSheet"
+              element={<StudentResultsSheet />}
+            />
+            <Route path="/student-courses" element={<StudentCoursesPage />} />
+            <Route path="/student/transcript" element={<StudentTranscript />} />
+            <Route
+              path="/student/transcript/request"
+              element={<StudentTranscriptRequestForm />}
+            />
+            <Route
+              path="/student/transcript/status"
+              element={<TranscripStatus />}
+            />
+          </Route>
+
+          {/* ------------------ ADMIN-ONLY AREA ------------------ */}
+          <Route element={<RequireRole roles={["ADMIN"]} />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/user-management" element={<UserManagement />} />
+            <Route path="/admin/role-management" element={<RoleManagement />} />
+            <Route
+              path="/admin/student-management"
+              element={<StudentManagement />}
+            />
+          </Route>
+
+          {/* ------------------ FALLBACK ------------------ */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
     </div>
   );
 }
 
 export default App;
-
