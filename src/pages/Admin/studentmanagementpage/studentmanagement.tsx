@@ -286,6 +286,7 @@ const StudentManagement: React.FC = () => {
                                                                     onClick={() => {
                                                                         setFormMode('edit');
                                                                         setSelectStudentId(student.id ?? student.studentId);
+                                                                        console.log("edit student Id: ", student.id ?? student.studentId);
                                                                         setShowForm(true);
                                                                     }}
                                                                 >

@@ -36,7 +36,7 @@ interface AddStudentFormProps {
   onUpdate?: () => void;
 }
 
-const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClose, onCreate }) => {
+const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClose, onCreate, onUpdate }) => {
   const [form] = Form.useForm();
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -200,18 +200,21 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
   };
 
   const handleFinish = async (values: any) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      messageApi.error("You are not authenticated");
-      return;
-    }
+  const token = localStorage.getItem("token");
+  if (!token) {
+    messageApi.error("You are not authenticated");
+    return;
+  }
 
-    const isCreate = mode === "create";
-    const isEdit = mode === "edit";
-    let payload: StudentRegisterRequest | StudentUpdateRequest;
+  const isCreate = mode === "create";
+  const isEdit = mode === "edit";
 
-    if (isCreate) {
-      payload = {
+  // Log for debugging
+  console.log("Submitting student:", { mode, studentId, values });
+
+  // Build payload based on mode
+  const payload: StudentRegisterRequest | StudentUpdateRequest = isCreate
+    ? {
         firstName: values.firstName,
         lastName: values.lastName,
         registrationNumber: values.registrationNumber,
@@ -222,9 +225,8 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
         gender: values.gender,
         dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
         address: values.address,
-      };
-    } else {
-      payload = {
+      }
+    : {
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
@@ -233,33 +235,32 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
         gender: values.gender,
         dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
       };
-    }
-    try {
-      setSubmitting(true);
 
-      if (isCreate) {
-        await axios.post(`${API_BASE_URL}/v1/students`, payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        messageApi.success("Student registered successfully");
-        form.resetFields();
-        onCreate?.(payload as StudentRegisterRequest);
-      }
+  try {
+    setSubmitting(true);
 
-      if (mode === 'edit' && studentId) {
-        await axios.put(`${API_BASE_URL}/v1/students/${studentId}`, payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        messageApi.success("Student updated successfully");
-        onUpdate?.(); // call parent callback to refresh
-      }
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || "Operation failed";
-      messageApi.error(msg);
-    } finally {
-      setSubmitting(false);
+    if (isCreate) {
+      await axios.post(`${API_BASE_URL}/v1/students`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      form.resetFields();
+      onCreate?.(payload as StudentRegisterRequest);
+      messageApi.success("Student registered successfully");
+    } else if (isEdit && studentId) {
+      await axios.put(`${API_BASE_URL}/v1/students/${studentId}`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      messageApi.success("Student updated successfully");
+      onUpdate?.();
     }
-  };
+  } catch (err: any) {
+    const msg = err?.response?.data?.message || err?.message || "Operation failed";
+    messageApi.error(msg);
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
 
   return <div>{contextHolder}{
