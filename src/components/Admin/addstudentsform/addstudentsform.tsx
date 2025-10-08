@@ -8,6 +8,13 @@ import dayjs from "dayjs";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type Gender = "MALE" | "FEMALE";
+type Address = {
+  lane1: string;
+  lane2?: string;
+  city: string;
+  district: string;
+  postalCode: string;
+};
 
 type StudentRegisterRequest = {
   firstName: string;
@@ -19,13 +26,19 @@ type StudentRegisterRequest = {
   batchId: number;
   gender: Gender;
   dateOfBirth: string;
-  address: {
-    lane1: string;
-    lane2?: string;
-    city: string;
-    district: string;
-    postalCode: string;
-  };
+  address: Address
+};
+
+type StudentUpdateRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  departmentId: number;
+  batchId: number;
+  gender: Gender;
+  dateOfBirth: string;
+  address: Address;
 };
 
 interface AddStudentFormProps {
@@ -47,14 +60,17 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+
   const token = localStorage.getItem("token");
+  const isView = mode === 'view';
+  const isEdit = mode === 'edit';
+  const isCreate = mode === 'create';
 
   useEffect(() => {
     if (!token) {
       messageApi.error("You are not authenticated");
       return;
     }
-
     const headers = { Authorization: `Bearer ${token}` };
 
     const fetchDropdownData = async () => {
@@ -76,6 +92,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
         setDepartmentSelectionOptions(
           departments.map((d: any) => ({ label: d.departmentName, value: d.departmentId }))
         );
+
       } catch (error) {
         console.error("Failed to load dropdown data:", error);
         setBatchOptions([]);
@@ -87,12 +104,12 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
     };
 
     fetchDropdownData();
-  }, [messageApi]);
+  }, [messageApi, token]);
 
+  //Fetch student when viewing OR editing
   useEffect(() => {
-    if (mode !== 'view' || !studentId) return;
+    if (!(isView || isEdit) || !studentId) return;
 
-    const token = localStorage.getItem("token");
     if (!token) {
       messageApi.error("You are not authenticated");
       return;
@@ -131,8 +148,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
     };
 
     fetchStudent();
-  }, [mode, studentId, form, messageApi]);
-
+  }, [isView, isEdit, studentId, form, messageApi, token]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,90 +205,86 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
   //   }
   // };
 
-  type StudentUpdateRequest = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    departmentId: number;
-    gender: Gender;
-    dateOfBirth: string; // YYYY-MM-DD
-  };
+
 
   const handleFinish = async (values: any) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    messageApi.error("You are not authenticated");
-    return;
-  }
-
-  const isCreate = mode === "create";
-  const isEdit = mode === "edit";
-
-  // Log for debugging
-  console.log("Submitting student:", { mode, studentId, values });
-
-  // Build payload based on mode
-  const payload: StudentRegisterRequest | StudentUpdateRequest = isCreate
-    ? {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        registrationNumber: values.registrationNumber,
-        email: values.email,
-        phoneNumber: values.phoneNumber,
-        departmentId: values.departmentId,
-        batchId: values.batchId,
-        gender: values.gender,
-        dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
-        address: values.address,
-      }
-    : {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        phoneNumber: values.phoneNumber,
-        departmentId: values.departmentId,
-        gender: values.gender,
-        dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
-      };
-
-  try {
-    setSubmitting(true);
-
-    if (isCreate) {
-      await axios.post(`${API_BASE_URL}/v1/students`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      form.resetFields();
-      onCreate?.(payload as StudentRegisterRequest);
-      messageApi.success("Student registered successfully");
-    } else if (isEdit && studentId) {
-      await axios.put(`${API_BASE_URL}/v1/students/${studentId}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      messageApi.success("Student updated successfully");
-      onUpdate?.();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      messageApi.error("You are not authenticated");
+      return;
     }
-  } catch (err: any) {
-    const msg = err?.response?.data?.message || err?.message || "Operation failed";
-    messageApi.error(msg);
-  } finally {
-    setSubmitting(false);
-  }
-};
+
+    try {
+      setSubmitting(true);
+
+      if (isCreate) {
+        const payload: StudentRegisterRequest = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          registrationNumber: values.registrationNumber,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          departmentId: values.departmentId,
+          batchId: values.batchId,
+          gender: values.gender,
+          dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
+          address: values.address,
+        };
+
+        await axios.post(`${API_BASE_URL}/v1/students`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        messageApi.success("Student registered successfully");
+        form.resetFields();
+        onCreate?.(payload);
+      }
+
+      if (isEdit && studentId) {
+        // Align with your PUT spec
+        const payload: StudentUpdateRequest = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          departmentId: values.departmentId,
+          batchId: values.batchId,
+          gender: values.gender,
+          dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
+          address: values.address,
+        };
+
+        await axios.put(`${API_BASE_URL}/v1/students/${studentId}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        messageApi.success("Student updated successfully");
+        onUpdate?.();
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Operation failed";
+      messageApi.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const title =
+    isCreate ? "Add Student" :
+      isEdit ? "Edit Student" :
+        "View Student";
+
+  const submitLabel = isCreate ? "Create" : "Save changes";
 
 
-
-  return <div>{contextHolder}{
+  return <div>
+    {contextHolder}
     <div className="dashboard-cards">
-      {contextHolder}
       <div className="add-user-form-container">
         {/* Header */}
         <div className="add-user-form-header">
           <button type="button" className="add-user-back-btn" onClick={onClose} aria-label="Back">
             <FaArrowLeft className="add-user-back-icon" />
           </button>
-          <span className="add-user-title">Add Student</span>
+          <span className="add-user-title">{title}</span>
         </div>
 
         {/* File Upload */}
@@ -318,7 +330,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
           onFinish={handleFinish}
           requiredMark="optional"
           className="add-user-form-grid"
-          disabled={mode === 'view'}
+          disabled={isView}
         >
           <div className="add-user-two-col">
             <Form.Item
@@ -454,7 +466,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
               <Input placeholder="Postal code" />
             </Form.Item>
 
-            {mode === 'view' && (
+            {isView && (
               <Form.Item label="Status" name="studentStatus">
                 <Input disabled />
               </Form.Item>
@@ -464,24 +476,24 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClos
 
         {/* Actions */}
         <div className="add-user-form-actions">
-          {mode === 'view' ? null :
+          {!isView && (
             <Button
               type="primary"
               onClick={() => form.submit()}
               loading={submitting}
               className="add-user-create-btn"
             >
-              Create
+              {submitLabel}
             </Button>
-          }
+          )}
 
           <Button onClick={onClose} className="add-user-cancel-btn">
-            {mode === 'view' ? 'Close' : 'Cancel'}
+            {isView ? 'Close' : 'Cancel'}
           </Button>
         </div>
       </div>
     </div>
-  }</div>;
+  </div>;
 };
 
 export default AddStudentForm;

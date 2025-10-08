@@ -275,6 +275,7 @@ const StudentManagement: React.FC = () => {
                                                                         setFormMode('view');
                                                                         setSelectStudentId(student.id);
                                                                         setShowForm(true);
+                                                                        console.log("View student Id: ", student.id ?? student.studentId);  
                                                                     }}
                                                                 >
                                                                     <ArrowsAltOutlined className="text-lg" />
@@ -332,9 +333,10 @@ const StudentManagement: React.FC = () => {
                             mode={formMode}
                             studentId={selectStudentId ?? undefined}
                             onClose={() => setShowForm(false)}
-                            onCreate={(payload) => {
+                            onCreate={() => {
                                 setShowForm(false);
                                 fetchStudents(); // refresh after create
+                                messageApi.success("Student created successfully");
                             }}
                             onUpdate={() => {
                                 setShowForm(false);
