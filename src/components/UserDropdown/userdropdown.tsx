@@ -1,46 +1,44 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
-import './userdropdown.css';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
+import "./userdropdown.css";
+import { logout } from "../../services/auth";
+import { useAppDispatch } from "../../app/hooks";
+import { logoutThunk } from "../../features/auth/authSlice";
+import { showSuccess, showError } from "../../utils/toast";
 
 const UserDropdown: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const handleAccountClick = () => {
-    navigate('/account-setting');
-  };
+  const handleLogout = async () => {
+    // Dispatch Redux async thunk — it will clear token & session
+    await dispatch(logoutThunk());
+    showSuccess("Logout Success..");
 
-  const handlePreferencesClick = () => {
-    navigate('/preferences');
-  };
-
-  const handleLogout = () => {
-    // Clear user data from localStorage/sessionStorage if needed
-    localStorage.removeItem('authToken'); // or whatever key you used
-    sessionStorage.clear();
-
-    // Show alert (optional)
-    alert("Logging out...");
-
-    // Redirect to login page
-    navigate('/login', { replace: true });
-
+    // Redirect user to login page
+    navigate("/login", { replace: true });
   };
   return (
-    <div className="dropdown-menuuser" role="menu">
-      {/* Account (use Link) */}
+    <div className="dropdown-menuuser" role="menu" aria-label="User menu">
+      {/* Link item */}
       <Link to="/account-setting" className="dropdown-itemuser" role="menuitem">
         <FaUser className="dropdown-iconuser" />
         <span>My Account</span>
       </Link>
 
-      {/* Preferences (use Link) */}
-      <Link to="/preferences" className="dropdown-itemuser" role="menuitem">
+      {/* Button item */}
+      <button
+        type="button"
+        className="dropdown-itemuser"
+        onClick={() => alert("Preferences clicked")}
+        role="menuitem"
+      >
         <FaCog className="dropdown-iconuser" />
         <span>Preferences</span>
-      </Link>
+      </button>
 
-      {/* Logout (use button) */}
+      {/* Logout */}
       <button
         type="button"
         onClick={handleLogout}

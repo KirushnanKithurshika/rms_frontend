@@ -1,0 +1,67 @@
+.sidebar-approval {
+    margin-top: 3px;
+    width: fit-content;
+    height: 100%;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+
+
+}
+
+.main-area-approval {
+    display: flex;
+    flex: 1;
+    background-color: #e4e4e4;
+    overflow: hidden;
+}
+
+.dashboard-content-approval {
+    margin-top: 100px;
+    flex: 1;
+
+    overflow-y: auto;
+}
+
+.card-approval {
+    margin: 10px;
+    width: 100%;
+    background-color: #fff;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+
+}
+
+@media (max-width: 768px) {
+
+
+.main-area-approval{
+    display: block;
+    position: relative;
+    height: 100%;
+    margin: 10px;
+  }
+
+  .card-approval {
+    height:100%;
+    width: auto;
+    flex: none;
+  }
+    .sidebar-approval {
+        position: fixed;
+        top: 90px;
+        left: 0;
+        height: calc(100vh - 100px);
+        background-color: #fff;
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+        transform: translateX(0%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 999;
+    }
+
+    .sidebar-approval.active {
+        transform: translateX(0);
+    }
+}

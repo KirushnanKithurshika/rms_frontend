@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import "./Studentsidebar.css";
+
 import {
   FaChevronLeft,
   FaChevronRight,
-  FaFileAlt,
-  FaShareSquare,
-  FaSpinner,
+  FaClipboardCheck,
   FaReceipt,
 } from "react-icons/fa";
 
@@ -17,61 +15,60 @@ const ApprovalSidebar: React.FC = () => {
 
   const handleToggle = () => {
     setSidebarState((prev) =>
-      prev === "expanded" ? "collapsed" : prev === "collapsed" ? "hidden" : "expanded"
+      prev === "expanded"
+        ? "collapsed"
+        : prev === "collapsed"
+        ? "hidden"
+        : "expanded"
     );
   };
 
+  const BASE = "/staff/approvals";
+
   return (
-    <div className={`student-sidebar ${sidebarState}`}>
+    <aside
+      className={`student-sidebar ${sidebarState}`}
+      aria-label="Approvals sidebar"
+    >
       <button
-  className="sidebar-toggle-btn"
-  aria-label="Toggle sidebar"
-  onClick={handleToggle}
->
-  {sidebarState === "hidden" ? <FaChevronRight /> : <FaChevronLeft />}
-  {sidebarState !== "expanded" && (
-    <div className="mobile-sidebar-backdrop" onClick={handleToggle}></div>
-  )}
-</button>
+        className="sidebar-toggle-btn"
+        aria-label="Toggle sidebar"
+        onClick={handleToggle}
+      >
+        {sidebarState === "hidden" ? <FaChevronRight /> : <FaChevronLeft />}
+      </button>
+
+      {sidebarState !== "expanded" && (
+        <div className="mobile-sidebar-backdrop" onClick={handleToggle} />
+      )}
 
       {(sidebarState === "expanded" || sidebarState === "collapsed") && (
         <>
           <div className="sidebar-divider" />
+
           <NavLink
-            to="/student/transcript"
+            to={BASE}
             end
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
           >
-            <FaFileAlt className="sidebar-icon" />
-            {sidebarState === "expanded" && <span>Transcript</span>}
+            <FaClipboardCheck className="sidebar-icon" />
+            {sidebarState === "expanded" && <span>Approval Requests</span>}
           </NavLink>
 
           <NavLink
-            to="/student/transcript/request"
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
-          >
-            <FaShareSquare className="sidebar-icon" />
-            {sidebarState === "expanded" && <span>Request Transcript</span>}
-          </NavLink>
-
-          <NavLink
-            to="/student/transcript/status"
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
-          >
-            <FaSpinner className="sidebar-icon" />
-            {sidebarState === "expanded" && <span>Status</span>}
-          </NavLink>
-
-          <NavLink
-            to="/student/transcript/history"
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
+            to={`${BASE}/history`}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
           >
             <FaReceipt className="sidebar-icon" />
             {sidebarState === "expanded" && <span>History</span>}
           </NavLink>
         </>
       )}
-    </div>
+    </aside>
   );
 };
 
