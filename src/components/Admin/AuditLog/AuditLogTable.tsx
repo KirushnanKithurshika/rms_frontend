@@ -88,8 +88,8 @@ const AuditLogTable: React.FC = () => {
             if (token) headers.Authorization = `Bearer ${token}`;
 
             const [start, end] = dateRange ?? [null, null];
-const formatFullDateTime = (d: dayjs.Dayjs) =>
-  d ? d.format("YYYY-MM-DD HH:mm:ss") : undefined;
+            const formatFullDateTime = (d: dayjs.Dayjs) =>
+                d ? d.format("YYYY-MM-DD HH:mm:ss") : undefined;
 
             const params = {
                 changedBy: nameLike?.trim() || undefined, // map UI "Name" → API changedBy
