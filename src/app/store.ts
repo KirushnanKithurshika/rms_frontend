@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
+import studentResultsReducer from "../features/studentResults/studentResultsSlice"; // ✅ reducer, not thunk
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    studentResults: studentResultsReducer,
   },
   middleware: (getDefault) => getDefault({ serializableCheck: false }),
 });
