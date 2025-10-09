@@ -10,7 +10,9 @@ import {
     Drawer,
     Typography,
     Tooltip,
+    Divider
 } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import type { TablePaginationConfig, TableProps } from "antd";
 import { SearchOutlined, ReloadOutlined, EyeOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
@@ -179,15 +181,100 @@ const AuditLogTable: React.FC = () => {
         showTotal: (t, range) => `${range[0]}-${range[1]} of ${t}`,
     };
 
+    type AuditRow = {
+        key: string;
+        field: string;
+        oldValue?: any;
+        newValue?: any;
+        changeType: "added" | "removed" | "updated";
+    };
+
+    const buildAuditRows = (rec?: any): AuditRow[] => {
+        if (!rec?.changedFields) return [];
+        let payload: any = rec.changedFields;
+
+        try {
+            // backend sends stringified JSON
+            payload = typeof payload === "string" ? JSON.parse(payload) : payload;
+        } catch {
+            return [];
+        }
+
+        // CREATE: { new: { NewValue: {...} } }
+        if (payload?.new?.NewValue) {
+            const nv = payload.new.NewValue ?? {};
+            return Object.entries(nv).map(([k, v]) => ({
+                key: `add-${k}`,
+                field: k,
+                newValue: v,
+                changeType: "added",
+            }));
+        }
+
+        // DELETE: { old: { OldValue: {...} } }
+        if (payload?.old?.OldValue) {
+            const ov = payload.old.OldValue ?? {};
+            return Object.entries(ov).map(([k, v]) => ({
+                key: `del-${k}`,
+                field: k,
+                oldValue: v,
+                changeType: "removed",
+            }));
+        }
+
+        // UPDATE: { name: { OldValue: "...", NewValue: "..." }, ... }
+        const rows: AuditRow[] = [];
+        Object.entries(payload).forEach(([field, obj]: any) => {
+            rows.push({
+                key: `upd-${field}`,
+                field,
+                oldValue: obj?.OldValue,
+                newValue: obj?.NewValue,
+                changeType: "updated",
+            });
+        });
+        return rows;
+    };
+
+
+    const columns: ColumnsType<AuditRow> = [
+        {
+            title: "Field",
+            dataIndex: "field",
+            width: 180,
+            render: (t) => <Typography.Text strong>{t}</Typography.Text>,
+        },
+        {
+            title: "Old",
+            dataIndex: "oldValue",
+            render: (v) =>
+                v !== undefined ? (
+                    <Typography.Text delete>{String(v)}</Typography.Text>
+                ) : (
+                    <Typography.Text type="secondary">—</Typography.Text>
+                ),
+        },
+        {
+            title: "New",
+            dataIndex: "newValue",
+            render: (v) =>
+                v !== undefined ? (
+                    <Typography.Text>{String(v)}</Typography.Text>
+                ) : (
+                    <Typography.Text type="secondary">—</Typography.Text>
+                ),
+        },
+
+    ];
+
+
     return (
         <div className="auditlog-card" style={{ background: "#f0f2f5", borderRadius: 12, padding: 10 }}>
-            {/* Filters: big Name search  other filters (responsive grid) */}
             <div className="audit-filters" style={{ marginBottom: 12 }}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontSize: 12, color: "#666" }}>Name</span>
                     <Input
                         allowClear
-                        showCount
                         maxLength={50}
                         size="large"
                         value={nameLike}
@@ -306,7 +393,7 @@ const AuditLogTable: React.FC = () => {
                     key="changedAt"
                     sorter
                     width={200}
-                    render={(iso: string) => dayjs(iso).format("YYYY-MM-DD HH:mm:ss")}
+                    render={(iso: string) => dayjs(iso).format("YYYY-MM-DD HH:mm")}
                 />
                 <Table.Column<AuditLog>
                     title="Changed Fields"
@@ -330,21 +417,51 @@ const AuditLogTable: React.FC = () => {
             </Table>
 
             <Drawer
-                title={`Audit Log #${drawerRecord?.id} • ${drawerRecord?.entity} • ${drawerRecord?.action}`}
+                title={`Audit Log: ${drawerRecord?.changedBy}`}
                 open={openDrawer}
                 onClose={() => setOpenDrawer(false)}
-                width={640}
+                width={720}
             >
                 <Space direction="vertical" size="small" style={{ width: "100%" }}>
                     <Typography.Text type="secondary">
-                        Name: {drawerRecord?.changedBy} •{" "}
-                        {drawerRecord ? dayjs(drawerRecord.changedAt).format("YYYY-MM-DD HH:mm:ss") : ""}
+                        Date:&nbsp;
+                        {drawerRecord ? dayjs(drawerRecord.changedAt).format("YYYY-MM-DD HH:mm") : ""}
                     </Typography.Text>
-                    <Typography.Text code style={{ display: "block", whiteSpace: "pre-wrap" }}>
-                        {prettyJson(drawerRecord?.changedFields)}
+                    <Typography.Text type="secondary">
+                        Action:&nbsp;
+                        <Tag color={
+                            drawerRecord?.action === "create"
+                                ? "green"
+                                : drawerRecord?.action === "delete"
+                                    ? "red"
+                                    : "geekblue"
+                        }>
+                            {drawerRecord?.action?.toUpperCase()}
+                        </Tag>
                     </Typography.Text>
+
+                    <Divider style={{ margin: "8px 0" }} />
+
+                    <Table
+                        className="audit-diff-table"
+                        size="middle"
+                        columns={columns}
+                        dataSource={buildAuditRows(drawerRecord)}
+                        pagination={false}
+                        bordered
+                        rowClassName={(r) =>
+                            r.changeType === "added"
+                                ? "row-added"
+                                : r.changeType === "removed"
+                                    ? "row-removed"
+                                    : "row-updated"
+                        }
+                        scroll={{ y: 420 }}
+                        sticky
+                    />
                 </Space>
             </Drawer>
+
         </div>
     );
 };

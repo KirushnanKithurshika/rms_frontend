@@ -27,13 +27,7 @@ const AuditLog: React.FC = () => {
                     <AdminSidebar />
                 </div>
                 <div className="dashboard-content">
-                    <div className="dashboard-cards">
-                        <div className="cardcourse">
-                            <div className="roles-page-container">
-                                <AuditLogTable />
-                            </div>
-                        </div>
-                    </div>
+                    <AuditLogTable />
                 </div>
             </div>
         </div>
