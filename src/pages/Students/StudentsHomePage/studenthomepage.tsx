@@ -21,9 +21,9 @@ const StudentDashboard = () => {
     if (userId) dispatch(fetchStudentResultsSheet(userId));
   }, [dispatch, userId]);
 
-  useEffect(() => {
-    console.log("Redux resultsSheet state updated:", resultsSheet);
-  }, [resultsSheet]);
+  // useEffect(() => {
+  //   console.log("Redux resultsSheet state updated:", resultsSheet);
+  // }, [resultsSheet]);
 
   return (
     <div className="lec-dashboard-container">
