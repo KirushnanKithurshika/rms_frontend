@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import "./studenthomebuttonsection.css";
+import { useSelector } from "react-redux";
 import { FaSearch, FaChevronDown } from "react-icons/fa";
 import StudentResultsSheet from "../Studentsresultsheet/StudentResultsSheet";
+import "./studenthomebuttonsection.css";
+import type { RootState } from "../../../app/store";
 
 const ResultsTabsButtomSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"CA" | "EXAM">("CA");
   const [q, setQ] = useState("");
   const [openSemester, setOpenSemester] = useState<number | null>(null); // single-open
+
+  const resultsSheet = useSelector(
+    (state: RootState) => state.studentResults.resultsSheet
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +22,8 @@ const ResultsTabsButtomSection: React.FC = () => {
   const toggleSemester = (n: number) =>
     setOpenSemester((cur) => (cur === n ? null : n));
 
-  const semesters = [1, 2, 3, 4, 5, 6];
+  // Use semesters from resultsSheet
+  const semesters = resultsSheet?.semesters ?? [];
 
   return (
     <div className="results-wrap">
@@ -41,7 +48,12 @@ const ResultsTabsButtomSection: React.FC = () => {
           </button>
         </div>
 
-        <form className="search" onSubmit={handleSearch} role="search" aria-label="Search semester">
+        <form
+          className="search"
+          onSubmit={handleSearch}
+          role="search"
+          aria-label="Search semester"
+        >
           <input
             type="text"
             inputMode="search"
@@ -57,38 +69,65 @@ const ResultsTabsButtomSection: React.FC = () => {
         </form>
       </div>
 
-      {/* Accordion: Semesters 01 - 06 */}
+      {/* Accordion: Dynamic Semesters */}
       <div className="sem-accordion">
-        {semesters.map((n) => {
-          const open = openSemester === n;
-          return (
-            <div key={n} className={`sem-item ${open ? "open" : ""}`}>
-              <button
-                type="button"
-                className="sem-head"
-                onClick={() => toggleSemester(n)}
-                aria-expanded={open}
-                aria-controls={`sem-panel-${n}`}
-              >
-                <span className="sem-title">Semester {String(n).padStart(2, "0")}</span>
-                <FaChevronDown className="sem-arrow" aria-hidden="true" />
-              </button>
+        {semesters.length > 0 ? (
+          semesters
+            .filter((s) =>
+              q ? s.semesterName.toLowerCase().includes(q.toLowerCase()) : true
+            )
+            .map((semester, index) => {
+              const open = openSemester === index;
+              return (
+                <div key={index} className={`sem-item ${open ? "open" : ""}`}>
+                  <button
+                    type="button"
+                    className="sem-head"
+                    onClick={() => toggleSemester(index)}
+                    aria-expanded={open}
+                    aria-controls={`sem-panel-${index}`}
+                  >
+                    <span className="sem-title">{semester.semesterName}</span>
+                    <FaChevronDown className="sem-arrow" aria-hidden="true" />
+                  </button>
 
-              <div
-                id={`sem-panel-${n}`}
-                className="sem-panel"
-                hidden={!open}
-                role="region"
-                aria-label={`Semester ${n} results`}
-              >
-                {/* The panel is exactly the same width as the band, but the sheet is centered inside */}
-                <div className="results-sheet-host">
-                  <StudentResultsSheet />
+                  <div
+                    id={`sem-panel-${index}`}
+                    className="sem-panel"
+                    hidden={!open}
+                    role="region"
+                    aria-label={`${semester.semesterName} results`}
+                  >
+                    <div className="results-sheet-host">
+                      <StudentResultsSheet
+                        university={resultsSheet?.university ?? ""} // <-- fallback
+                        facultyLine={resultsSheet?.facultyLine ?? ""}
+                        specialization={resultsSheet?.specialization ?? ""}
+                        sheetTitle={resultsSheet?.sheetTitle ?? ""}
+                        provisionalLine={resultsSheet?.provisionalLine ?? ""}
+                        version={resultsSheet?.version ?? ""}
+                        core={semester.core}
+                        electives={semester.electives}
+                        student={{
+                          ...resultsSheet?.student!,
+                          gradesByCode:
+                            resultsSheet?.student?.gradesByCode ?? {}, // default empty object
+                        }}
+                        modulesCountingForGPA={{
+                          core: semester.core.map((c) => c.code),
+                          electives: semester.electives.map((c) => c.code),
+                        }}
+                        gradeByCode={semester.gradesByCode}
+                        note={resultsSheet?.note ?? ""}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })
+        ) : (
+          <p>No semester data available.</p>
+        )}
       </div>
     </div>
   );
