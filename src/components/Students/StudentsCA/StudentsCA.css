@@ -1,0 +1,190 @@
+/* Page scaffold */
+.results-page {
+    background: #f5f7fb;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.sheet-scroller {
+    display: grid;
+    place-items: start center;
+}
+
+.a4-sheet {
+    width: 794px;
+    min-height: 1123px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 36px 44px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+}
+
+
+.a4-header {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.uni-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0 0 4px 0;
+    color: #0a0a0a;
+}
+
+.dept-line {
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.batch-line {
+    font-size: 12px;
+    color: #1f2937;
+    margin-top: 2px;
+}
+
+.sheet-subtitle {
+    font-size: 12px;
+    color: #0b3e5a;
+    margin-top: 4px;
+    font-weight: 700;
+}
+
+/* Student meta */
+.student-meta {
+    margin-top: 36px;
+    margin-left: 6px;
+    width: 60%;
+}
+
+.meta-row {
+    display: grid;
+    grid-template-columns: 120px 16px 1fr;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1f2937;
+    margin: 8px 0;
+}
+
+.meta-label {
+    color: #111827;
+}
+
+.meta-sep {
+    color: #6b7280;
+}
+
+.meta-value {
+    font-weight: 600;
+}
+
+/* CA tables */
+.ca-blocks {
+    margin-top: 28px;
+    display: grid;
+    gap: 26px;
+}
+
+.ca-table-wrap {
+    padding: 8px 0;
+}
+
+.ca-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: 1px solid #cfd6df;
+}
+
+.ca-table thead th {
+    background: #e9edf3;
+    color: #111827;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 10px 8px;
+    border-right: 1px solid #cfd6df;
+    border-bottom: 1px solid #c0cada;
+}
+
+.ca-table thead th:last-child {
+    border-right: none;
+}
+
+.ca-table tbody td {
+    font-size: 13px;
+    color: #0f172a;
+    padding: 12px 10px;
+    border-right: 1px solid #e5e9ef;
+    border-bottom: 1px solid #e5e9ef;
+    background: #fff;
+}
+
+.ca-table tbody td:last-child {
+    border-right: none;
+}
+
+.ca-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.t-center {
+    text-align: center;
+}
+
+/* Status badge */
+.status.ok {
+    color: #15803d;
+    font-weight: 700;
+}
+
+.status.bad {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+/* Controls */
+.down-controls {
+    margin-top: 18px;
+}
+
+.down-controls button {
+    background: #0b3e5a;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.down-controls button:hover {
+    filter: brightness(1.05);
+}
+
+/* Print */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .results-page {
+        background: none;
+        padding: 0;
+    }
+
+    .a4-sheet {
+        width: auto;
+        min-height: auto;
+        border: none;
+        box-shadow: none;
+        padding: 18mm 18mm;
+       
+    }
+
+    .ca-table {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}

@@ -70,7 +70,7 @@ const ResultsPreview: React.FC = () => {
       </div>
 
       {activeTab === 'CA' && (
-        <div className="rp-card">
+        <div className="results-page">
           <div className="rp-card-header">
             <div className="rp-section">
               <h4>{selectedCourse.name}</h4>
@@ -163,7 +163,6 @@ const ResultsPreview: React.FC = () => {
                     <td>{idx + 1}</td>
                     <td>{student.id}</td>
                     <td>{student.name}</td>
-                    {/* simple placeholder value */}
                     <td>{Math.max(0, Number(student.total) - 40)}</td>
                     <td>{student.status}</td>
                   </tr>

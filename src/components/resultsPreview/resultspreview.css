@@ -1,4 +1,5 @@
 .rp-container {
+  align-items: center;
   padding: 20px;
   font-family: 'Segoe UI', sans-serif;
   background-color: #fff;

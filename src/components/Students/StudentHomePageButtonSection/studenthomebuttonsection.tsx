@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./studenthomebuttonsection.css";
 import { FaSearch, FaChevronDown } from "react-icons/fa";
 import StudentResultsSheet from "../Studentsresultsheet/StudentResultsSheet";
+import StudentsConAss from "../StudentsCA/StudentsCA";
 
 const ResultsTabsButtomSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"CA" | "EXAM">("CA");
@@ -83,8 +84,12 @@ const ResultsTabsButtomSection: React.FC = () => {
               >
                 {/* The panel is exactly the same width as the band, but the sheet is centered inside */}
                 <div className="results-sheet-host">
-                  <StudentResultsSheet />
-                </div>
+  {activeTab === "CA" ? (
+    <StudentsConAss />
+  ) : (
+    <StudentResultsSheet  />
+  )}
+</div>
               </div>
             </div>
           );
