@@ -15,7 +15,6 @@ type Props = {
   specialization: string;
   sheetTitle: string;
   provisionalLine: string;
-  version: string;
   core: Item[];
   electives: Item[];
   student: Student;
@@ -30,7 +29,6 @@ const StudentResultsSheet: React.FC<Props> = ({
   specialization,
   sheetTitle,
   provisionalLine,
-  version,
   core,
   electives,
   student,
@@ -93,7 +91,6 @@ const StudentResultsSheet: React.FC<Props> = ({
             <div className="hdr spec">{specialization}</div>
             <div className="hdr title">{sheetTitle}</div>
             <div className="hdr under">{provisionalLine}</div>
-            <div className="hdr ver">{version}</div>
 
             {/* Section title */}
             <div className="section-title">Modules Counting for GPA</div>
