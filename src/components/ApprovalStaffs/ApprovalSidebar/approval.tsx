@@ -52,7 +52,7 @@ const ApprovalSidebar: React.FC = () => {
 
         
           <NavLink
-            to={`/history`}
+            to={`/approval-history`}
             className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
           >
             <FaReceipt className="sidebar-icon" />

@@ -17,29 +17,29 @@ const StudentDashboard = () => {
       </div>
 
 
-     {/* <div className="breadcrumb">
+      {/* <div className="breadcrumb">
         <BreadcrumbNav />
       </div>*/}
 
-   
+
       <div className="dashboard-content">
-        <StudentSubNav/>
+        <StudentSubNav />
 
         <div className="subnav-divider"></div>
         <div className="dashboard-cards-students">
-          
+
           <div className="card-students">
-             <StudentMetrics/>
+            <StudentMetrics />
           </div>
-<div className='SHP'><ResultsTabsButtomSection/></div>
+          <div className='SHP'><ResultsTabsButtomSection /></div>
           <div>
-        
+
           </div>
-        
-          </div>
+
         </div>
       </div>
-   
+    </div>
+
   );
 };
 

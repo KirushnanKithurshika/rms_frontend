@@ -27,6 +27,7 @@ import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptAppl
 import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
+import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
 
 
 
@@ -61,7 +62,7 @@ function App() {
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
           <Route path="/approval-requests" element={<ApprovalPage />} />
-
+<Route path="/approval-history" element={<ApprovalHistory/>}/>
 
 
 

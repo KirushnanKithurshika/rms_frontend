@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import Navbarin from "../../../components/Navbar/navbarin";
 import ApprovalSidebar from "../../../components/ApprovalStaffs/ApprovalSidebar/approval";
-import "./Approval.css";
+import "./ApprovalHistorypage.css";
+import ApprovalHistoryPage from "../../../components/ApprovalStaffs/ApprovalHistory/ApprovalHistory";
 
 
 
@@ -23,7 +24,7 @@ const ApprovalHistory = () => {
           
 
           <div className="card-approval">
-           
+           <ApprovalHistoryPage/>
           </div>
         </div>
       </div>
