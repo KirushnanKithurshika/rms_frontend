@@ -94,7 +94,7 @@ const CreateCourseForm: React.FC = () => {
       setAssessmentInput("");
       return;
     }
-    // If empty and Backspace, remove the last chip
+
     if (e.key === "Backspace" && !assessmentInput) {
       setSelectedAssessments((prev) => prev.slice(0, -1));
     }
@@ -102,13 +102,13 @@ const CreateCourseForm: React.FC = () => {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    // Do something with the form data
+ 
     const payload = {
       academicYear,
       department,
       semester,
       assessments: selectedAssessments,
-      // ...other fields you may add later
+   
     };
     console.log("Create course payload:", payload);
   };
@@ -167,10 +167,8 @@ const CreateCourseForm: React.FC = () => {
             </div>
 
             <div>
-              <div className="form-group">
-                <label>Coordinator</label>
-                <input className="input" placeholder="Coordinator" />
-              </div>
+             
+             
 
               <div className="form-group">
                 <label>Credit Value</label>
@@ -203,7 +201,7 @@ const CreateCourseForm: React.FC = () => {
         <div className="assessment-section">
           <h3 className="section-headingCC">Assessment Components:</h3>
 
-          {/* Input to add assessments */}
+         
           <div className="form-group" style={{ marginBottom: "10px" }}>
             <input
               className="input"
