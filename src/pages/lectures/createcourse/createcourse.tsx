@@ -17,7 +17,7 @@ const CreateCourseUI = () => {
                 <BreadcrumbNav />
             </div>
 
-            {/* Show backdrop only on mobile */}
+           
             <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={handleBackdropClick}></div>
 
             <div className="main-area">

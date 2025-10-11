@@ -74,7 +74,8 @@
 
 .dragdrophead {
     text-align: left;
-    color: #08234C;
+    color: #58595a;
+    font-size: 12px;
 }
 
 .upload-tabs {
@@ -256,7 +257,7 @@
     }
 
     .dragdrophead{
-        font-size: 15px;
+        font-size: 12px;
         margin-bottom: 20px;
     }
 

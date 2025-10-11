@@ -61,7 +61,7 @@
 }
 
 .card {
-
+min-height:100%;
   flex: 1 1 200px;
   background-color: #fff;
   border-radius: 10px;
@@ -161,7 +161,7 @@
   margin-bottom: 20px;
 }
 
-/* Responsive tweak */
+
 @media screen and (max-width: 768px) {
   .graph-card {
     width: 90%;
