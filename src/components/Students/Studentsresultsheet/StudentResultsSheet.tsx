@@ -10,17 +10,17 @@ type Student = {
 type Counting = { core?: string[]; electives?: string[] };
 
 type Props = {
-  university: string;
-  facultyLine: string;
-  specialization: string;
-  sheetTitle: string;
-  provisionalLine: string;
-  core: Item[];
-  electives: Item[];
-  student: Student;
-  modulesCountingForGPA: Counting;
-  note: string;
-  gradeByCode: Record<string, string>;
+  university?: string;
+  facultyLine?: string;
+  specialization?: string;
+  sheetTitle?: string;
+  provisionalLine?: string;
+  core?: Item[];
+  electives?: Item[];
+  student?: Student;
+  modulesCountingForGPA?: Counting;
+  note?: string;
+  gradeByCode?: Record<string, string>;
 };
 
 const StudentResultsSheet: React.FC<Props> = ({
@@ -65,10 +65,10 @@ const StudentResultsSheet: React.FC<Props> = ({
     "-",
   ];
 
-  const coreCodes = Array.isArray(modulesCountingForGPA.core)
-    ? modulesCountingForGPA.core
+  const coreCodes = Array.isArray(modulesCountingForGPA?.core)
+    ? modulesCountingForGPA?.core
     : [];
-  const elecCodes = Array.isArray(modulesCountingForGPA.electives)
+  const elecCodes = Array.isArray(modulesCountingForGPA?.electives)
     ? modulesCountingForGPA.electives
     : [];
 
@@ -106,7 +106,7 @@ const StudentResultsSheet: React.FC<Props> = ({
             <div className="group">Core Modules</div>
             <table className="list">
               <tbody>
-                {core.map((m, i) => (
+                {core?.map((m, i) => (
                   <tr key={`c-${i}`}>
                     <td className="code">{m.code}</td>
                     <td className="name">{m.name}</td>
@@ -120,7 +120,7 @@ const StudentResultsSheet: React.FC<Props> = ({
             <div className="group">Technical / General Electives</div>
             <table className="list">
               <tbody>
-                {electives.map((m, i) => (
+                {electives?.map((m, i) => (
                   <tr key={`e-${i}`}>
                     <td className="code">{m.code}</td>
                     <td className="name">{m.name}</td>

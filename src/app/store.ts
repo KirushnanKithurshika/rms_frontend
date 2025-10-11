@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
-import studentResultsReducer from "../features/studentResults/studentResultsSlice"; // ✅ reducer, not thunk
+import studentResultsReducer from "../features/studentResults/studentResultsSlice";
 import studentCourseReducer from "../features/studentCourses/studentCoursesSlice";
 import lecturerDashboardReducer from "../features/lecturerDashboard/lecturerDashboardSlice";
+import lecturerCoursesReducer from "../features/lecturerCourses/lecturerCoursesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     studentResults: studentResultsReducer,
     studentCourses: studentCourseReducer,
     lecturerDashboard: lecturerDashboardReducer,
+    lecturerCourses: lecturerCoursesReducer,
   },
   middleware: (getDefault) => getDefault({ serializableCheck: false }),
 });
