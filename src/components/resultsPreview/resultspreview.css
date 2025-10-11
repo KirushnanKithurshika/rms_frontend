@@ -22,7 +22,8 @@
 
 .rp-divider {
   border: none;
-  border-top: 1px solid #041748;
+  border-radius: 1px;
+  border-top: 2px solid #041748;
   margin-bottom: 24px;
 }
 
@@ -63,46 +64,46 @@
   box-shadow: 0 0 0 3px rgba(63, 131, 248, 0.15);
 }
 
-/* ======= Tabs ======= */
+.rp-divider {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 12px;
+}
+
+/* Tabs */
 .rp-tabs {
   display: flex;
-  justify-content: flex-start;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 12px;
 }
 
 .rp-tab {
-  padding: 10px 24px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  color: #0a223f;
+  padding: 8px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 14px;
-  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  font-weight: 700;
 }
 
 .rp-tab:hover {
-  border-color: #bcbcbc;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  background: #e9eef5;
 }
 
 .rp-tab.is-active {
-  background-color: #dff2ff;
-  border: 1px solid #d8d8d8;
-  font-weight: 600;
+  background: #0b3e5a;
+  color: #fff;
+  border-color: #0b3e5a;
 }
 
 .rp-print-btn {
   margin-left: auto;
-  background-color: #0a2558;
-  color: #fff;
 }
 
-/* ======= Card ======= */
+
 .rp-card {
-  max-width: 794px;
+
   border: 1px solid #d6d6d6;
   padding: 16px;
   border-radius: 10px;
@@ -127,7 +128,7 @@
 .rp-section h4 {
   text-align: left;
   margin: 0 0 6px;
-  font-size: 16px;
+  font-size: 13px;
   color: #0a2558;
   font-weight: 700;
 }
@@ -135,7 +136,7 @@
 .rp-section p {
   text-align: left;
   margin: 0 0 6px;
-  font-size: 14px;
+  font-size: 13px;
   color: #0a2558;
   font-weight: 600;
 }
@@ -155,8 +156,9 @@
   margin-bottom: 6px;
 }
 
-/* ======= Table ======= */
+
 .rp-table-wrap {
+  align-items: center;
   overflow-x: auto;
   display: block;
   width: 100%;
@@ -164,9 +166,9 @@
 
 .rp-table {
   width: 100%;
-  max-width: 744px;
+
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 12px;
   min-width: 700px;
   background-color: #fff;
 }
@@ -180,9 +182,9 @@
 }
 
 .rp-table th {
-  background-color: #0a2558;
-  color: #fff;
-  font-weight: 700;
+  background-color: #f9fbff;
+  color: #0a053d;
+  font-weight: 400;
   letter-spacing: 0.2px;
 }
 
@@ -191,12 +193,12 @@
 }
 
 .rp-table td {
-  color: #0a2558;
-  font-weight: 500;
+  color: #000000;
   background-color: #fff;
+
 }
 
-/* Footer text in card */
+
 .rp-print-footer {
   color: #797979;
   font-size: 12px;

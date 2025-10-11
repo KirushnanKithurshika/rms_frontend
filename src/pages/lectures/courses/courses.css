@@ -584,8 +584,8 @@
     position: absolute;
     left: 0;
     top: 50%;
-    transform: translateY(-50%); /* vertically center the button */
-    margin: 0;                   /* remove any extra margins */
+    transform: translateY(-50%); 
+    margin: 0;                   
     width: 36px;
     height: 36px;
     display: inline-flex;

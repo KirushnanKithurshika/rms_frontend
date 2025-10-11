@@ -25,7 +25,7 @@ body {
 
 .results-page {
   max-width: 800px;
-  background: #f3f4f6;
+  background: #ffffff;
   padding: 16px 12px 40px;
   overflow: auto;
   overscroll-behavior: contain;
@@ -247,7 +247,7 @@ body {
   font-size: 12px;
 }
 
-/* signatures */
+
 .rs-sign-exact {
   --col-gap: 140px;
   --top-row-h: 24px;
