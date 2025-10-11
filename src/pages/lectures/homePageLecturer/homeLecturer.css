@@ -47,7 +47,6 @@
   overflow-y: auto;
 }
 
-/* Cards */
 .dashboard-cards {
   display: flex;
   flex-wrap: wrap;
@@ -57,7 +56,6 @@
 
 .card {
   flex: 1 1 200px;
-  width: fit-content;
   background-color: #fff;
   border-radius: 10px;
   padding: 1.5rem;
@@ -90,7 +88,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
