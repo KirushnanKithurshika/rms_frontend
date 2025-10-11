@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 
-import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
+import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-import ResultsPreview from '../../../components/resultsPreview/resultspreview.tsx';
+import ResultsPreview from '../../../components/Lecturer/resultsPreview/resultspreview.tsx';
 const ResultsPreviewPage = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 

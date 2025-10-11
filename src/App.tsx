@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-import CreateCourseForm from "./components/createcourseform/createcourseform";
+import CreateCourseForm from "./components/Lecturer/createcourseform/createcourseform";
 import "./App.css";
 import WelcomePage from "./pages/Intropage/welcomepage";
 import LoginPage from "./pages/loginpage/loginpage";
@@ -29,6 +29,8 @@ import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
 
+import CourseHistory from "./pages/lectures/History/History";
+
 
 
 function App() {
@@ -36,6 +38,7 @@ function App() {
     <Router>
 
       <div className="mt-16">
+       
         <Routes>
           {/* Public */}
           <Route path="/" element={<WelcomePage />} />
@@ -63,6 +66,7 @@ function App() {
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
           <Route path="/approval-requests" element={<ApprovalPage />} />
 <Route path="/approval-history" element={<ApprovalHistory/>}/>
+<Route path="/course-history" element={<CourseHistory/>}/>
 
 
 

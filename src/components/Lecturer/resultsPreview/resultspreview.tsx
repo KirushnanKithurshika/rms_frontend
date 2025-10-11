@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import "./resultspreview.css";
-import Logo from "../../assets/ResultsP_Logo.png";
+import Logo from "../../../assets/ResultsP_Logo.png";
 
-/** ------- Demo data ------- */
+
 const dummyData = [
   { id: "1", name: "Student A", project: 18, quiz1: 25, quiz2: 28, total: 71, status: "Pass" },
   { id: "2", name: "Student B", project: 15, quiz1: 22, quiz2: 27, total: 64, status: "Pass" },
@@ -16,8 +16,6 @@ const courses = [
   { code: "EC7202", name: "Computer Networks" },
   { code: "EC7203", name: "Web Engineering" },
 ];
-
-/** ------- Reusable value/label dropdown styled like your other custom dropdown ------- */
 type Option = { value: string; label: string };
 
 const CustomDropdownVL: React.FC<{

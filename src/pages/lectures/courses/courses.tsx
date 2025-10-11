@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import './courses.css';
-import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
+import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-import ResultUploadInterface from '../../../components/resultuploadinterface/ResultUploadInterface.tsx';
-import FileUploadCard from '../../../components/fileuploadcard/fileuploadcard.tsx';
+import ResultUploadInterface from '../../../components/Lecturer/resultuploadinterface/ResultUploadInterface.tsx';
+import FileUploadCard from '../../../components/Lecturer/fileuploadcard/fileuploadcard.tsx';
 import { FaEdit, FaTrash, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 
 interface Course {

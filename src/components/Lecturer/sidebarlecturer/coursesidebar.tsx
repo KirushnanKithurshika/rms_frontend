@@ -16,6 +16,7 @@ import {
   FaInfoCircle,
   FaComments,
   FaBullhorn,
+  FaHistory,
 } from 'react-icons/fa';
 
 type SidebarState = 'expanded' | 'collapsed' | 'hidden';
@@ -101,9 +102,9 @@ const LectureSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Results Preview</span>}
           </NavLink>
 
-          <NavLink to="/course-details" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <FaInfoCircle className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Course Details</span>}
+          <NavLink to="/course-history" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+            <FaHistory className="sidebar-icon" />
+            {sidebarState === 'expanded' && <span>History</span>}
           </NavLink>
 
           <NavLink to="/student-enquiries" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
