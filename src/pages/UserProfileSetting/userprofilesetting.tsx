@@ -258,9 +258,6 @@ const AccountSettings: React.FC = () => {
                
               </div>
 
-              {/* LOWER PART action buttons (reuses same classes) */}
-              
-
             </div>
           </div>
         </div>
