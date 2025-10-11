@@ -416,9 +416,11 @@
 }
 
 .modal-body {
+  text-align: center;
   padding: 16px;
+  line-height: 2cap;
   color: #6e7481;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .modal-footer {
@@ -445,7 +447,8 @@
 }
 
 .btn-delete.ghost {
-  color: #334155;
+  color: #4a4848;
+  background-color: #ececec;
 }
 
 .btn-delete.danger {
@@ -527,19 +530,23 @@
   .dashboard-cardscourse {
     display: grid;
     height: fit-content;
-
     gap: 30px;
     justify-content: center;
   }
 
   .details-header {
     padding: 12px 14px 10px;
+    align-items: flex-start;
   }
 
   .cd-body {
     padding: 12px 14px;
   }
 
+  .cd-title {
+    font-size: 14px;
+    text-align: left;
+  }
 
   .cd-item {
     grid-template-columns: 1fr;
@@ -567,9 +574,38 @@
 }
 
 @media (max-width: 420px) {
-  .back-btn {
-    width: 100%;
+   .details-header {
+    position: relative;
+    padding-left: 44px;          /* space for the absolute back button */
+    justify-content: center;     /* center the title block */
+  }
+
+  .details-header .back-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%); /* vertically center the button */
+    margin: 0;                   /* remove any extra margins */
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items:flex-start;
     justify-content: center;
+    padding: 0;                  
+  }
+
+  .details-header > div {
+    flex: 0 1 auto;              
+    text-align: center;          
+  }
+
+  .details-header .cd-title {
+    font-size: 12px;           
+    line-height: 1.5;
+  }
+
+  .details-header .cd-subtitle {
+    font-size: 12px;
   }
 
   .details-actions {
@@ -599,5 +635,7 @@
     flex: 1 1 100%;
     min-width: 0;
   }
+
+   
 
 }

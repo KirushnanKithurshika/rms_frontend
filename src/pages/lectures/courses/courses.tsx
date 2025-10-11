@@ -237,7 +237,6 @@ const Courses: React.FC = () => {
               <div className="details-header">
                 <button className="back-btn" onClick={handleBackToList}>
                   <FaArrowLeft style={{ marginRight: 8 }} />
-                  Back
                 </button>
                 <div>
                   <h3 className="cd-title">
@@ -294,7 +293,6 @@ const Courses: React.FC = () => {
                 <div className="details-header">
                   <button className="back-btn" onClick={handleBackToList}>
                     <FaArrowLeft style={{ marginRight: 8 }} />
-                    Back
                   </button>
                   <div>
                     <h3 className="cd-title">
