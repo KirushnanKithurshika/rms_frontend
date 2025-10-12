@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbarin from '../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
 import { FaArrowLeft, FaChevronDown, FaCamera, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./userprofilesetting.css";
+
+type BasicForm = {
+  email: string;
+  fullName: string;
+  department: string;
+  address: string;
+  contact: string;
+};
 
 const AccountSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -13,9 +21,23 @@ const AccountSettings: React.FC = () => {
     "https://cdn-icons-png.flaticon.com/512/847/847969.png"
   );
 
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // --- Basic info form state (UPPER PART) ---
+  const initialForm: BasicForm = useMemo(
+    () => ({
+      email: "",
+      fullName: "",
+      department: "",
+      address: "",
+      contact: "",
+    }),
+    []
+  );
+
+  const [form, setForm] = useState<BasicForm>(initialForm);
+  const [savedProfileImage, setSavedProfileImage] = useState(profileImage); // for cancel reset
+
+  const onChange = (k: keyof BasicForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,11 +47,29 @@ const AccountSettings: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
-    alert("Profile saved successfully!");
+  // Upper-part Save/Cancel
+  const handleSaveUpper = () => {
+    // TODO: call API to save profile + form fields
+    setSavedProfileImage(profileImage);
+    alert("Profile details saved successfully!");
+  };
+  const handleCancelUpper = () => {
+    // revert to last saved values (no navigation)
+    setForm(initialForm);
+    setProfileImage(savedProfileImage);
   };
 
-  const handleCancel = () => {
+  // --- Password section state (LOWER PART) ---
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Bottom Save/Cancel (keep your original intentions)
+  const handleSaveBottom = () => {
+    // TODO: submit password change
+    alert("Profile saved successfully!");
+  };
+  const handleCancelBottom = () => {
     navigate("/lecturerhome");
   };
 
@@ -75,7 +115,7 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
 
-              {/* Basic Info Form */}
+              {/* Basic Info Form (UPPER PART) */}
               <div className="form-grid">
                 <div className="form-group">
                   <label>User Name</label>
@@ -84,28 +124,64 @@ const AccountSettings: React.FC = () => {
 
                 <div className="form-group">
                   <label>Email</label>
-                  <input type="email" placeholder="Enter Email" className="input" />
+                  <input
+                    type="email"
+                    placeholder="Enter Email"
+                    className="input"
+                    value={form.email}
+                    onChange={onChange("email")}
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Full Name</label>
-                  <input type="text" placeholder="Enter Full Name" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Full Name"
+                    className="input"
+                    value={form.fullName}
+                    onChange={onChange("fullName")}
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Department</label>
-                  <input type="text" placeholder="Enter Department" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Department"
+                    className="input"
+                    value={form.department}
+                    onChange={onChange("department")}
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Address</label>
-                  <input type="text" placeholder="Enter Address" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Address"
+                    className="input"
+                    value={form.address}
+                    onChange={onChange("address")}
+                  />
                 </div>
 
                 <div className="form-group">
                   <label>Contact Number</label>
-                  <input type="text" placeholder="Enter Contact Number" className="input" />
+                  <input
+                    type="text"
+                    placeholder="Enter Contact Number"
+                    className="input"
+                    value={form.contact}
+                    onChange={onChange("contact")}
+                  />
                 </div>
+              </div>
+
+              {/* UPPER PART action buttons (uses the SAME classes) */}
+              <div className="button-row">
+                <button className="save-btn" onClick={handleSaveUpper}>Save</button>
+                <button className="cancel-btn" onClick={handleCancelUpper}>Cancel</button>
               </div>
 
               {/* Password Management Section */}
@@ -122,7 +198,6 @@ const AccountSettings: React.FC = () => {
 
                 {showPasswordSection && (
                   <div className="password-grid">
-                    
                     {/* Current Password */}
                     <div className="form-group password-input-wrapper">
                       <label>Current Password</label>
@@ -173,14 +248,14 @@ const AccountSettings: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                  </div>
-                )}
+                     <div className="button-row">
+                <button className="save-btn" onClick={handleSaveBottom}>Update</button>
+                <button className="cancel-btn" onClick={handleCancelBottom}>Cancel</button>
               </div>
-
-              {/* Action Buttons */}
-              <div className="button-row">
-                <button className="save-btn" onClick={handleSave}>Save</button>
-                <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+                  </div>
+                  
+                )}
+               
               </div>
 
             </div>

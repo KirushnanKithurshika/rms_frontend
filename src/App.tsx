@@ -26,13 +26,20 @@ import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTra
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
+import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
+import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
+
+import CourseHistory from "./pages/lectures/History/History";
+import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
 
 
 
 function App() {
   return (
     <Router>
+
       <div className="mt-16">
+       
         <Routes>
           {/* Public */}
           <Route path="/" element={<WelcomePage />} />
@@ -57,9 +64,11 @@ function App() {
           <Route path="/student-courses" element={<StudentCoursesPage />} />
           <Route path="/student/transcript" element={<StudentTranscript />} />
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
-          <Route path="/student/transcript/status" element={<TranscripStatus/>} />
-
-
+          <Route path="/student/transcript/status" element={<TranscripStatus />} />
+          <Route path="/approval-requests" element={<ApprovalPage />} />
+<Route path="/approval-history" element={<ApprovalHistory/>}/>
+<Route path="/course-history" element={<CourseHistory/>}/>
+<Route path="/modify-results" element={<ModifyResultsPage/>}/>
 
 
 

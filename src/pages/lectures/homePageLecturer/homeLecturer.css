@@ -37,6 +37,7 @@
 }
 
 .sidebar {
+  background-color: white;
   margin-top: 3px;
   width:fit-content;
   height: 100hv;
@@ -50,7 +51,7 @@
   overflow-y: auto;
 }
 
-/* Cards */
+
 .dashboard-cards {
 
   display: flex;
@@ -60,6 +61,7 @@
 }
 
 .card {
+min-height:100%;
   flex: 1 1 200px;
   background-color: #fff;
   border-radius: 10px;
@@ -94,8 +96,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  gap: 1rem;
+  flex-wrap: wrap;   gap: 1rem;
 }
 
 .analytics-header h3 {
@@ -160,7 +161,7 @@
   margin-bottom: 20px;
 }
 
-/* Responsive tweak */
+
 @media screen and (max-width: 768px) {
   .graph-card {
     width: 90%;

@@ -28,9 +28,10 @@
   grid-template-columns: 1fr;
   gap: 20px;
 }
-/* Custom Dropdown */
+
+
 .custom-dropdown-userform {
- 
+
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
@@ -49,7 +50,8 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 10px;
-  font-size: 14px;
+  color:#08234C;
+  font-size: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -80,7 +82,7 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   margin-top: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
   animation: fadeDropdown 0.2s ease;
   overflow: hidden;
@@ -103,9 +105,44 @@
   font-weight: bold;
 }
 
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef2f7;
+  color: #0a2558;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.chip-x {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 900;
+  line-height: 1;
+  color: #0a2558;
+}
+
 @keyframes fadeDropdown {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 1024px) {
@@ -171,8 +208,8 @@
 
 .submit-button-createcourse:hover {
   background-color: #dadada;
-    color: #0a2558;
-    border-color: #0a2558;
+  color: #0a2558;
+  border-color: #0a2558;
 }
 
 .submit-button-createcourse:active {

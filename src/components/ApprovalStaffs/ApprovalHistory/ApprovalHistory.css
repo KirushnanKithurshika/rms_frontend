@@ -1,0 +1,266 @@
+
+.ah-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+    padding: 14px;
+}
+
+
+.ah-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 2px 12px 2px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.ah-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #0a223f;
+}
+
+.ah-tools {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ah-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ah-search-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 12px;
+    color: #9aa3af;
+}
+
+.ah-search input {
+    width: 260px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 10px 8px 28px;
+    font-size: 13px;
+    outline: none;
+}
+
+.ah-search input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.ah-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: #fff;
+    font-size: 13px;
+}
+
+
+.ah-scroll-x {
+    overflow-x: auto;
+}
+
+.ah-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+    margin-top: 10px;
+    border: 1px solid #e5e9ed;
+}
+
+.ah-table thead th {
+    background: #e9edf3;
+    color: #0b235c;
+    text-align: left;
+    font-weight: 700;
+    padding: 10px 12px;
+    font-size: 12px;
+    border-right: 1px solid #e5e9ed;
+    border-bottom: 1px solid #d8dee6;
+}
+
+.ah-table thead th:last-child {
+    border-right: none;
+}
+
+.ah-table tbody td {
+    padding: 12px 12px;
+    border-right: 1px solid #eef2f7;
+    border-bottom: 1px solid #eef2f7;
+    font-size: 13px;
+    color: #0a223f;
+    vertical-align: middle;
+    background: #fff;
+}
+
+.ah-table tbody td:last-child {
+    border-right: none;
+}
+
+.ah-table tbody tr:hover td {
+    background: #fafcff;
+}
+
+.ah-strong {
+    font-weight: 700;
+}
+
+.ah-summary {
+    max-width: 360px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Badges & Chips */
+.ah-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #eef2f7;
+    color: #0a2558;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ah-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.ah-badge.ok {
+    background: #e7f6ec;
+    color: #15803d;
+    border: 1px solid #bbebca;
+}
+
+.ah-badge.bad {
+    background: #fdecec;
+    color: #b91c1c;
+    border: 1px solid #f9c6c6;
+}
+
+/* Actions */
+.ah-actions-col {
+    width: 150px;
+}
+
+.ah-actions {
+    text-align: right;
+}
+
+.ah-btn-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0b3e5a;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    transition:
+        background-color .18s ease,
+        box-shadow .18s ease,
+        transform .08s ease;
+}
+
+.ah-btn-view:hover {
+    background: #0a3249;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(11, 54, 79, 0.25);
+}
+
+.ah-btn-view:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.ah-caret {
+    transition: transform .18s ease;
+    font-size: 11px;
+}
+
+.ah-caret.rot {
+    transform: rotate(180deg);
+}
+
+
+.ah-detail-row td {
+    background: #f8fafc;
+}
+
+.ah-detail {
+    padding: 12px 10px;
+    border-left: 3px solid #c7d2fe;
+    background: #f6f7ff;
+    border-radius: 8px;
+}
+
+.ah-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px 16px;
+}
+
+.ah-span-2 {
+    grid-column: span 2;
+}
+
+.ah-k {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.ah-v {
+    font-size: 13px;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.ah-empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 16px 8px;
+}
+
+@media (max-width: 980px) {
+    .ah-detail-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ah-span-2 {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .ah-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ah-span-2 {
+        grid-column: span 1;
+    }
+
+    .ah-tools {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .ah-search input {
+        width: 100%;
+    }
+}

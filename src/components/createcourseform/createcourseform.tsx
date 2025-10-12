@@ -20,7 +20,6 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -63,42 +62,62 @@ const CustomDropdown: React.FC<DropdownProps> = ({
 };
 
 const CreateCourseForm: React.FC = () => {
-  const academicYears = [
-    "2020/2021",
-    "2021/2022",
-    "2022/2023",
-    "2023/2024",
-    "2024/2025",
-  ];
-
-  const departments = [
-    "Computer Engineering",
-    "Electrical Engineering",
-    "Mechanical Engineering",
-    "Marine Engineering",
-    "Civil Engineering",
-  ];
-
-  const semesters = [
-    "Semester 1",
-    "Semester 2",
-    "Semester 3",
-    "Semester 4",
-    "Semester 5",
-    "Semester 6",
-    "Semester 7",
-    "Semester 8",
-  ];
+  const academicYears = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
+  const departments = ["Computer Engineering","Electrical Engineering","Mechanical Engineering","Marine Engineering","Civil Engineering"];
+  const semesters = ["Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7","Semester 8"];
 
   const [academicYear, setAcademicYear] = useState("");
   const [department, setDepartment] = useState("");
   const [semester, setSemester] = useState("");
 
+  // Assessments
+  const [selectedAssessments, setSelectedAssessments] = useState<string[]>([]);
+  const [assessmentInput, setAssessmentInput] = useState("");
+
+  const addAssessment = (raw: string) => {
+    const v = raw.trim().replace(/\s+/g, " ");
+    if (!v) return;
+    setSelectedAssessments((prev) =>
+      prev.some((x) => x.toLowerCase() === v.toLowerCase()) ? prev : [...prev, v]
+    );
+  };
+
+  const removeAssessment = (name: string) => {
+    setSelectedAssessments((prev) => prev.filter((x) => x !== name));
+  };
+
+  const handleAssessmentsKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    // Add on Enter or comma
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addAssessment(assessmentInput);
+      setAssessmentInput("");
+      return;
+    }
+
+    if (e.key === "Backspace" && !assessmentInput) {
+      setSelectedAssessments((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+ 
+    const payload = {
+      academicYear,
+      department,
+      semester,
+      assessments: selectedAssessments,
+   
+    };
+    console.log("Create course payload:", payload);
+  };
+
   return (
     <div className="form-wrapper">
       <h2 className="form-title">Create Course</h2>
 
-      <form className="form-content">
+      <form className="form-content" onSubmit={handleSubmit}>
         <div className="section course-section">
           <h3 className="section-headingCC">Course Details</h3>
           <div className="form-grid">
@@ -148,10 +167,8 @@ const CreateCourseForm: React.FC = () => {
             </div>
 
             <div>
-              <div className="form-group">
-                <label>Coordinator</label>
-                <input className="input" placeholder="Coordinator" />
-              </div>
+             
+             
 
               <div className="form-group">
                 <label>Credit Value</label>
@@ -161,7 +178,6 @@ const CreateCourseForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Coordinator Section */}
         <div className="section coordinator-section">
           <h3 className="section-headingCC">Coordinator Details</h3>
           <div className="form-grid">
@@ -182,26 +198,39 @@ const CreateCourseForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Assessment Section */}
         <div className="assessment-section">
           <h3 className="section-headingCC">Assessment Components:</h3>
-          <div className="checkbox-grid">
-            {[
-              "Quizzes",
-              "Lab Work",
-              "Take Home",
-              "Assignments",
-              "Project Work",
-              "Mini Project",
-              "Midterm Exam",
-              "Final Exam",
-            ].map((label) => (
-              <label key={label} className="checkbox-item">
-                <input type="checkbox" className="custom-checkbox" />
-                <span>{label}</span>
-              </label>
-            ))}
+
+         
+          <div className="form-group" style={{ marginBottom: "10px" }}>
+            <input
+              className="input"
+              placeholder="Type assessment type and press Enter"
+              value={assessmentInput}
+              onChange={(e) => setAssessmentInput(e.target.value)}
+              onKeyDown={handleAssessmentsKeyDown}
+              aria-label="Add assessment"
+            />
           </div>
+
+          {/* Chip list */}
+          {selectedAssessments.length > 0 && (
+            <div className="chip-wrap">
+              {selectedAssessments.map((a) => (
+                <span className="chip" key={a}>
+                  {a}
+                  <button
+                    type="button"
+                    className="chip-x"
+                    aria-label={`Remove ${a}`}
+                    onClick={() => removeAssessment(a)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="submit-button-createcoursediv">
