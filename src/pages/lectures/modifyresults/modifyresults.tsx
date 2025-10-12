@@ -3,9 +3,10 @@ import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
+import EditCourseDetails from '../../../components/Lecturer/EditCourseDetails/EditCourseDetails.tsx';
 
 
-const ModifyResultsPage= () => {
+const ModifyResultsPage = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleBackdropClick = () => setSidebarOpen(false);
@@ -18,7 +19,7 @@ const ModifyResultsPage= () => {
                 <BreadcrumbNav />
             </div>
 
-          
+
             <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={handleBackdropClick}></div>
 
             <div className="main-area">
@@ -27,21 +28,9 @@ const ModifyResultsPage= () => {
                 </div>
 
                 <div className="dashboard-content">
-                     <div className="analytics-section">
-            <div className="analytics-header">
-              <h3>Analytics Latest Updates</h3>
-              <div className='searchbarlecturer'>
-                <CourseSearchBarlechome />
-              </div>
-
-
-            </div>
-           
-
-
-
-
-          </div>
+                    <div className='card'>
+                    <EditCourseDetails/>
+                    </div>
                 </div>
             </div>
         </div>

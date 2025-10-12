@@ -30,6 +30,7 @@ import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
 
 import CourseHistory from "./pages/lectures/History/History";
+import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
 
 
 
@@ -67,6 +68,7 @@ function App() {
           <Route path="/approval-requests" element={<ApprovalPage />} />
 <Route path="/approval-history" element={<ApprovalHistory/>}/>
 <Route path="/course-history" element={<CourseHistory/>}/>
+<Route path="/modify-results" element={<ModifyResultsPage/>}/>
 
 
 

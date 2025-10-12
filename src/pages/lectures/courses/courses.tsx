@@ -108,7 +108,7 @@ const Courses: React.FC = () => {
   const navigate = useNavigate();
   const handleCreateCourse = () => navigate('/createcourseui');
 
-  // Close dropdown on outside click
+ 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -119,7 +119,7 @@ const Courses: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Optional: close delete modal by Esc
+
   useEffect(() => {
     if (!showDeleteModal) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeDeleteModal();
