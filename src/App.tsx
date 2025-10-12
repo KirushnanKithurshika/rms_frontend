@@ -45,6 +45,11 @@ import UserDropdown from "./components/UserDropdown/userdropdown";
 import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
 import LandingRedirect from "./routes/LandingRedirect";
 import AuditLog from "./pages/AuditLog/AuditLog";
+import ActivityHistoryPage from "./components/Lecturer/LecCourseHis/LecCourseHis";
+import EditCourseDetails from "./components/EditCourseDetails/EditCourseDetails";
+import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycoursedetails";
+import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
+import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 
 // ---------- Fallback ----------
 const NotAuthorized = () => (
@@ -93,7 +98,8 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             <Route path="/results-preview" element={<ResultsPreviewPage />} />
             <Route path="/results-analysis" element={<AnalizePage />} />
-
+            <Route path="/course-history" element={<EditCourseDetails />} />
+            <Route path="/editcourse-details" element={<ModifyCourseDetail />} />
             {/* Student routes */}
             <Route
               path="/student/student-dashboard"
@@ -126,8 +132,9 @@ function App() {
             />
             <Route path="/admin/audit-logs" element={<AuditLog />} />
           </Route>
-
-
+          {/* ------------------ APPROVAL ------------------ */}
+          <Route path="/approval-requests" element={<ApprovalPage/>} />
+          <Route path="/approval-history" element={<ApprovalHistory />} />
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

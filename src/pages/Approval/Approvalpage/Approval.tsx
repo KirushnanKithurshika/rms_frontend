@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import Navbarin from "../../components/Navbar/navbarin";
-import ApprovalSidebar from "../../components/ApprovalStaffs/ApprovalSidebar/approval";
-import "./Approval.css";
 
-import ApprovalRequestsTable from "../../components/ApprovalStaffs/Approvaltable/Approval";
+
+import "./Approval.css";
+import ApprovalRequestsTable from "../../../components/ApprovalStaffs/Approvaltable/Approval";
+import Navbarin from "../../../components/Navbar/navbarin";
+import ApprovalSidebar from "../../../components/ApprovalStaffs/ApprovalSidebar/approval";
+
+
 
 /* 👇 Add this local type so TS knows what ApprovalRow is */
 type ApprovalRow = {
