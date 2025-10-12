@@ -3,9 +3,9 @@ import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
-import DonutChart from '../../../components/Charts/DonutChart.tsx';
-import MarksRangeBarChart from '../../../components/Charts/MarksRangeBarChart.tsx';
+import MarksRangeBarChart from '../../../components/graphs/marksrangegraph/marksrange.tsx'
 import "./analysepage.css";
+import DonutChart from '../../../components/graphs/passfailgraph/passfailgraph.tsx';
 const AnalizePage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -40,12 +40,12 @@ const AnalizePage = () => {
             <div className="analytics-graphs-container">
               <div className="graph-card">
                 <h4 className="graph-title">Pass vs Fail Percentage</h4>
-                <DonutChart/>
+                <DonutChart pass={75} fail={25} />
               </div>
 
               <div className="graph-card">
                 <h4 className="graph-title">Marks Range Vs Students Number</h4>
-                <MarksRangeBarChart/>
+                <MarksRangeBarChart dataValues={[5, 15, 25, 30, 10]} />
               </div>
             </div>
 
