@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
-import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
+import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
-import EditCourseDetails from '../../../components/Lecturer/EditCourseDetails/EditCourseDetails.tsx';
+import EditCourseDetails from '../../../components/EditCourseDetails/EditCourseDetails.tsx';
 
 
 const ModifyResultsPage = () => {

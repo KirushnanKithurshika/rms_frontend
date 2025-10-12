@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
-import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
+import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import ActivityHistoryPage from '../../../components/Lecturer/LecCourseHis/LecCourseHis.tsx';
 

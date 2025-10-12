@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
-import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
+import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-import CreateCourseForm from '../../../components/Lecturer/createcourseform/createcourseform.tsx';
+import CreateCourseForm from '../../../components/createcourseform/createcourseform.tsx';
 
 const CreateCourseUI = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);

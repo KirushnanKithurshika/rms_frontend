@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import './homeLecturer.css';
-import LectureSidebar from '../../../components/Lecturer/sidebarlecturer/coursesidebar.tsx';
+import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx'
 import DonutChart from '../../../components/graphs/passfailgraph/passfailgraph.tsx'

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-import CreateCourseForm from "./components/Lecturer/createcourseform/createcourseform";
+import CreateCourseForm from "./components/createcourseform/createcourseform";
 import "./App.css";
 import WelcomePage from "./pages/Intropage/welcomepage";
 import LoginPage from "./pages/loginpage/loginpage";
