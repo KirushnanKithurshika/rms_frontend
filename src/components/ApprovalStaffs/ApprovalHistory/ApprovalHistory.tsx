@@ -156,7 +156,7 @@ const ApprovalHistoryPage: React.FC = () => {
                               {r.decision === "APPROVED" ? "Approved" : "Rejected"}
                             </span>
                           </td>
-                          <td>{format(new Date(r.decidedAt), "yyyy-MM-dd HH:mm")}</td>
+                          <td className="decidedat">{format(new Date(r.decidedAt), "yyyy-MM-dd HH:mm")}</td>
                           <td className="ah-actions">
                             <button
                               type="button"

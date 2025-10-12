@@ -69,6 +69,7 @@
 }
 
 .ah-table {
+    text-align: left;
     width: 100%;
     border-collapse: collapse;
     min-width: 860px;
@@ -95,7 +96,7 @@
     padding: 12px 12px;
     border-right: 1px solid #eef2f7;
     border-bottom: 1px solid #eef2f7;
-    font-size: 13px;
+    font-size: 11px;
     color: #0a223f;
     vertical-align: middle;
     background: #fff;
@@ -110,33 +111,34 @@
 }
 
 .ah-strong {
-    font-weight: 700;
+    font-weight:500;
 }
 
 .ah-summary {
     max-width: 360px;
     overflow: hidden;
+    text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* Badges & Chips */
+
 .ah-chip {
     display: inline-block;
     padding: 4px 10px;
     background: #eef2f7;
     color: #0a2558;
     border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 500;
 }
 
 .ah-badge {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 999px;
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 600;
 }
 
 .ah-badge.ok {
@@ -161,6 +163,7 @@
 }
 
 .ah-btn-view {
+    font-size: 11px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -235,7 +238,9 @@
     color: #6b7280;
     padding: 16px 8px;
 }
-
+.decidedat{
+    font-style: oblique;
+}
 @media (max-width: 980px) {
     .ah-detail-grid {
         grid-template-columns: 1fr 1fr;

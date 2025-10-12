@@ -42,14 +42,14 @@
     text-align:center;
     font-weight: 700;
     padding: 10px 12px;
-    font-size: 13px;
+    font-size: 12px;
     border-bottom: 1px solid #0a2558;
 }
 
 .ar-table tbody td {
     padding: 10px 12px;
     border-bottom: 1px solid #e5e9ed;
-    font-size: 14px;
+    font-size: 12px;
     color: #0a223f;
 }
 
@@ -80,7 +80,7 @@
     color: #0a2558;
     border-radius: 9999px;
 
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .ar-dept {
@@ -94,18 +94,18 @@
 }
 
 .ar-actions {
-    text-align: right;
+    text-align:center;
 }
 
 .ar-btn-approve {
+
     appearance: none;
-    font-size: 12px;
+    font-size: 11px;
     border: 0;
     background: #dc2626;
     color: #fff;
     padding: 10px 16px;
     border-radius: 9999px;
-
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(220, 38, 38, .25);
     transition: transform .04s ease, filter .2s ease, box-shadow .2s ease;
@@ -192,7 +192,7 @@
 
 .ar-modal-header h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 13px;
     line-height: 1.2;
     color: #0b235c;
 }
@@ -219,7 +219,7 @@
 
 
 .ar-modal-summary {
-    font-size: 14px;
+    font-size: 12px;
     text-align: left;
     display: grid;
     grid-template-columns: 1fr;
