@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import "./resultspreview.css";
-import Logo from "../../../assets/ResultsP_Logo.png";
+import Logo from "../../assets/ResultsP_Logo.png";
 
 
 const dummyData = [
