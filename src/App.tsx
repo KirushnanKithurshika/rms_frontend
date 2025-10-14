@@ -31,6 +31,8 @@ import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypag
 
 import CourseHistory from "./pages/lectures/History/History";
 import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
+import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
+import ResultsApprovalPage from "./pages/Approval copy/ResultsApproval/Approval";
 
 
 
@@ -39,7 +41,7 @@ function App() {
     <Router>
 
       <div className="mt-16">
-       
+
         <Routes>
           {/* Public */}
           <Route path="/" element={<WelcomePage />} />
@@ -66,11 +68,12 @@ function App() {
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
           <Route path="/approval-requests" element={<ApprovalPage />} />
-<Route path="/approval-history" element={<ApprovalHistory/>}/>
-<Route path="/course-history" element={<CourseHistory/>}/>
-<Route path="/modify-results" element={<ModifyResultsPage/>}/>
+          <Route path="/approval-history" element={<ApprovalHistory />} />
+          <Route path="/course-history" element={<CourseHistory />} />
+          <Route path="/modify-results" element={<ModifyResultsPage />} />
 
-
+  <Route path="/signatureboard" element={<SignatureBoard />} />
+   <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
 
 
           {/* Lecturer */}
