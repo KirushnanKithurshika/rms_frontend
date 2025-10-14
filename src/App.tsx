@@ -51,7 +51,7 @@ import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycours
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 
-// ---------- Fallback ----------
+
 const NotAuthorized = () => (
   <div style={{ padding: "2rem", textAlign: "center" }}>
     <h2>403 – Not Authorized</h2>
@@ -59,9 +59,7 @@ const NotAuthorized = () => (
   </div>
 );
 
-// ==========================================================
-// APP ROUTES
-// ==========================================================
+
 function App() {
   return (
     <div className="mt-16">
@@ -133,7 +131,7 @@ function App() {
             <Route path="/admin/audit-logs" element={<AuditLog />} />
           </Route>
           {/* ------------------ APPROVAL ------------------ */}
-          <Route path="/approval-requests" element={<ApprovalPage/>} />
+          <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
