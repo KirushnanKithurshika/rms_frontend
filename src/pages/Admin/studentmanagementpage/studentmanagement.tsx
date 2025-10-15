@@ -1,99 +1,214 @@
-import { useState, useEffect } from 'react';
-import '../../../index.css';
-import Navbarin from '../../../components/Navbar/navbarin.tsx';
-import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-import AdminSidebar from '../../../components/Admin/adminsidebar/adminsidebar.tsx';
-import { ArrowsAltOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+// StudentManagement.tsx
+import { useEffect, useMemo, useRef, useState } from "react";
+import "../../../index.css";
+
+import Navbarin from "../../../components/Navbar/navbarin.tsx";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
+import AdminSidebar from "../../../components/Admin/adminsidebar/adminsidebar.tsx";
+
 import {
-    FaChevronDown,
-    FaSpinner,
-    FaCalendarAlt,
-} from 'react-icons/fa';
-import { FiSearch } from 'react-icons/fi';
-import Pagination from '../../../components/Admin/pagination/pagination.tsx';
+    Table,
+    Tag,
+    Popconfirm,
+    message,
+    Button,
+    Input,
+    Space,
+} from "antd";
+import type {
+    FilterDropdownProps,
+    ColumnType,
+    ColumnsType,
+} from "antd/es/table/interface";
+import type { InputRef } from "antd";
+import {
+    ArrowsAltOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    SearchOutlined,
+} from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
 
-import AddStudentForm from '../../../components/Admin/addstudentsform/addstudentsform.tsx';
+import AddStudentForm from "../../../components/Admin/addstudentsform/addstudentsform.tsx";
 
-const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];
-const dateOptions = ['Newest', 'Oldest', 'Joined This Month', 'Joined Last 30 Days'];
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-import { Popconfirm, message } from "antd";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
+type Nullable<T> = T | null | undefined;
 
-const statusColors: Record<string, string> = {
-    Active: "active",
-    Inactive: "inactive",
-    Banned: "banned",
-    Pending: "pending",
-    Suspended: "suspended",
+// ---- Data types ------------------------------------------------------------
+
+interface Batch {
+    id?: number;
+    name?: string;
+}
+
+interface Department {
+    id?: number;
+    departmentName?: string;
+}
+
+interface Address {
+    city?: string;
+    line1?: string;
+}
+
+export interface StudentRow {
+    id?: number;
+    studentId?: number;
+    firstName?: string;
+    lastName?: string;
+    registrationNumber?: string;
+    email?: string;
+    phoneNumber?: string;
+    gender?: string;
+    dateOfBirth?: string;
+    batch?: Batch;
+    department?: Department;
+    address?: Address;
+    studentStatus?: string; // e.g., ACTIVE, DROPOUT, SUSPENDED, GRADUATED
+}
+
+// ---- Status pill colors ----------------------------------------------------
+
+const STATUS_COLORS: Record<string, string> = {
+    ACTIVE: "#4caf50",
+    DROPOUT: "#ff9800",
+    SUSPENDED: "#f44336",
+    GRADUATED: "#2196f3",
 };
+
+// ---- Column search hook (reusable) -----------------------------------------
+
+function useColumnSearch<T extends object>() {
+    const [searchText, setSearchText] = useState<string>("");
+    const [searchedKey, setSearchedKey] = useState<string>("");
+    const inputRef = useRef<InputRef>(null);
+
+    const normalize = (val: unknown) =>
+        val === null || val === undefined ? "" : String(val);
+
+    const handleSearch = (
+        selectedKeys: React.Key[],
+        confirm: FilterDropdownProps["confirm"],
+        columnKey: string
+    ) => {
+        confirm();
+        setSearchText(String(selectedKeys[0] ?? ""));
+        setSearchedKey(columnKey);
+    };
+
+    const handleReset = (clearFilters?: () => void) => {
+        clearFilters?.();
+        setSearchText("");
+    };
+
+    /**
+     * dataIndexKey: a unique string key for this column (used to track highlight)
+     * getText: how to extract string text from the row for filtering/highlighting
+     */
+    const getColumnSearchProps = (
+        dataIndexKey: string,
+        getText: (record: T) => Nullable<string | number>,
+        placeholder?: string
+    ): ColumnType<T> => ({
+        filterDropdown: ({
+            setSelectedKeys,
+            selectedKeys,
+            confirm,
+            clearFilters,
+        }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={inputRef}
+                    placeholder={placeholder ?? "Search"}
+                    value={selectedKeys[0] as string}
+                    onChange={(e) =>
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                    }
+                    onPressEnter={() =>
+                        handleSearch(selectedKeys as string[], confirm, dataIndexKey)
+                    }
+                    style={{ marginBottom: 8, display: "block" }}
+                    allowClear
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        icon={<SearchOutlined />}
+                        size="small"
+                        onClick={() =>
+                            handleSearch(selectedKeys as string[], confirm, dataIndexKey)
+                        }
+                    >
+                        Search
+                    </Button>
+                    <Button size="small" onClick={() => handleReset(clearFilters)}>
+                        Reset
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered: boolean) => (
+            <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+        ),
+        onFilter: (value, record) => {
+            const text = normalize(getText(record));
+            return text.toLowerCase().includes(String(value).toLowerCase());
+        },
+        onFilterDropdownOpenChange(open) {
+            if (open) setTimeout(() => inputRef.current?.select(), 100);
+        },
+        render: (_: unknown, record) => {
+            const text = normalize(getText(record));
+            if (searchedKey !== dataIndexKey) return text;
+            return (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text}
+                />
+            );
+        },
+    });
+
+    return { getColumnSearchProps };
+}
+
+// ---- Component -------------------------------------------------------------
 
 const StudentManagement: React.FC = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [isStatusOpen, setIsStatusOpen] = useState(false);
-    const [isDateOpen, setIsDateOpen] = useState(false);
-
-    const [selectedStatus, setSelectedStatus] = useState('Status');
-    const [selectedDate, setSelectedDate] = useState('Date');
-
-    // const [showAddUserForm, setShowAddUserForm] = useState(false);
     const [showForm, setShowForm] = useState(false);
-    const [formMode, setFormMode] = useState<'create' | 'view' | 'edit'>('create');
-    const [selectStudentId, setSelectStudentId] = useState<number | null>(null);
+    const [formMode, setFormMode] = useState<"create" | "view" | "edit">("create");
+    const [selectStudentId, setSelectStudentId] = useState<number | undefined>(
+        undefined
+    );
 
-    const handleBackdropClick = () => setSidebarOpen(false);
-    const [messageApi, contextHolder] = message.useMessage();
-
-    const handleCreateUser = (user: any) => {
-        console.log("New User:", user);
-        // setShowAddUserForm(false);
-        setShowForm(false);
-    };
-
-    const handleSelectStatus = (status: string) => {
-        setSelectedStatus(status);
-        setIsStatusOpen(false);
-    };
-
-    const handleSelectDate = (option: string) => {
-        setSelectedDate(option);
-        setIsDateOpen(false);
-    };
-
-    const toggleStatusDropdown = () => {
-        setIsStatusOpen(prev => !prev);
-        setIsDateOpen(false);
-    };
-
-    const toggleDateDropdown = () => {
-        setIsDateOpen(prev => !prev);
-        setIsStatusOpen(false);
-    };
-
-    const [Student, setStudent] = useState<any[]>([]);
+    const [rows, setRows] = useState<StudentRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [deletingId, setDeletingId] = useState<number | null>(null);
 
-    const statusColorMap: Record<string, string> = {
-        ACTIVE: "#4caf50",      // green
-        DROPOUT: "#ff9800",     // orange
-        SUSPENDED: "#f44336",   // red
-        GRADUATED: "#2196f3",   // blue
-    };
-    const token = localStorage.getItem('token');
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const token = localStorage.getItem("token");
+
+    
     const fetchStudents = async () => {
         setLoading(true);
         try {
             const res = await fetch(`${API_BASE_URL}/v1/students`, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
+                    Authorization: token ? `Bearer ${token}` : "",
+                    "Content-Type": "application/json",
+                },
             });
-            const data = await res.json();
-            setStudent(Array.isArray(data.data) ? data.data : []);
-        } catch (error) {
-            setStudent([]);
+            const json = await res.json();
+            const list = Array.isArray(json?.data) ? (json.data as StudentRow[]) : [];
+            setRows(list);
+        } catch {
+            setRows([]);
+            messageApi.error("Failed to load students");
         } finally {
             setLoading(false);
         }
@@ -101,11 +216,11 @@ const StudentManagement: React.FC = () => {
 
     useEffect(() => {
         fetchStudents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleDeleteStudent = async (id: number) => {
+    const handleDelete = async (id: number) => {
         if (!token) {
-            message.error("You are not authenticated.");
             messageApi.error("You are not authenticated.");
             return;
         }
@@ -121,26 +236,196 @@ const StudentManagement: React.FC = () => {
 
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                message.error(data?.message || "Failed to delete student");
                 messageApi.error(data?.message || "Failed to delete student");
                 return;
             }
 
-            // success: remove from table optimistically
-            setStudent((prev) => prev.filter((s) => (s.id ?? s.studentId) !== id));
-            message.success(data?.message || "Student deleted");
+            setRows((prev) => prev.filter((s) => (s.id ?? s.studentId) !== id));
             messageApi.success(data?.message || "Student deleted");
         } catch (err: any) {
-            message.error(err?.message || "Failed to delete student");
             messageApi.error(err?.message || "Failed to delete student");
         } finally {
             setDeletingId(null);
         }
     };
 
+    const handleOpenCreate = () => {
+        setFormMode("create");
+        setSelectStudentId(undefined);
+        setShowForm(true);
+    };
+
+    const handleOpenView = (id?: number) => {
+        setFormMode("view");
+        setSelectStudentId(id);
+        setShowForm(true);
+    };
+
+    const handleOpenEdit = (id?: number) => {
+        setFormMode("edit");
+        setSelectStudentId(id);
+        setShowForm(true);
+    };
+
+    const { getColumnSearchProps } = useColumnSearch<StudentRow>();
+
+    const columns: ColumnsType<StudentRow> = useMemo(
+        () => [
+            {
+                title: "Full Name",
+                key: "fullName",
+                ...getColumnSearchProps(
+                    "fullName",
+                    (r) => `${r.firstName ?? ""} ${r.lastName ?? ""}`.trim()
+                ),
+            },
+            {
+                title: "Reg No",
+                key: "registrationNumber",
+                ...getColumnSearchProps(
+                    "registrationNumber",
+                    (r) => r.registrationNumber ?? ""
+                ),
+            },
+            {
+                title: "Username (Email)",
+                key: "email",
+                ...getColumnSearchProps("email", (r) => r.email ?? ""),
+            },
+            {
+                title: "Phone No",
+                key: "phoneNumber",
+                responsive: ["md"],
+                ...getColumnSearchProps("phoneNumber", (r) => r.phoneNumber ?? ""),
+            },
+            {
+                title: "Gender",
+                dataIndex: "gender",
+                key: "gender",
+                width: 100,
+                filters: [
+                    { text: "Male", value: "Male" },
+                    { text: "Female", value: "Female" },
+                    { text: "Other", value: "Other" },
+                ],
+                onFilter: (value, record) =>
+                    String(record.gender ?? "").toLowerCase() ===
+                    String(value).toLowerCase(),
+            },
+            {
+                title: "DOB",
+                dataIndex: "dateOfBirth",
+                key: "dateOfBirth",
+                responsive: ["lg"],
+                sorter: (a, b) =>
+                    new Date(a.dateOfBirth ?? 0).getTime() -
+                    new Date(b.dateOfBirth ?? 0).getTime(),
+            },
+            {
+                title: "Batch",
+                key: "batch",
+                responsive: ["md"],
+                ...getColumnSearchProps("batch", (r) => r.batch?.name ?? ""),
+            },
+            {
+                title: "Department",
+                key: "department",
+                responsive: ["lg"],
+                ...getColumnSearchProps(
+                    "department",
+                    (r) => r.department?.departmentName ?? ""
+                ),
+            },
+            {
+                title: "Address",
+                key: "address",
+                responsive: ["lg"],
+                ...getColumnSearchProps("address", (r) => r.address?.city ?? ""),
+            },
+            {
+                title: "Status",
+                dataIndex: "studentStatus",
+                key: "studentStatus",
+                width: 140,
+                filters: [
+                    { text: "ACTIVE", value: "ACTIVE" },
+                    { text: "DROPOUT", value: "DROPOUT" },
+                    { text: "SUSPENDED", value: "SUSPENDED" },
+                    { text: "GRADUATED", value: "GRADUATED" },
+                ],
+                onFilter: (value, record) =>
+                    String(record.studentStatus ?? "") === String(value),
+                render: (status: string) => {
+                    const color = STATUS_COLORS[status] ?? "#757575";
+                    return (
+                        <span
+                            style={{
+                                color: "#fff",
+                                backgroundColor: color,
+                                padding: "2px 10px",
+                                borderRadius: 12,
+                                fontWeight: 500,
+                                fontSize: "0.95em",
+                                display: "inline-block",
+                                minWidth: 80,
+                                textAlign: "center",
+                            }}
+                        >
+                            {status ?? "—"}
+                        </span>
+                    );
+                },
+            },
+            {
+                title: "Action",
+                key: "action",
+                fixed: "right",
+                width: 140,
+                render: (_, record) => {
+                    const id = record.id ?? record.studentId!;
+                    const disabled = deletingId === id;
+                    return (
+                        <Space>
+                            <Button
+                                title="View"
+                                onClick={() => handleOpenView(id)}
+                                icon={<ArrowsAltOutlined />}
+                            />
+                            <Button
+                                title="Edit"
+                                onClick={() => handleOpenEdit(id)}
+                                icon={<EditOutlined />}
+                            />
+                            <Popconfirm
+                                title="Delete student?"
+                                description="This action cannot be undone."
+                                okText="Delete"
+                                okButtonProps={{ danger: true, loading: disabled }}
+                                cancelText="Cancel"
+                                onConfirm={() => handleDelete(id)}
+                            >
+                                <Button
+                                    title="Delete"
+                                    danger
+                                    disabled={disabled}
+                                    icon={<DeleteOutlined />}
+                                />
+                            </Popconfirm>
+                        </Space>
+                    );
+                },
+            },
+        ],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [deletingId]
+    );
+
+    const handleBackdropClick = () => setSidebarOpen(false);
+
     return (
         <div className="admin-dashboard-container">
             {contextHolder}
+
             <div className="nav">
                 <Navbarin />
             </div>
@@ -150,12 +435,12 @@ const StudentManagement: React.FC = () => {
             </div>
 
             <div
-                className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`}
+                className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`}
                 onClick={handleBackdropClick}
-            ></div>
+            />
 
             <div className="main-area">
-                <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}>
+                <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
                     <AdminSidebar />
                 </div>
 
@@ -163,167 +448,27 @@ const StudentManagement: React.FC = () => {
                     {!showForm && (
                         <div className="dashboard-cards">
                             <div className="cardcourse">
-                                <h3 className='user-management-header'>Student Management</h3>
                                 <div className="user-management-header">
-                                    <div className="custom-searchbar">
-                                        <input type="text" placeholder="Search…" />
-                                        <FiSearch className="search-icon" />
-                                    </div>
-
-                                    <div className="filters">
-                                        <div className="custom-dropdown">
-                                            <button className="dropdown-toggle" onClick={toggleStatusDropdown}>
-                                                <FaSpinner className="icon spin" />
-                                                <span>{selectedStatus}</span>
-                                                <FaChevronDown className="chevron" />
-                                            </button>
-                                            {isStatusOpen && (
-                                                <ul className="dropdown-menu">
-                                                    {statuses.map((status, index) => (
-                                                        <li key={index} onClick={() => handleSelectStatus(status)}>
-                                                            {status}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </div>
-
-                                        <div className="custom-dropdown">
-                                            <button className="dropdown-toggle" onClick={toggleDateDropdown}>
-                                                <FaCalendarAlt className="icon" />
-                                                <span>{selectedDate}</span>
-                                                <FaChevronDown className="chevron" />
-                                            </button>
-                                            {isDateOpen && (
-                                                <ul className="dropdown-menu">
-                                                    {dateOptions.map((option, index) => (
-                                                        <li key={index} onClick={() => handleSelectDate(option)}>
-                                                            {option}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </div>
-
-                                        <button className="add-user-btn" onClick={() => { setFormMode('create'); setSelectStudentId(null); setShowForm(true); }}>
-                                            Add Student +
-                                        </button>
-                                    </div>
+                                    <h3 className="user-management-header">Student Management</h3>
+                                    <Button type="primary" onClick={handleOpenCreate}>
+                                        Add Student +
+                                    </Button>
                                 </div>
 
-                                <div className="table-wrapper">
-                                    <table className="user-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Full Name</th>
-                                                <th>Reg No</th>
-                                                <th>Username</th>
-                                                <th>Phone No</th>
-                                                <th>Gender</th>
-                                                <th>DOB</th>
-                                                <th>Batch</th>
-                                                <th>Department</th>
-                                                <th>Address</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {loading ? (
-                                                <tr>
-                                                    <td colSpan={9}> loading...</td>
-                                                </tr>
-                                            ) : Student.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={9}> No data available</td>
-                                                </tr>
-                                            ) : (
-                                                Student.map((student, i) => (
-                                                    <tr key={student.id || i}>
-                                                        <td>{student.firstName} {student.lastName}</td>
-                                                        <td>{student.registrationNumber}</td>
-                                                        <td>{student.email}</td>
-                                                        <td>{student.phoneNumber}</td>
-                                                        <td>{student.gender}</td>
-                                                        <td>{student.dateOfBirth}</td>
-                                                        <td>{student.batch?.name}</td>
-                                                        <td>{student.department?.departmentName}</td>
-                                                        <td>{student.address?.city}</td>
-                                                        <td>
-                                                            <span
-                                                                style={{
-                                                                    color: "#fff",
-                                                                    backgroundColor: statusColorMap[student.studentStatus] || "#757575",
-                                                                    padding: "2px 10px",
-                                                                    borderRadius: "12px",
-                                                                    fontWeight: 500,
-                                                                    fontSize: "0.95em",
-                                                                    display: "inline-block",
-                                                                    minWidth: "80px",
-                                                                    textAlign: "center"
-                                                                }}
-                                                            >
-                                                                {student.studentStatus}
-                                                            </span>
-                                                        </td>
-                                                        <td className="action py-2">
-                                                            <div className="flex items-center justify-center gap-3">
-                                                                <button
-                                                                    className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 hover:scale-110"
-                                                                    title="View Details"
-                                                                    onClick={() => {
-                                                                        setFormMode('view');
-                                                                        setSelectStudentId(student.id);
-                                                                        setShowForm(true);
-                                                                        console.log("View student Id: ", student.id ?? student.studentId);  
-                                                                    }}
-                                                                >
-                                                                    <ArrowsAltOutlined className="text-lg" />
-                                                                </button>
-
-                                                                <button
-                                                                    className="p-2 rounded-full bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition-all duration-200 hover:scale-110"
-                                                                    title="Edit"
-                                                                    onClick={() => {
-                                                                        setFormMode('edit');
-                                                                        setSelectStudentId(student.id ?? student.studentId);
-                                                                        console.log("edit student Id: ", student.id ?? student.studentId);
-                                                                        setShowForm(true);
-                                                                    }}
-                                                                >
-                                                                    <EditOutlined className="text-lg" />
-                                                                </button>
-
-
-                                                                <Popconfirm
-                                                                    title="Delete student?"
-                                                                    description="This action cannot be undone."
-                                                                    okText="Delete"
-                                                                    okButtonProps={{ danger: true, loading: deletingId === (student.id ?? student.studentId) }}
-                                                                    cancelText="Cancel"
-                                                                    onConfirm={() => handleDeleteStudent(student.id ?? student.studentId)}
-                                                                >
-                                                                    <button
-                                                                        className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 disabled:opacity-50"
-                                                                        title="Delete"
-                                                                        disabled={deletingId === (student.id ?? student.studentId)}
-                                                                    >
-                                                                        <DeleteOutlined className="text-lg" />
-                                                                    </button>
-                                                                </Popconfirm>
-
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div className="pagination">
-                                    <Pagination />
-                                </div>
+                                <Table<StudentRow>
+                                    bordered
+                                    loading={loading}
+                                    rowKey={(r) => (r.id ?? r.studentId ?? Math.random()).toString()}
+                                    columns={columns}
+                                    dataSource={rows}
+                                    scroll={{ x: 1200 }}
+                                    pagination={{
+                                        pageSize: 15,
+                                        showSizeChanger: true,
+                                        showTotal: (total, range) =>
+                                            `${range[0]}-${range[1]} of ${total} students`,
+                                    }}
+                                />
                             </div>
                         </div>
                     )}
@@ -331,22 +476,20 @@ const StudentManagement: React.FC = () => {
                     {showForm && (
                         <AddStudentForm
                             mode={formMode}
-                            studentId={selectStudentId ?? undefined}
+                            studentId={selectStudentId}
                             onClose={() => setShowForm(false)}
                             onCreate={() => {
                                 setShowForm(false);
-                                fetchStudents(); // refresh after create
-                                messageApi.success("Student created successfully");
+                                fetchStudents();
+                                message.success("Student created successfully");
                             }}
                             onUpdate={() => {
                                 setShowForm(false);
-                                fetchStudents(); // refresh after edit
-                                messageApi.success("Student updated successfully");
+                                fetchStudents();
+                                message.success("Student updated successfully");
                             }}
                         />
                     )}
-
-
                 </div>
             </div>
         </div>
