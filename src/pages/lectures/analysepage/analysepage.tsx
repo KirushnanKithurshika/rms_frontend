@@ -64,9 +64,9 @@ const AnalizePage = () => {
               <h3>Analytics Latest Updates</h3>
 
               <div className="searchbarlecturer">
-                {/* FIX 1: Provide required props */}
+                {/* FIX 1: Provide required props (map to expected shape) */}
                 <CourseSearchBarlechome
-                  courses={courses}
+                  courses={courses.map(c => ({ courseId: c.id, courseDisplayName: c.name }))}
                   selectedCourseId={selectedCourseId}
                   onCourseSelect={onCourseSelect}
                 />
