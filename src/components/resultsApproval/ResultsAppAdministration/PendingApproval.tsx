@@ -39,7 +39,7 @@ type PendingApprovalsProps = {
 };
 
 const PendingApprovals: React.FC<PendingApprovalsProps> = ({ items, onApprove }) => (
-  <section className="pa-wrap">
+  <section className="pa-scope pa-wrap">
     <h4 className="pa-heading">pending Results Approval</h4>
     <div className="pa-list">
       {items.map((it) => (
