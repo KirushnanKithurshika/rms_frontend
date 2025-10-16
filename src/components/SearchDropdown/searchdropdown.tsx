@@ -1,39 +1,55 @@
-import React, { useState } from 'react';
-import './searchdropdown.css';
-import { FaSearch, FaChevronDown } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import "./searchdropdown.css";
+import { FaSearch, FaChevronDown } from "react-icons/fa";
 
-const courses = [
-  'EC7201 - Information Security-22nd',
-  'EE7001 - Research & Methodology-23rd',
-  'CS6103 - Machine Learning-22nd',
-  'CE7102 - Data Structures-22nd',
-  'EC7201 - Information Security-22nd',
-  'EE7001 - Research & Methodology-23rd',
-  'CS6103 - Machine Learning-22nd',
-  'CE7102 - Data Structures-22nd',
-];
+interface Course {
+  courseId: string;
+  courseDisplayName: string;
+}
 
-const CourseSearchBarlechome: React.FC = () => {
-  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
+interface Props {
+  courses: Course[];
+  selectedCourseId: string;
+  onCourseSelect: (courseId: string) => void;
+}
+
+const CourseSearchBarlechome: React.FC<Props> = ({
+  courses,
+  selectedCourseId,
+  onCourseSelect,
+}) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const selectedCourse =
+    courses.find((c) => c.courseId === selectedCourseId)?.courseDisplayName ||
+    "Select Course";
 
-  const handleSelect = (course: string) => {
-    setSelectedCourse(course);
-    setDropdownOpen(false);
-  };
+  useEffect(() => {
+    if (courses.length > 0 && !selectedCourseId) {
+      onCourseSelect(courses[0].courseId);
+    }
+  }, [courses]);
 
   return (
     <div className="course-search-container">
       <FaSearch className="search-iconLH" />
-      <div className="selected-courseLH" onClick={() => setDropdownOpen(!dropdownOpen)}>
+      <div
+        className="selected-courseLH"
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+      >
         <span>{selectedCourse}</span>
         <FaChevronDown className="dropdown-iconLH" />
       </div>
       {dropdownOpen && (
         <ul className="dropdown-menuLH">
-          {courses.map((course, index) => (
-            <li key={index} onClick={() => handleSelect(course)}>
-              {course}
+          {courses.map((course) => (
+            <li
+              key={course.courseId}
+              onClick={() => {
+                onCourseSelect(course.courseId);
+                setDropdownOpen(false);
+              }}
+            >
+              {course.courseDisplayName}
             </li>
           ))}
         </ul>

@@ -32,7 +32,6 @@ export interface StudentResultsSheet {
   specialization: string;
   sheetTitle: string;
   provisionalLine: string;
-  version: string;
   semesters: SemesterResult[];
   student: StudentInfo;
   note: string;

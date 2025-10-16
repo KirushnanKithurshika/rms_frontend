@@ -105,7 +105,6 @@ const ResultsTabsButtomSection: React.FC = () => {
                         specialization={resultsSheet?.specialization ?? ""}
                         sheetTitle={resultsSheet?.sheetTitle ?? ""}
                         provisionalLine={resultsSheet?.provisionalLine ?? ""}
-                        version={resultsSheet?.version ?? ""}
                         core={semester.core}
                         electives={semester.electives}
                         student={{
