@@ -195,3 +195,10 @@
 
 
 }
+
+/* basic login page styles — replace with your real styles */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
