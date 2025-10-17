@@ -9,7 +9,7 @@ const BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
     /\/+$/,
     ""
-  ) ?? "http://localhost:8087/api"; // 👈 match your Spring Boot backend port
+  ) ?? "http://13.60.171.88:8080/api"; // 👈 match your Spring Boot backend port
 
 const api = axios.create({
   baseURL: BASE_URL,
