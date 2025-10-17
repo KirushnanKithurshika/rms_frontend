@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 import Navbar from "../../components/Navbar/navbar";
-import "./LoginPage.css";
+import "./loginPage.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
