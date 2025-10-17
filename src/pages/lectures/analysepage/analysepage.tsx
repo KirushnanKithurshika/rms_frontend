@@ -1,60 +1,76 @@
-import { useMemo, useState } from 'react';
-import Navbarin from '../../../components/Navbar/navbarin.tsx';
-import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
-import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
-import DonutChart from '../../../components/graphs/passfailgraph/passfailgraph.tsx';
-import MarksRangeBarChart from '../../../components/graphs/marksrangegraph/marksrange.tsx';
-
-type Course = { id: string; name: string };
+import { useEffect, useState } from "react";
+import Navbarin from "../../../components/Navbar/navbarin.tsx";
+import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar.tsx";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
+import CourseSearchBarlechome from "../../../components/SearchDropdown/searchdropdown.tsx";
+import DonutChart from "../../../components/graphs/passfailgraph/passfailgraph.tsx";
+import MarksRangeBarChart from "../../../components/graphs/marksrangegraph/marksrange.tsx";
+import { useAppSelector, useAppDispatch } from "../../../app/hooks.ts";
+import {
+  fetchLecturerDashboard,
+  setSelectedCourse,
+} from "../../../features/lecturerDashboard/lecturerDashboardSlice.ts";
+import { selectUserId } from "../../../features/auth/selectors.ts";
 
 const AnalizePage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const userId = useAppSelector(selectUserId);
 
-  // --- Mock data (replace with API data) ---
-  const courses: Course[] = useMemo(
-    () => [
-      { id: 'CSE101', name: 'Programming I' },
-      { id: 'CSE202', name: 'Data Structures' },
-      { id: 'ENG301', name: 'Signals & Systems' },
-    ],
-    []
+  const { data, loading, error, selectedCourseId } = useAppSelector(
+    (state) => state.lecturerDashboard
   );
 
-  const [selectedCourseId, setSelectedCourseId] = useState<string>(courses[0]?.id ?? '');
+  useEffect(() => {
+    if (userId) dispatch(fetchLecturerDashboard(userId));
+  }, [dispatch, userId]);
 
-  // Example pass/fail for the selected course
-  const [pass, setPass] = useState<number>(78);
-  const [fail, setFail] = useState<number>(22);
-
-  // Example marks-range data for the bar chart (adjust to your component’s shape)
-  // If your MarksRangeBarChart expects a different structure, align it here.
-  const [dataValues, setDataValues] = useState<number[]>([3, 12, 25, 18, 7]); // e.g., [0–20, 21–40, 41–60, 61–80, 81–100]
+  const handleCourseChange = (courseId: string) => {
+    dispatch(setSelectedCourse(courseId));
+  };
 
   const handleBackdropClick = () => setSidebarOpen(false);
 
-  const onCourseSelect = (courseId: string) => {
-    setSelectedCourseId(courseId);
-    // TODO: fetch & set pass/fail + dataValues for the chosen course
-    // setPass(...); setFail(...); setDataValues([...]);
-  };
+  const selectedAnalytics =
+    (selectedCourseId && data?.analyticsData?.[selectedCourseId]) || null;
+
+  const isAnalyticsObject =
+    selectedAnalytics && typeof selectedAnalytics === "object";
+
+  const passCount = isAnalyticsObject
+    ? (selectedAnalytics as any).passFailPercentage?.passCount ?? 0
+    : 0;
+
+  const failCount = isAnalyticsObject
+    ? (selectedAnalytics as any).passFailPercentage?.failCount ?? 0
+    : 0;
+
+  const marksRange: number[] = isAnalyticsObject
+    ? (selectedAnalytics as any).marksRange?.studentCounts ?? [0, 0, 0, 0, 0]
+    : [0, 0, 0, 0, 0];
+
+  if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
+  if (error) return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
 
   return (
     <div className="lec-dashboard-container">
-      <div className="nav"><Navbarin /></div>
+      <div className="nav">
+        <Navbarin />
+      </div>
 
       <div className="breadcrumb">
         <BreadcrumbNav />
       </div>
 
-      {/* Show backdrop only on mobile */}
+      {/* Backdrop */}
       <div
-        className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`}
+        className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`}
         onClick={handleBackdropClick}
-      />
+      ></div>
 
       <div className="main-area">
-        <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}>
+        {/* Sidebar */}
+        <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
           <LectureSidebar />
         </div>
 
@@ -62,13 +78,11 @@ const AnalizePage = () => {
           <div className="analytics-section">
             <div className="analytics-header">
               <h3>Analytics Latest Updates</h3>
-
               <div className="searchbarlecturer">
-                {/* FIX 1: Provide required props (map to expected shape) */}
                 <CourseSearchBarlechome
-                  courses={courses.map(c => ({ courseId: c.id, courseDisplayName: c.name }))}
-                  selectedCourseId={selectedCourseId}
-                  onCourseSelect={onCourseSelect}
+                  courses={data?.availableCourses ?? []}
+                  selectedCourseId={selectedCourseId ?? ""}
+                  onCourseSelect={handleCourseChange}
                 />
               </div>
             </div>
@@ -76,17 +90,14 @@ const AnalizePage = () => {
             <div className="analytics-graphs-container">
               <div className="graph-card">
                 <h4 className="graph-title">Pass vs Fail Percentage</h4>
-                {/* FIX 2: Provide pass/fail */}
-                <DonutChart pass={pass} fail={fail} />
+                <DonutChart pass={passCount} fail={failCount} />
               </div>
 
               <div className="graph-card">
                 <h4 className="graph-title">Marks Range Vs Students Number</h4>
-                {/* FIX 3: Provide dataValues */}
-                <MarksRangeBarChart dataValues={dataValues} />
+                <MarksRangeBarChart dataValues={marksRange} />
               </div>
             </div>
-
           </div>
         </div>
       </div>
