@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Navbarin from "../../../components/Navbar/navbarin";
-import ApprovalSidebar from "../../../components/ApprovalStaffs/ApprovalSidebar/approval";
-import "./Approval.css";
+import "./ResultsApproval.css";
 import PendingApprovals from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
 
@@ -11,6 +10,7 @@ import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsA
 const approvals = [
   { id: "22-5", title: "22nd batch 5th Semester Results" },
   { id: "22-6", title: "22nd batch 6th Semester Results" },
+
 ];
 const ResultsApprovalPage = () => {
   const navigate = useNavigate();

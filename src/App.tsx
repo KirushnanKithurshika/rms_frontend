@@ -32,7 +32,7 @@ import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypag
 import CourseHistory from "./pages/lectures/History/History";
 import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
 import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
-import ResultsApprovalPage from "./pages/Approval copy/ResultsApproval/Approval";
+import ResultsApprovalPage from "./pages/Approval copy/ResultsApproval/ResultsApproval";
 
 
 
@@ -72,15 +72,15 @@ function App() {
           <Route path="/course-history" element={<CourseHistory />} />
           <Route path="/modify-results" element={<ModifyResultsPage />} />
 
-  <Route path="/signatureboard" element={<SignatureBoard />} />
-   <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
+          <Route path="/signatureboard" element={<SignatureBoard />} />
+          <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
 
 
-          {/* Lecturer */}
+        
 
 
 
-          {/* Admin */}
+        
 
         </Routes>
       </div>

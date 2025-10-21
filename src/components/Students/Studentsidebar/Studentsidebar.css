@@ -10,7 +10,7 @@
   border: 1px solid #ffffff;
   border-radius: 2px;
   font-family: 'Segoe UI', sans-serif;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
   transition: width 0.3s ease;
   z-index: 100;           
 }
