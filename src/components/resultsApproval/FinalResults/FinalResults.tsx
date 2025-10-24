@@ -1,30 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSignature,     // Sign
-  faDownload,      // Download
-  faCircleCheck,   // Approve
-  faLocationDot,   // Anchor (panel icon)
-  faRulerHorizontal, // Size (panel icon)
-  faArrowsUpDownLeftRight, // Position (panel icon)
-  faRotateLeft,    // Reset
-  faTrash,         // Clear
+  faSignature,
+  faDownload,
+  faCircleCheck,
+  faLocationDot,
+  faRulerHorizontal,
+  faArrowsUpDownLeftRight,
+  faRotateLeft,
+  faTrash,
   faChevronUp,
   faChevronDown,
   faChevronLeft,
   faChevronRight,
+  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom"; // <-- React Router
 import SignaturePad from "signature_pad";
 import { PDFDocument } from "pdf-lib";
 import "./FinalResults.css";
 
 type ResultApprovalViewerProps = {
-  pdfUrl: string; // must be same-origin or CORS-enabled direct PDF
+  pdfUrl: string;
   onApprove: (signedPdfBlobUrl?: string) => void;
   onSign?: (signatureDataUrl: string) => void;
   onDownload?: (signedPdfBlobUrl?: string) => void;
   approveLabel?: string;
-  autoDownloadAfterSign?: boolean; // default true
+  autoDownloadAfterSign?: boolean;
+  onBack?: () => void; // optional custom back handler (parent can override)
 };
 
 /* ----------------- Helpers ----------------- */
@@ -41,10 +44,10 @@ function dataUrlToUint8(dataUrl: string) {
 
 type Placement = {
   anchor?: "bottomRight" | "bottomLeft" | "topRight" | "topLeft";
-  offsetX?: number; // + right
-  offsetY?: number; // + up
-  widthPts?: number; // (optional) target width in points
-  scaleFactor?: number; // scales default width
+  offsetX?: number;
+  offsetY?: number;
+  widthPts?: number;
+  scaleFactor?: number;
 };
 
 async function stampSignatureIntoPdf(
@@ -80,8 +83,8 @@ async function stampSignatureIntoPdf(
   let y = margin;
   const anchor = placement.anchor ?? "bottomRight";
   if (anchor === "bottomLeft") { x = margin; y = margin; }
-  if (anchor === "topRight")   { x = pageWidth - targetWidth - margin; y = pageHeight - targetHeight - margin; }
-  if (anchor === "topLeft")    { x = margin; y = pageHeight - targetHeight - margin; }
+  if (anchor === "topRight") { x = pageWidth - targetWidth - margin; y = pageHeight - targetHeight - margin; }
+  if (anchor === "topLeft") { x = margin; y = pageHeight - targetHeight - margin; }
 
   x += placement.offsetX ?? 0;
   y += placement.offsetY ?? 0;
@@ -189,12 +192,26 @@ const SignatureDialog: React.FC<{
           </div>
         ) : (
           <div className="ra-tab-panel">
-            <input type="file" accept="image/png,image/jpeg" onChange={onFileChange} />
+            <div className="ra-upload">
+              <input
+                id="sigUpload"
+                type="file"
+                className="ra-upload-input"
+                accept="image/png,image/jpeg"
+                onChange={onFileChange}
+              />
+              <label htmlFor="sigUpload" className="ra-upload-btn">
+                Choose image
+              </label>
+              <span className="ra-upload-hint">PNG or JPG • up to ~5 MB</span>
+            </div>
+
             {uploadPreview && (
               <div className="ra-upload-preview">
                 <img src={uploadPreview} alt="Signature preview" />
               </div>
             )}
+
             <div className="ra-row">
               <button className="ra-btn ra-primary" onClick={handleUseUploaded} disabled={!uploadPreview}>
                 Use Signature
@@ -216,6 +233,7 @@ const ResultApprovalViewer: React.FC<ResultApprovalViewerProps> = ({
   onDownload,
   approveLabel = "Approve",
   autoDownloadAfterSign = true,
+  onBack,
 }) => {
   const [isSignOpen, setIsSignOpen] = useState(false);
   const [signatureDataUrl, setSignatureDataUrl] = useState<string | null>(null);
@@ -230,6 +248,8 @@ const ResultApprovalViewer: React.FC<ResultApprovalViewerProps> = ({
   const [pageDims, setPageDims] = useState<{ w: number; h: number } | null>(null);
 
   const effectivePdfUrl = signedPdfUrl ?? pdfUrl;
+
+  const navigate = useNavigate();
 
   const handleDownload = () => {
     if (onDownload) return onDownload(effectivePdfUrl ?? undefined);
@@ -277,7 +297,6 @@ const ResultApprovalViewer: React.FC<ResultApprovalViewerProps> = ({
       }
       await applyStamp(effectivePdfUrl, signatureDataUrl);
 
-      // Download the newly signed if requested
       if (autoDownloadAfterSign && signedPdfUrl) {
         const a = document.createElement("a");
         a.href = signedPdfUrl;
@@ -307,18 +326,22 @@ const ResultApprovalViewer: React.FC<ResultApprovalViewerProps> = ({
     setOffsetY((v) => v + dy);
     await restampIfPossible();
   };
+
   const handleScaleChange: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
     setScaleFactor(parseFloat(e.target.value));
     await restampIfPossible();
   };
+
   const handleAnchorChange: React.ChangeEventHandler<HTMLSelectElement> = async (e) => {
     setAnchor(e.target.value as Placement["anchor"]);
     await restampIfPossible();
   };
+
   const handleResetPlacement = async () => {
     setScaleFactor(1); setOffsetX(0); setOffsetY(0); setAnchor("bottomRight");
     await restampIfPossible();
   };
+
   const handleClearSignatures = () => {
     if (signedPdfUrl) URL.revokeObjectURL(signedPdfUrl);
     setSignedPdfUrl(null);
@@ -327,10 +350,46 @@ const ResultApprovalViewer: React.FC<ResultApprovalViewerProps> = ({
     setScaleFactor(1); setOffsetX(0); setOffsetY(0); setAnchor("bottomRight");
   };
 
+  // Robust Back behavior:
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+      return;
+    }
+
+    // Prefer app history via React Router
+    try {
+      if (navigate) {
+        navigate(-1);
+        return;
+      }
+    } catch {
+      // ignore and fall back below
+    }
+
+    // Fallbacks for non-router or direct landings
+    const sameOriginReferrer =
+      document.referrer &&
+      (() => {
+        try { return new URL(document.referrer).origin === window.location.origin; }
+        catch { return false; }
+      })();
+
+    const hasHistory = window.history.length > 1;
+
+    if (hasHistory || sameOriginReferrer) {
+      window.history.back();
+    } else {
+      window.location.href = "/results-approval-requests"; 
+    }
+  };
+
   return (
     <section className="ra-shell">
       {/* Rail */}
       <aside className="ra-rail" aria-label="Document actions">
+      
+
         <button
           className="ra-rail-btn ra-rail-btn--primary"
           onClick={handleSignClick}

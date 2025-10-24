@@ -23,10 +23,10 @@
 .ra-rail-btn {
     width: 100%;
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0;
-    /* we’ll expand on hover */
     padding: 10px 8px;
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -34,7 +34,7 @@
     cursor: pointer;
     transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, gap .18s ease;
     overflow: hidden;
-    /* hide label until reveal */
+  
 }
 
 /* Icon-only by default; reveal label on hover/focus */
@@ -42,7 +42,6 @@
     opacity: 0;
     max-width: 0;
     margin-left: 0;
-    white-space: nowrap;
     transition: opacity .18s ease, max-width .18s ease, margin-left .18s ease;
     font-size: 10px;
     color: #334155;
@@ -52,7 +51,7 @@
 .ra-rail-btn:focus-visible .ra-rail-text {
     opacity: 1;
     max-width: 120px;
-    margin-left: 8px;
+   
 }
 
 .ra-rail-btn:hover,
@@ -80,6 +79,7 @@
 }
 
 .ra-approve {
+  
     background: linear-gradient(180deg, #ecfff3 0%, #e6f9ee 100%);
     border-color: #cbeed6;
 }
@@ -92,7 +92,6 @@
     width: 22px;
     height: 22px;
     font-size: 22px;
-    /* FA sizing */
     color: #36455b;
 }
 
@@ -134,7 +133,7 @@
     font-size: 14px;
 }
 
-/* ---------- Modal (Signature dialog) ---------- */
+
 .ra-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -187,6 +186,70 @@
     border-color: #cfe0ff;
 }
 
+
+.ra-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ra-upload-input {
+  position: absolute;
+  left: -9999px;
+}
+
+
+.ra-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid #dbe3f0;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+  color: #0f172a;
+  font-size: 14px;
+  cursor: pointer;
+  transition: box-shadow .15s ease, border-color .15s ease, transform .08s ease;
+  user-select: none;
+}
+
+.ra-upload-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+  border-color: #bfd0ff;
+  background: linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
+}
+
+.ra-upload-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+
+.ra-upload-hint {
+  font-size: 12px;
+  color: #64748b;
+}
+
+
+.ra-upload-preview {
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(2, 6, 23, 0.06);
+  max-width: 100%;
+}
+
+.ra-upload-preview img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
 .ra-tab-panel {
     padding: 16px;
 }
@@ -365,7 +428,6 @@
     color: #475569;
 }
 
-/* Nudge buttons */
 .ra-nudge-grid {
     display: grid;
     grid-template-rows: auto auto auto;
@@ -410,7 +472,6 @@
     cursor: not-allowed;
 }
 
-/* Settings actions */
 .ra-settings-actions {
     margin-top: 6px;
     display: flex;
@@ -471,7 +532,7 @@
         grid-template-columns: 1fr;
     }
 
-    /* Turn the rail into a bottom toolbar */
+
     .ra-rail {
         position: sticky;
         bottom: 0;
@@ -488,9 +549,7 @@
         width: auto;
         padding: 8px 10px;
     }
-
-    /* Keep icon-only on very small screens, reveal label only on hover */
-    .ra-rail-btn .ra-rail-text {
+  .ra-rail-btn .ra-rail-text {
         font-size: 12px;
     }
 
@@ -502,147 +561,19 @@
         grid-template-columns: 1fr;
         align-items: start;
     }
+
+    .ra-upload {
+    gap: 8px;
+  }
+  .ra-upload-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .ra-upload-hint {
+    width: 100%;
+  }
+
+
 }
 
-/* ---------- Dark mode (optional) ---------- */
-@media (prefers-color-scheme: dark) {
-    .ra-rail {
-        background: #0b1220;
-        border-color: #1b2437;
-    }
 
-    .ra-rail-btn {
-        background: #0f172a;
-        border-color: #25304a;
-    }
-
-    .ra-rail-btn--primary {
-        background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
-        border-color: #2a3a69;
-    }
-
-    .ra-approve {
-        background: linear-gradient(180deg, #0f1a14 0%, #0b1510 100%);
-        border-color: #224233;
-    }
-
-    .ra-ico {
-        color: #e2e8f0;
-    }
-
-    .ra-rail-text {
-        color: #cbd5e1;
-    }
-
-    .ra-stage {
-        background: #0b1220;
-        border-color: #1b2437;
-    }
-
-    .ra-canvas {
-        border-color: #1b2437;
-        background: #0f172a;
-    }
-
-    .ra-pdf {
-        background: #0b1220;
-    }
-
-    .ra-empty {
-        color: #9aa4b2;
-    }
-
-    .ra-modal {
-        background: #0f172a;
-    }
-
-    .ra-modal-header {
-        border-bottom-color: #1b2437;
-    }
-
-    .ra-tab {
-        background: #111827;
-        color: #e5e7eb;
-    }
-
-    .ra-tab.active {
-        background: #0b1220;
-        border-color: #2a3a69;
-    }
-
-    .ra-btn {
-        background: #111827;
-        border-color: #25304a;
-        color: #e2e8f0;
-    }
-
-    .ra-btn.ra-primary {
-        background: #3556a8;
-        border-color: #3556a8;
-    }
-
-    .ra-settings {
-        background: #0b1220;
-        border-color: #1b2437;
-        box-shadow: 0 8px 22px rgba(0, 0, 0, .35);
-    }
-
-    .ra-settings__header h4 {
-        color: #e5e7eb;
-    }
-
-    .ra-settings__header p {
-        color: #94a3b8;
-    }
-
-    .ra-settings-row {
-        border-top-color: #1b2437;
-    }
-
-    .ra-field-label {
-        color: #cbd5e1;
-    }
-
-    .ra-settings select {
-        background: #0f172a;
-        color: #e2e8f0;
-        border-color: #25304a;
-    }
-
-    .ra-settings select:focus {
-        border-color: #3556a8;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, .25);
-    }
-
-    .ra-field--range input[type="range"] {
-        background: linear-gradient(90deg, #29437a 0%, #1f3360 100%);
-    }
-
-    .ra-settings-value {
-        color: #9aa4b2;
-    }
-
-    .ra-nudge-grid button {
-        background: #0f172a;
-        border-color: #25304a;
-        color: #e5e7eb;
-    }
-
-    .ra-nudge-grid button:hover:not(:disabled) {
-        background: #0b1220;
-        border-color: #3556a8;
-        box-shadow: none;
-    }
-
-    .ra-btn--ghost {
-        background: #0f172a;
-        border-color: #2a3a69;
-        color: #93c5fd;
-    }
-
-    .ra-btn--danger {
-        background: #2a1212;
-        border-color: #4a1b1b;
-        color: #fecaca;
-    }
-}

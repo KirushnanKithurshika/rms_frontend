@@ -36,6 +36,27 @@
 
 }
 
+
+.approval-topbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 5px;
+
+}
+
+.pa-button--ghost {
+  font-size: 22px;
+  background: #fff;
+  color: #111827;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.pa-button--ghost:hover {
+  background: #f9fafb;
+}
+
 @media (max-width: 768px) {
 
 

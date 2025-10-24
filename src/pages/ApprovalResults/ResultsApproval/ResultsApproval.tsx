@@ -5,11 +5,10 @@ import PendingApprovals, { type ApprovalItem } from "../../../components/results
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
 import ResultApprovalViewer from "../../../components/resultsApproval/FinalResults/FinalResults";
 
-const approvals:ApprovalItem[] = [
+const approvals: ApprovalItem[] = [
   { id: "22-5", title: "22nd batch 5th Semester Results" },
   { id: "22-6", title: "22nd batch 6th Semester Results" },
 ];
-
 
 const PDF_MAP: Record<string, string> = {
   "22-5": "/pdfs/22-5.pdf",
@@ -21,14 +20,15 @@ const ResultsApprovalPage = () => {
 
   const pdfUrl = useMemo(() => (selectedId ? PDF_MAP[selectedId] : ""), [selectedId]);
 
+  // From the PendingApprovals list: choose which item to open
   const onApprove = (id: string) => {
     setSelectedId(id);
   };
 
+  // When the viewer approves, go back to list (you can also do API calls here)
   const handleApprove = () => {
     if (!selectedId) return;
-
-    setSelectedId(null); 
+    setSelectedId(null);
   };
 
   const handleDownload = () => {
@@ -57,6 +57,20 @@ const ResultsApprovalPage = () => {
               <PendingApprovals items={approvals} onApprove={onApprove} />
             )}
 
+            {selectedId && (
+              <div className="approval-topbar">
+                <button
+                  type="button"
+                  className="pa-button pa-button--ghost"
+                  onClick={() => setSelectedId(null)}
+                  aria-label="Back to Pending Approvals"
+                >
+                  ←
+                </button>
+              </div>
+            )}
+         
+
             {selectedId && pdfUrl && (
               <ResultApprovalViewer
                 pdfUrl={pdfUrl}
@@ -64,6 +78,7 @@ const ResultsApprovalPage = () => {
                 onSign={() => console.log("Sign flow")}
                 onDownload={handleDownload}
                 approveLabel="Approve"
+                onBack={() => setSelectedId(null)}   // viewer’s own Back also returns to list
               />
             )}
 
