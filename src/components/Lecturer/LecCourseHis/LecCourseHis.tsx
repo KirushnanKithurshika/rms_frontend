@@ -24,7 +24,6 @@ const demoHistory: HistoryItem[] = [
   {
     id: "h1",
     when: "2025-10-10T09:22:00Z",
-  
     action: "RESULTS_UPLOADED",
     courseCode: "EE7002",
     courseTitle: "Machine Learning",
@@ -39,7 +38,6 @@ const demoHistory: HistoryItem[] = [
   {
     id: "h2",
     when: "2025-10-09T15:05:00Z",
- 
     action: "RESULTS_MODIFIED",
     courseCode: "EE7004",
     courseTitle: "Database Systems",
@@ -54,7 +52,6 @@ const demoHistory: HistoryItem[] = [
   {
     id: "h3",
     when: "2025-10-08T11:10:00Z",
- 
     action: "COURSE_UPDATED",
     courseCode: "EE7006",
     courseTitle: "Artificial Intelligence",
@@ -71,7 +68,6 @@ const demoHistory: HistoryItem[] = [
   {
     id: "h4",
     when: "2025-10-06T08:30:00Z",
-
     action: "COURSE_CREATED",
     courseCode: "EE7010",
     courseTitle: "Distributed Systems",
@@ -86,7 +82,6 @@ const demoHistory: HistoryItem[] = [
   {
     id: "h5",
     when: "2025-10-05T17:40:00Z",
- 
     action: "COURSE_DELETED",
     courseCode: "EE7001",
     courseTitle: "Research & Methodology",
@@ -98,7 +93,6 @@ const demoHistory: HistoryItem[] = [
   {
     id: "h6",
     when: "2025-10-03T14:02:00Z",
- 
     action: "RESULTS_DELETED",
     courseCode: "EE7005",
     courseTitle: "Computer Networks",
@@ -141,8 +135,6 @@ const ActivityHistoryPage: React.FC = () => {
   const [query, setQuery] = useState("");
   const [actionFilter, setActionFilter] = useState<"ALL" | ActionType>("ALL");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const handleBackdropClick = () => setSidebarOpen(false);
 
   const rows = useMemo(() => {
     let data = [...demoHistory].sort(
@@ -157,172 +149,161 @@ const ActivityHistoryPage: React.FC = () => {
         (r) =>
           r.courseCode.toLowerCase().includes(q) ||
           r.courseTitle.toLowerCase().includes(q) ||
-          r.summary.toLowerCase().includes(q)
+          r.summary.toLowerCase().includes(q) ||
+          // also search inside details values
+          Object.values(r.details ?? {})
+            .map((v) => (typeof v === "object" ? JSON.stringify(v) : String(v)))
+            .join(" ")
+            .toLowerCase()
+            .includes(q)
       );
     }
     return data;
   }, [query, actionFilter]);
 
   return (
-    
-          <div className="hist-card">
-            <div className="hist-header">
-              <h3>Activity History</h3>
+    <div className="hist-card">
+      <div className="hist-header">
+        <h3>Activity History</h3>
 
-              <div className="hist-tools">
-                <div className="hist-search">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="Search course, actor, or summary…"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    aria-label="Search history"
-                  />
-                </div>
+        <div className="hist-tools">
+          <div className="hist-search">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search course, actor, or summary…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search history"
+            />
+          </div>
 
-                <select
-                  className="hist-select"
-                  value={actionFilter}
-                  onChange={(e) => setActionFilter(e.target.value as any)}
-                  aria-label="Filter by action"
-                >
-                  <option value="ALL">All actions</option>
-                  <option value="COURSE_CREATED">Course Created</option>
-                  <option value="COURSE_UPDATED">Course Updated</option>
-                  <option value="COURSE_DELETED">Course Deleted</option>
-                  <option value="RESULTS_UPLOADED">Results Uploaded</option>
-                  <option value="RESULTS_MODIFIED">Results Modified</option>
-                  <option value="RESULTS_DELETED">Results Deleted</option>
-                </select>
-              </div>
-            </div>
+          <select
+            className="hist-select"
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value as any)}
+            aria-label="Filter by action"
+          >
+            <option value="ALL">All actions</option>
+            <option value="COURSE_CREATED">Course Created</option>
+            <option value="COURSE_UPDATED">Course Updated</option>
+            <option value="COURSE_DELETED">Course Deleted</option>
+            <option value="RESULTS_UPLOADED">Results Uploaded</option>
+            <option value="RESULTS_MODIFIED">Results Modified</option>
+            <option value="RESULTS_DELETED">Results Deleted</option>
+          </select>
+        </div>
+      </div>
 
-            <div className="hist-scroll-x">
-              <table className="hist-table" role="table">
-                <thead>
+      <div className="hist-scroll-x">
+        <table className="hist-table" role="table">
+          <thead>
+            <tr>
+              <th>When</th>
+              <th>Action</th>
+              <th>Course</th>
+              <th>Summary</th>
+              <th className="hist-actions-col">Details</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={5} className="hist-empty">
+                  No history found.
+                </td>
+              </tr>
+            )}
+
+            {rows.map((r) => {
+              const isOpen = expanded === r.id;
+
+              return (
+                <React.Fragment key={r.id}>
                   <tr>
-                    <th>When</th>
-                    <th>Action</th>
-                    <th>Course</th>
-                    <th>Summary</th>
-                 
-                    <th className="hist-actions-col">Details</th>
-                  </tr>
-                </thead>
+                    <td className="hist-when">{fmt.format(new Date(r.when))}</td>
+                    <td>
+                      <span className={`hist-badge ${ACTION_TONES[r.action]}`}>
+                        {ACTION_LABELS[r.action]}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="hist-course">
+                        <span className="code">{r.courseCode}</span>
+                        <span className="title">{r.courseTitle}</span>
+                      </div>
+                    </td>
+                    <td className="hist-summary" title={r.summary}>
+                      {r.summary}
+                    </td>
 
-                <tbody>
-                  {rows.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="hist-empty">
-                        No history found.
+                    <td className="hist-actions">
+                      <button
+                        type="button"
+                        className="hist-btn-view"
+                        onClick={() => setExpanded(isOpen ? null : r.id)}
+                        aria-expanded={isOpen}
+                        aria-controls={`hist-detail-${r.id}`}
+                        title={isOpen ? "Hide details" : "View details"}
+                      >
+                        {isOpen ? "Hide" : "View"}
+                        <span className={`caret ${isOpen ? "rot" : ""}`}>▾</span>
+                      </button>
+                    </td>
+                  </tr>
+
+                  {isOpen && (
+                    <tr id={`hist-detail-${r.id}`} className="hist-detail-row">
+                      <td colSpan={5}>
+                        <div className="hist-detail">
+                          <div className="hist-detail-grid">
+                            <h4 className="hist-detail-heading">More details</h4>
+
+                            {r.details && Object.keys(r.details).length > 0 ? (
+                              <div className="hist-detail-kv">
+                                {Object.entries(r.details).map(([k, v]) => (
+                                  <div className="kv" key={k}>
+                                    <div className="kk">{k}</div>
+                                    <div className="vv">
+                                      {Array.isArray(v)
+                                        ? v.join(", ")
+                                        : typeof v === "object"
+                                        ? JSON.stringify(v, null, 2)
+                                        : String(v)}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="hist-no-extra">No extra details available.</div>
+                            )}
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   )}
-
-                  {rows.map((r) => {
-                    const isOpen = expanded === r.id;
-                    return (
-                      <React.Fragment key={r.id}>
-                        <tr>
-                          <td className="hist-when">{fmt.format(new Date(r.when))}</td>
-                          <td>
-                            <span className={`hist-badge ${ACTION_TONES[r.action]}`}>
-                              {ACTION_LABELS[r.action]}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="hist-course">
-                              <span className="code">{r.courseCode}</span>
-                              <span className="title">{r.courseTitle}</span>
-                            </div>
-                          </td>
-                          <td className="hist-summary" title={r.summary}>
-                            {r.summary}
-                          </td>
-                       
-                          <td className="hist-actions">
-                            <button
-                              type="button"
-                              className="hist-btn-view"
-                              onClick={() => setExpanded(isOpen ? null : r.id)}
-                              aria-expanded={isOpen}
-                              aria-controls={`hist-detail-${r.id}`}
-                              title="View details"
-                            >
-                              {isOpen ? "Hide" : "View"}
-                              <span className={`caret ${isOpen ? "rot" : ""}`}>▾</span>
-                            </button>
-                          </td>
-                        </tr>
-
-                        {isOpen && (
-                          <tr id={`hist-detail-${r.id}`} className="hist-detail-row">
-                            <td colSpan={6}>
-                              <div className="hist-detail">
-                                <div className="hist-detail-grid">
-                                  <div>
-                                    <div className="k">Action</div>
-                                    <div className="v">{ACTION_LABELS[r.action]}</div>
-                                  </div>
-                                  <div>
-                                    <div className="k">When</div>
-                                    <div className="v">
-                                      {fmt.format(new Date(r.when))}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    
-                                  
-                                  </div>
-                                  <div className="span-2">
-                                    <div className="k">Summary</div>
-                                    <div className="v">{r.summary}</div>
-                                  </div>
-
-                                  {/* Render key/value details, if any */}
-                                  {r.details && (
-                                    <div className="span-2">
-                                      <div className="k">More details</div>
-                                      <div className="v details-kv">
-                                        {Object.entries(r.details).map(([k, v]) => (
-                                          <div className="kv" key={k}>
-                                            <span className="kk">{k}</span>
-                                            <span className="vv">
-                                              {Array.isArray(v) ? v.join(", ") : String(v)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-       
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
