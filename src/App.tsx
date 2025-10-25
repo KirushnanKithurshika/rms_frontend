@@ -22,6 +22,9 @@ import Courses from "./pages/lectures/courses/courses";
 import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
 import AnalizePage from "./pages/lectures/analysepage/analysepage";
 import CreateCourseForm from "./components/createcourseform/createcourseform";
+import CoursesHistory from "./pages/lectures/History/History";
+import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycoursedetails";
+
 
 // Admin
 import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
@@ -45,13 +48,9 @@ import UserDropdown from "./components/UserDropdown/userdropdown";
 import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
 import LandingRedirect from "./routes/LandingRedirect";
 import AuditLog from "./pages/AuditLog/AuditLog";
-import ActivityHistoryPage from "./components/Lecturer/LecCourseHis/LecCourseHis";
-import EditCourseDetails from "./components/EditCourseDetails/EditCourseDetails";
-import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycoursedetails";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
-import CoursesHistory from "./pages/lectures/History/History";
 
 
 const NotAuthorized = () => (
