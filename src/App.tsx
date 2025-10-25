@@ -50,6 +50,7 @@ import EditCourseDetails from "./components/EditCourseDetails/EditCourseDetails"
 import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycoursedetails";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
+import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 
 
 const NotAuthorized = () => (
@@ -133,6 +134,7 @@ function App() {
           {/* ------------------ APPROVAL ------------------ */}
           <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
+           <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
