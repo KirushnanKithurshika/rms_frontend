@@ -71,7 +71,6 @@ function App() {
           <Route path="/approval-history" element={<ApprovalHistory />} />
           <Route path="/course-history" element={<CourseHistory />} />
           <Route path="/modify-results" element={<ModifyResultsPage />} />
-
           <Route path="/signatureboard" element={<SignatureBoard />} />
           <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
 
