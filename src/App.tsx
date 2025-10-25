@@ -51,6 +51,7 @@ import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycours
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
+import CoursesHistory from "./pages/lectures/History/History";
 
 
 const NotAuthorized = () => (
@@ -97,7 +98,7 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             <Route path="/results-preview" element={<ResultsPreviewPage />} />
             <Route path="/results-analysis" element={<AnalizePage />} />
-            <Route path="/course-history" element={<EditCourseDetails />} />
+            <Route path="/course-history" element={<CoursesHistory />} />
             <Route path="/editcourse-details" element={<ModifyCourseDetail />} />
             {/* Student routes */}
             <Route
