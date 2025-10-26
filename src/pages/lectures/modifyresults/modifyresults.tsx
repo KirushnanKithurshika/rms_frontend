@@ -3,7 +3,7 @@ import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import CourseSearchBarlechome from '../../../components/SearchDropdown/searchdropdown.tsx';
-import EditCourseDetails from '../../../components/EditCourseDetails/EditCourseDetails.tsx';
+
 
 
 const ModifyResultsPage = () => {
@@ -29,7 +29,7 @@ const ModifyResultsPage = () => {
 
                 <div className="dashboard-content">
                     <div className='card'>
-                    <EditCourseDetails/>
+                        <CourseSearchBarlechome />
                     </div>
                 </div>
             </div>
