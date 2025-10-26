@@ -54,8 +54,7 @@ const FileUploadCard: React.FC<FileUploadProps> = ({
           aria-valuenow={progress}
           aria-label="File upload progress"
         >
-          {/* Use a UNIQUE class to avoid clashes with Bootstrap's .progress-bar */}
-          <div
+            <div
             className="upload-progress-bar"
             style={{ width: `${progress}%` }}
           />

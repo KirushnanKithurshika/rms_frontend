@@ -75,17 +75,21 @@ type CourseDraft = {
 };
 
 type Props = {
-    initial?: Partial<CourseDraft>;
-   onUpdate?: (payload: CourseDraft) => void;
+  /** Optional initial values when editing an existing course */
+  initial?: Partial<CourseDraft>;
+  /** Bubble up actions if you want to handle in parent */
+  onUpdate?: (payload: CourseDraft) => void;
   onCancel?: () => void;
 };
 
 const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => {
-   const academicYears = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
+  // static options
+  const academicYears = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
   const departments = ["Computer Engineering","Electrical Engineering","Mechanical Engineering","Marine Engineering","Civil Engineering"];
   const semesters = ["Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7","Semester 8"];
 
-    const initialSnapshot: CourseDraft = useMemo(
+  // build initial snapshot (what “Cancel” restores)
+  const initialSnapshot: CourseDraft = useMemo(
     () => ({
       code: initial?.code ?? "",
       title: initial?.title ?? "",
@@ -102,6 +106,7 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
     [initial]
   );
 
+  // form state
   const [code, setCode] = useState(initialSnapshot.code);
   const [title, setTitle] = useState(initialSnapshot.title);
   const [academicYear, setAcademicYear] = useState(initialSnapshot.academicYear);
@@ -114,9 +119,10 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
   const [email, setEmail] = useState(initialSnapshot.email);
   const [assessments, setAssessments] = useState<string[]>(initialSnapshot.assessments);
 
-
+  // assessment input
   const [assessmentInput, setAssessmentInput] = useState("");
 
+  // detect “dirty” (any change vs. snapshot)
   const isDirty = useMemo(() => {
     const snap = initialSnapshot;
     return !(
