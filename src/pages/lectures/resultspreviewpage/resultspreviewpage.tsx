@@ -27,7 +27,7 @@ const ResultsPreviewPage = () => {
 
                 <div className="dashboard-content">
                     <div className="dashboard-cards-preview">
-                        <div className="card">
+                        <div className="rp-card">
                             <div className="rp-page">
                              <ResultsPreview />
                              </div>

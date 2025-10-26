@@ -27,7 +27,9 @@ const Courses: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [editCourse, setEditCourse] = useState<Course | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+
   const [activeMenuIndex, setActiveMenuIndex] = useState<number | null>(null);
 
   // ✅ Fetch lecturer’s courses on mount
@@ -64,7 +66,31 @@ const Courses: React.FC = () => {
     setUploadedFileName(null);
   };
 
-  const handleCreateCourse = () => navigate("/createcourseui");
+  const handleBack = () => {
+    setSelectedCourse(null);
+    setUploadedFileName(null);
+  };
+
+  const handleDropdownToggle = (idx: number) => {
+    setActiveMenuIndex(prev => (prev === idx ? null : idx));
+  };
+
+  const navigate = useNavigate();
+
+const handleCreateCourse = () => {
+  navigate('/createcourseui'); 
+};
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setActiveMenuIndex(null);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="lec-dashboard-container">
@@ -118,7 +144,7 @@ const Courses: React.FC = () => {
                         <div
                           className="card-options"
                           onClick={(e) => {
-                            e.stopPropagation();
+                            e.stopPropagation(); 
                             setActiveMenuIndex(
                               activeMenuIndex === idx ? null : idx
                             );
@@ -161,18 +187,58 @@ const Courses: React.FC = () => {
           ) : (
             // ✅ Selected Course View
             <div className="result-upload-section">
-              <ResultUploadInterface
-                course={selectedCourse}
+              <div className="card">
+                <ResultUploadInterface
+                  course={selectedCourse}
                 onBack={() => setSelectedCourse(null)}
-                onFileUpload={(name: string) => setUploadedFileName(name)}
+                  onFileUpload={(name: string) => setUploadedFileName(name)}
+                />
+                {uploadedFileName && <FileUploadCard fileName={uploadedFileName} />}
+              </div>
+            </div>
+          )}
+
+          {/* --- Edit Course --- */}
+          {view === 'edit' && editCourse && (
+
+            <div className="edit-course-section card">
+              <button className="back-btn" onClick={handleBackToList}><FaArrowLeft style={{ marginRight: 8 }} /></button>
+              <EditCourseDetails
+                initial={editCourse}
+                onUpdate={(updatedCourse) => {
+                  setCourses(prev => prev.map(c => c.code === updatedCourse.code ? updatedCourse : c));
+                  setView('details');
+                  setDetailsCourse(updatedCourse);
+                  setEditCourse(null);
+                }}
+                onCancel={() => { setView('details'); setEditCourse(null); }}
               />
-              {uploadedFileName && (
-                <FileUploadCard fileName={uploadedFileName} />
-              )}
             </div>
           )}
         </div>
       </div>
+
+      {/* --- Delete Modal --- */}
+      {showDeleteModal && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title" onClick={closeDeleteModal}>
+          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
+            <div className="modal-header">
+              <h4 id="delete-title">Delete Course</h4>
+              <button className="close-btn" aria-label="Close" onClick={closeDeleteModal}>×</button>
+            </div>
+            <div className="modal-body">
+              <p className='modal-body'>
+                {courseToDelete ? <>Are you sure you want to delete <strong>{courseToDelete.code} — {courseToDelete.title}</strong>?</> : "Are you sure you want to delete this course?"}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-delete danger" onClick={confirmDelete}>Delete</button>
+              <button className="btn-delete ghost" onClick={closeDeleteModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

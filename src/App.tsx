@@ -39,32 +39,15 @@ import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscoursein
 import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
+import ApprovalPage from "./pages/Approval/Approval";
 
-// Shared / user
-import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
-import UserDropdown from "./components/UserDropdown/userdropdown";
-
-// ---------- Guards ----------
-import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
-import LandingRedirect from "./routes/LandingRedirect";
-import AuditLog from "./pages/AuditLog/AuditLog";
-import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
-import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
-import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
-
-
-const NotAuthorized = () => (
-  <div style={{ padding: "2rem", textAlign: "center" }}>
-    <h2>403 – Not Authorized</h2>
-    <p>You don’t have permission to access this page.</p>
-  </div>
-);
 
 
 function App() {
   return (
-    <div className="mt-16">
+    <Router>
       <div className="mt-16">
+
         <Routes>
           {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -73,8 +56,8 @@ function App() {
 
           {/* Login, verification, reset - accessible only if NOT logged in */}
           <Route element={<RequireAnonymous />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/verification" element={<TwoStepVerification />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/verification" element={<TwoStepVerification />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/reset-password-mail"
@@ -88,15 +71,15 @@ function App() {
             <Route path="/dashboard" element={<AdminDashboard />} />
             <Route path="/landing" element={<LandingRedirect />} />
             <Route path="/drop" element={<UserDropdown />} />
-            <Route path="/account-setting" element={<AccountSettings />} />
+          <Route path="/account-setting" element={<AccountSettings />} />
 
             {/* Lecturer routes */}
-            <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/lecturerhome" element={<LecturerDashboard />} />
             <Route path="/createcourse" element={<CreateCourseForm />} />
-            <Route path="/createcourseui" element={<CreateCourseUI />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/results-preview" element={<ResultsPreviewPage />} />
-            <Route path="/results-analysis" element={<AnalizePage />} />
+          <Route path="/createcourseui" element={<CreateCourseUI />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/results-preview" element={<ResultsPreviewPage />} />
+          <Route path="/results-analysis" element={<AnalizePage />} />
             <Route path="/course-history" element={<CoursesHistory />} />
             <Route path="/editcourse-details" element={<ModifyCourseDetail />} />
             {/* Student routes */}
@@ -122,9 +105,9 @@ function App() {
 
           {/* ------------------ ADMIN-ONLY AREA ------------------ */}
           <Route element={<RequireRole roles={["ADMIN"]} />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/user-management" element={<UserManagement />} />
-            <Route path="/admin/role-management" element={<RoleManagement />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/user-management" element={<UserManagement />} />
+          <Route path="/admin/role-management" element={<RoleManagement />} />
             <Route
               path="/admin/student-management"
               element={<StudentManagement />}
