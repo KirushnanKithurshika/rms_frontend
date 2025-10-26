@@ -34,6 +34,7 @@ import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
 import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
+import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
 
 
 
@@ -71,16 +72,17 @@ function App() {
           <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
           <Route path="/course-history" element={<CourseHistory />} />
-          <Route path="/modify-results" element={<ModifyResultsPage />} />
+          <Route path="/modify-results" element={<ModifyResults/>} />
           <Route path="/signatureboard" element={<SignatureBoard />} />
-          <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
-<Route path="/lec-announcement-page" element={<AnnouncementPage/>}/>
-
-        
-
+          <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
+          <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
+          
 
 
-        
+
+
+
+
 
         </Routes>
       </div>
