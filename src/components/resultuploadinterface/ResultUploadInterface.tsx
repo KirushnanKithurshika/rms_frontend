@@ -10,12 +10,13 @@ interface ResultUploadInterfaceProps {
 
 const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({ course, onBack, onFileUpload }) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [activeTab, setActiveTab] = useState<'ca' | 'final'>('ca'); // Track active tab
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setSelectedFile(file);
-            onFileUpload(file.name); // Pass the file name to parent component
+            onFileUpload(file.name);
         }
     };
 
@@ -27,8 +28,18 @@ const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({ course, o
             </div>
 
             <div className="upload-tabs">
-                <button className="tab-btnCA active">Continuous Assessment</button>
-                <button className="tab-btnCA">Final Exam</button>
+                <button
+                    className={`tab-btnCA ${activeTab === 'ca' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('ca')}
+                >
+                    Continuous Assessment
+                </button>
+                <button
+                    className={`tab-btnCA ${activeTab === 'final' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('final')}
+                >
+                    Final Exam
+                </button>
             </div>
 
             <div className='Uploadarea'>

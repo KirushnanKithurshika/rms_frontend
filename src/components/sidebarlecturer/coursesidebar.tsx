@@ -112,7 +112,7 @@ const LectureSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Student Enquiries</span>}
           </NavLink>
 
-          <NavLink to="/announcements" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/lec-announcement-page" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaBullhorn className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Announcements</span>}
           </NavLink>
