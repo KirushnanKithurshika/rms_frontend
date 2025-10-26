@@ -39,7 +39,14 @@ import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscoursein
 import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
-import ApprovalPage from "./pages/Approval/Approval";
+import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
+import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
+import AuditLog from "./pages/AuditLog/AuditLog";
+import { RequireAnonymous, RequireAuth, RequireRole } from "./routes/guards";
+import LandingRedirect from "./routes/LandingRedirect";
+import UserDropdown from "./components/UserDropdown/userdropdown";
+import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
+import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 
 
 
@@ -52,7 +59,7 @@ function App() {
           {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/welcomepage" element={<WelcomePage />} />
-          <Route path="/not-authorized" element={<NotAuthorized />} />
+          <Route path="/not-authorized" element={<NotAutorized/>} />
 
           {/* Login, verification, reset - accessible only if NOT logged in */}
           <Route element={<RequireAnonymous />}>
@@ -69,8 +76,8 @@ function App() {
           <Route element={<RequireAuth />}>
             {/* Generic pages (accessible to all logged-in users) */}
             <Route path="/dashboard" element={<AdminDashboard />} />
-            <Route path="/landing" element={<LandingRedirect />} />
-            <Route path="/drop" element={<UserDropdown />} />
+            <Route path="/landing" element={<LandingRedirect/>} />
+            <Route path="/drop" element={<UserDropdown/>} />
           <Route path="/account-setting" element={<AccountSettings />} />
 
             {/* Lecturer routes */}
@@ -112,7 +119,7 @@ function App() {
               path="/admin/student-management"
               element={<StudentManagement />}
             />
-            <Route path="/admin/audit-logs" element={<AuditLog />} />
+            <Route path="/admin/audit-logs" element={<AuditLog/>} />
           </Route>
           {/* ------------------ APPROVAL ------------------ */}
           <Route path="/approval-requests" element={<ApprovalPage />} />
@@ -122,7 +129,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-    </div>
+    </Router>
   );
 }
 

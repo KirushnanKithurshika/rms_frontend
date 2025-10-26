@@ -36,12 +36,8 @@
 .sidebar {
   background-color: white;
   margin-top: 3px;
-<<<<<<< HEAD
   width: fit-content;
   height: 100hv;
-=======
-  width:fit-content;
->>>>>>> dev_kithu
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -51,10 +47,6 @@
   overflow-y: auto;
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> dev_kithu
 .dashboard-cards {
   display: flex;
   flex-wrap: wrap;
@@ -63,10 +55,6 @@
 }
 
 .card {
-<<<<<<< HEAD
-=======
-min-height:100%;
->>>>>>> dev_kithu
   flex: 1 1 200px;
   background-color: #fff;
   border-radius: 10px;
@@ -100,12 +88,8 @@ min-height:100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-<<<<<<< HEAD
   flex-wrap: wrap;
   gap: 1rem;
-=======
-  flex-wrap: wrap;   gap: 1rem;
->>>>>>> dev_kithu
 }
 
 .analytics-header h3 {
