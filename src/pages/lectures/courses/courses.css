@@ -473,32 +473,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .cd-modal {
-    background: rgba(17, 24, 39, .96);
-    border-color: rgba(148, 163, 184, .12);
-  }
 
-  .cd-header {
-    border-bottom-color: rgba(148, 163, 184, .16);
-    background: linear-gradient(180deg, #111827, #0b1220);
-  }
-
-  .cd-title,
-  .cd-subtitle,
-  .cd-item .cd-v {
-    color: #e5e7eb;
-  }
-
-  .cd-body {
-    color: #e5e7eb;
-  }
-
-  .cd-footer {
-    background: #0b1220;
-    border-top-color: rgba(148, 163, 184, .16);
-  }
-}
 
 @keyframes fadeIn {
   from {
