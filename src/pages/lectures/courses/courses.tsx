@@ -32,6 +32,10 @@ const Courses: React.FC = () => {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState<number | null>(null);
 
+  // Edit / view state
+  const [view, setView] = useState<'list' | 'edit' | 'details'>('list');
+  const [detailsCourse, setDetailsCourse] = useState<Course | null>(null);
+
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
@@ -43,7 +47,7 @@ const Courses: React.FC = () => {
     }
   }, [dispatch, userId]);
 
-  // Filter courses based on search
+  // Filter courses
   const filteredCourses = courses.filter(
     (c) =>
       c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,10 +57,7 @@ const Courses: React.FC = () => {
   // Click outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setActiveMenuIndex(null);
       }
     };
@@ -70,17 +71,19 @@ const Courses: React.FC = () => {
     setUploadedFileName(null);
   };
 
-  const handleBack = () => {
+  const handleBackToList = () => {
     setSelectedCourse(null);
+    setEditCourse(null);
+    setView('list');
     setUploadedFileName(null);
   };
 
   const handleDropdownToggle = (idx: number) => {
-    setActiveMenuIndex((prev) => (prev === idx ? null : idx));
+    setActiveMenuIndex(prev => (prev === idx ? null : idx));
   };
 
   const handleCreateCourse = () => {
-    navigate("/createcourseui");
+    navigate('/createcourseui');
   };
 
   const openDeleteModal = (course: Course) => {
@@ -94,7 +97,7 @@ const Courses: React.FC = () => {
   };
 
   const confirmDelete = () => {
-    // Dispatch delete action here if needed
+    // Add dispatch to delete course here if needed
     closeDeleteModal();
   };
 
@@ -121,7 +124,7 @@ const Courses: React.FC = () => {
             <div>Loading courses...</div>
           ) : error ? (
             <div>Error: {error}</div>
-          ) : !selectedCourse ? (
+          ) : !selectedCourse && view === 'list' ? (
             <div className="cardcourse">
               <div className="courses-header">
                 <h3>Courses</h3>
@@ -156,17 +159,14 @@ const Courses: React.FC = () => {
 
                         {activeMenuIndex === idx && (
                           <div className="card-dropdown" ref={dropdownRef}>
-                            <div className="dropdown-item">
-                              <FaEdit className="iconcard" />
+                            <div className="dropdown-item" onClick={() => { setEditCourse(course); setView('edit'); }}>
+                              <FaEdit className="iconcard" /> Edit
+                            </div>
+                            <div className="dropdown-item" onClick={() => openDeleteModal(course)}>
+                              <FaTrash className="iconcard" /> Delete
                             </div>
                             <div className="dropdown-item">
-                              <FaTrash
-                                className="iconcard"
-                                onClick={() => openDeleteModal(course)}
-                              />
-                            </div>
-                            <div className="dropdown-item">
-                              <FaInfoCircle className="iconcard" />
+                              <FaInfoCircle className="iconcard" /> Info
                             </div>
                           </div>
                         )}
@@ -187,18 +187,38 @@ const Courses: React.FC = () => {
                 <button onClick={handleCreateCourse}>Create Course +</button>
               </div>
             </div>
-          ) : (
+          ) : view === 'edit' && editCourse ? (
+            <div className="edit-course-section card">
+              <button className="back-btn" onClick={handleBackToList}>
+                <FaArrowLeft style={{ marginRight: 8 }} />
+              </button>
+              <EditCourseDetails
+                initial={editCourse}
+                onUpdate={(updatedCourse) => {
+                  // Update local courses array
+                  // Assuming courses is from Redux, you may dispatch update here
+                  setEditCourse(null);
+                  setView('list');
+                  setDetailsCourse(updatedCourse);
+                }}
+                onCancel={handleBackToList}
+              />
+            </div>
+          ) : selectedCourse ? (
             <div className="result-upload-section">
+              <button className="back-btn" onClick={handleBackToList}>
+                <FaArrowLeft style={{ marginRight: 8 }} />
+              </button>
               <div className="card">
                 <ResultUploadInterface
                   course={selectedCourse}
-                  onBack={handleBack}
+                  onBack={handleBackToList}
                   onFileUpload={(name: string) => setUploadedFileName(name)}
                 />
                 {uploadedFileName && <FileUploadCard fileName={uploadedFileName} />}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -211,40 +231,23 @@ const Courses: React.FC = () => {
           aria-labelledby="delete-title"
           onClick={closeDeleteModal}
         >
-          <div
-            className="modal"
-            role="document"
-            onClick={(e) => e.stopPropagation()}
-            tabIndex={-1}
-          >
+          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
             <div className="modal-header">
               <h4 id="delete-title">Delete Course</h4>
-              <button className="close-btn" aria-label="Close" onClick={closeDeleteModal}>
-                ×
-              </button>
+              <button className="close-btn" aria-label="Close" onClick={closeDeleteModal}>×</button>
             </div>
             <div className="modal-body">
               <p>
                 {courseToDelete ? (
                   <>
-                    Are you sure you want to delete{" "}
-                    <strong>
-                      {courseToDelete.code} — {courseToDelete.title}
-                    </strong>
-                    ?
+                    Are you sure you want to delete <strong>{courseToDelete.code} — {courseToDelete.title}</strong>?
                   </>
-                ) : (
-                  "Are you sure you want to delete this course?"
-                )}
+                ) : "Are you sure you want to delete this course?"}
               </p>
             </div>
             <div className="modal-footer">
-              <button className="btn-delete danger" onClick={confirmDelete}>
-                Delete
-              </button>
-              <button className="btn-delete ghost" onClick={closeDeleteModal}>
-                Cancel
-              </button>
+              <button className="btn-delete danger" onClick={confirmDelete}>Delete</button>
+              <button className="btn-delete ghost" onClick={closeDeleteModal}>Cancel</button>
             </div>
           </div>
         </div>
