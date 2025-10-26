@@ -6,6 +6,7 @@ import LectureSidebar from '../../../components/sidebarlecturer/coursesidebar.ts
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import ResultUploadInterface from '../../../components/resultuploadinterface/ResultUploadInterface.tsx';
 import FileUploadCard from '../../../components/fileuploadcard/fileuploadcard.tsx';
+import EditCourseDetails from '../../../components/EditCourseDetails/EditCourseDetails.tsx';
 import { FaEdit, FaTrash, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 
 interface Course {
@@ -29,97 +30,64 @@ const courseData: Course[] = [
   { code: 'EE7006', title: 'Artificial Intelligence', credits: 3, department: 'Electrical Engineering', semester: 'Semester 2', coordinator: 'Dr. K. Raj', academicYear: '2024/2025', degreeProgram: 'MSc/PGDip in EE', description: 'Search, planning, reasoning, knowledge representation, and intro to deep learning with practical exercises.' },
 ];
 
-type ViewMode = 'list' | 'details' | 'upload';
+type ViewMode = 'list' | 'details' | 'upload' | 'edit';
 
 const Courses: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // use local state so we can delete
   const [courses, setCourses] = useState<Course[]>(courseData);
 
-  // view state
   const [view, setView] = useState<ViewMode>('list');
   const [detailsCourse, setDetailsCourse] = useState<Course | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [editCourse, setEditCourse] = useState<Course | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
-  // dropdown
   const [activeMenuIndex, setActiveMenuIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  // delete modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
-  const openDeleteModal = (course: Course) => {
-    setCourseToDelete(course);
-    setShowDeleteModal(true);
-    setActiveMenuIndex(null);
-  };
-  const closeDeleteModal = () => {
-    setShowDeleteModal(false);
-    setCourseToDelete(null);
-  };
+  const navigate = useNavigate();
+
+  // --- Dropdown & Modal Handlers ---
+  const handleDropdownToggle = (idx: number) => setActiveMenuIndex(prev => (prev === idx ? null : idx));
+  const openDeleteModal = (course: Course) => { setCourseToDelete(course); setShowDeleteModal(true); setActiveMenuIndex(null); };
+  const closeDeleteModal = () => { setShowDeleteModal(false); setCourseToDelete(null); };
   const confirmDelete = () => {
     if (!courseToDelete) return;
     setCourses(prev => prev.filter(c => c.code !== courseToDelete.code));
-    // if the deleted one is currently in a view, go back to list
-    if (detailsCourse?.code === courseToDelete.code || selectedCourse?.code === courseToDelete.code) {
-      setView('list');
-      setDetailsCourse(null);
-      setSelectedCourse(null);
-      setUploadedFileName(null);
+    if (detailsCourse?.code === courseToDelete.code || selectedCourse?.code === courseToDelete.code || editCourse?.code === courseToDelete.code) {
+      setView('list'); setDetailsCourse(null); setSelectedCourse(null); setEditCourse(null); setUploadedFileName(null);
     }
     closeDeleteModal();
   };
 
   const handleBackdropClick = () => setSidebarOpen(false);
 
+  // --- Search ---
   const filteredCourses = courses.filter(course =>
     course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCourseClick = (course: Course) => {
-    setDetailsCourse(course);
-    setView('details');
-    setUploadedFileName(null);
-  };
-
-  const handleBackToList = () => {
-    setView('list');
-    setDetailsCourse(null);
-    setSelectedCourse(null);
-    setUploadedFileName(null);
-  };
-
-  const handleGoToUpload = () => {
-    if (detailsCourse) {
-      setSelectedCourse(detailsCourse);
-      setView('upload');
-    }
-  };
-
-  const handleDropdownToggle = (idx: number) => {
-    setActiveMenuIndex(prev => (prev === idx ? null : idx));
-  };
-
-  const navigate = useNavigate();
+  // --- Navigation & View Handlers ---
+  const handleCourseClick = (course: Course) => { setDetailsCourse(course); setView('details'); setUploadedFileName(null); };
+  const handleBackToList = () => { setView('list'); setDetailsCourse(null); setSelectedCourse(null); setEditCourse(null); setUploadedFileName(null); };
+  const handleGoToUpload = () => { if (detailsCourse) { setSelectedCourse(detailsCourse); setView('upload'); } };
   const handleCreateCourse = () => navigate('/createcourseui');
 
- 
+  // --- Close dropdown on click outside ---
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setActiveMenuIndex(null);
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setActiveMenuIndex(null);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-
+  // --- Close modal on Escape ---
   useEffect(() => {
     if (!showDeleteModal) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeDeleteModal();
@@ -130,35 +98,21 @@ const Courses: React.FC = () => {
   return (
     <div className="lec-dashboard-container">
       <div className="nav"><Navbarin /></div>
-
-      <div className="breadcrumb">
-        <BreadcrumbNav />
-      </div>
-
-      <div
-        className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`}
-        onClick={handleBackdropClick}
-      ></div>
+      <div className="breadcrumb"><BreadcrumbNav /></div>
+      <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={handleBackdropClick}></div>
 
       <div className="main-area">
-        <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}>
-          <LectureSidebar />
-        </div>
+        <div className={`sidebar ${isSidebarOpen ? 'active' : ''}`}><LectureSidebar /></div>
 
         <div className="dashboard-content">
 
-    
+          {/* --- Course List --- */}
           {view === 'list' && (
             <div className="cardcourse">
               <div className="courses-header">
                 <h3>Courses</h3>
                 <div className="search-bar">
-                  <input
-                    type="text"
-                    placeholder="Search Courses"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+                  <input type="text" placeholder="Search Courses" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                   <button><i className="fa fa-search"></i></button>
                 </div>
               </div>
@@ -166,50 +120,27 @@ const Courses: React.FC = () => {
               <div className="dashboard-cardscourse">
                 {filteredCourses.length > 0 ? (
                   filteredCourses.map((course, idx) => (
-                    <div
-                      className="course-card"
-                      key={`${course.code}-${idx}`}
-                      onClick={() => handleCourseClick(course)}
-                    >
+                    <div className="course-card" key={`${course.code}-${idx}`} onClick={() => handleCourseClick(course)}>
                       <div className="card-top">
-                        <div
-                          className="card-options"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDropdownToggle(idx);
-                          }}
-                        >
-                          ⋮
-                        </div>
+                        <div className="card-options" onClick={(e) => { e.stopPropagation(); handleDropdownToggle(idx); }}>⋮</div>
 
                         {activeMenuIndex === idx && (
-                          <div
-                            className="card-dropdown"
-                            ref={dropdownRef}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="dropdown-item" onClick={() => alert('Edit (demo)')}>
-                              <FaEdit className="iconcard" />
-
-                            </div>
-                            <div
-                              className="dropdown-item"
-                              onClick={() => openDeleteModal(course)}
-                            >
-                              <FaTrash className="iconcard" />
-
-                            </div>
+                          <div className="card-dropdown" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
                             <div
                               className="dropdown-item"
                               onClick={() => {
-                                setDetailsCourse(course);
-                                setView('details');
+                                setEditCourse(course);
+                                setView('edit');
                                 setActiveMenuIndex(null);
                               }}
-                              role="button"
                             >
-                              <FaInfoCircle className="iconcard" />
-
+                              <FaEdit className="iconcard" /> 
+                            </div>
+                            <div className="dropdown-item" onClick={() => openDeleteModal(course)}>
+                              <FaTrash className="iconcard" /> 
+                            </div>
+                            <div className="dropdown-item" onClick={() => { setDetailsCourse(course); setView('details'); setActiveMenuIndex(null); }}>
+                              <FaInfoCircle className="iconcard" /> 
                             </div>
                           </div>
                         )}
@@ -232,75 +163,42 @@ const Courses: React.FC = () => {
             </div>
           )}
 
+          {/* --- Course Details --- */}
           {view === 'details' && detailsCourse && (
             <div className="details-view card">
               <div className="details-header">
-                <button className="back-btn" onClick={handleBackToList}>
-                  <FaArrowLeft style={{ marginRight: 8 }} />
-                </button>
+                <button className="back-btn" onClick={handleBackToList}><FaArrowLeft style={{ marginRight: 8 }} /></button>
                 <div>
-                  <h3 className="cd-title">
-                    {detailsCourse.code} — {detailsCourse.title}
-                  </h3>
-                  {detailsCourse.academicYear && (
-                    <div className="cd-subtitle">Academic Year: {detailsCourse.academicYear}</div>
-                  )}
+                  <h3 className="cd-title">{detailsCourse.code} — {detailsCourse.title}</h3>
+                  {detailsCourse.academicYear && <div className="cd-subtitle">Academic Year: {detailsCourse.academicYear}</div>}
                 </div>
               </div>
-
               <div className="cd-body" style={{ paddingTop: 0 }}>
                 <div className="cd-grid">
-                  <div className="cd-item">
-                    <div className="cd-k">Department</div>
-                    <div className="cd-v">{detailsCourse.department ?? '-'}</div>
-                  </div>
-                  <div className="cd-item">
-                    <div className="cd-k">Semester</div>
-                    <div className="cd-v">{detailsCourse.semester ?? '-'}</div>
-                  </div>
-                  <div className="cd-item">
-                    <div className="cd-k">Credits</div>
-                    <div className="cd-v">{detailsCourse.credits ?? '-'}</div>
-                  </div>
-                  <div className="cd-item">
-                    <div className="cd-k">Coordinator</div>
-                    <div className="cd-v">{detailsCourse.coordinator ?? '-'}</div>
-                  </div>
-                  <div className="cd-item">
-                    <div className="cd-k">Degree Program</div>
-                    <div className="cd-v">{detailsCourse.degreeProgram ?? '-'}</div>
-                  </div>
-
-                  <div className="cd-item cd-span-2">
-                    <div className="cd-k">Description</div>
-                    <div className="cd-v">{detailsCourse.description ?? '—'}</div>
-                  </div>
+                  <div className="cd-item"><div className="cd-k">Department</div><div className="cd-v">{detailsCourse.department ?? '-'}</div></div>
+                  <div className="cd-item"><div className="cd-k">Semester</div><div className="cd-v">{detailsCourse.semester ?? '-'}</div></div>
+                  <div className="cd-item"><div className="cd-k">Credits</div><div className="cd-v">{detailsCourse.credits ?? '-'}</div></div>
+                  <div className="cd-item"><div className="cd-k">Coordinator</div><div className="cd-v">{detailsCourse.coordinator ?? '-'}</div></div>
+                  <div className="cd-item"><div className="cd-k">Degree Program</div><div className="cd-v">{detailsCourse.degreeProgram ?? '-'}</div></div>
+                  <div className="cd-item cd-span-2"><div className="cd-k">Description</div><div className="cd-v">{detailsCourse.description ?? '—'}</div></div>
                 </div>
               </div>
-
               <div className="details-actions">
-               
-                <button className="cd-btn primary" onClick={handleGoToUpload}>
-                  Upload Results
-                </button>
+                <button className="cd-btn primary" onClick={handleGoToUpload}>Upload Results</button>
               </div>
             </div>
           )}
 
+          {/* --- Result Upload --- */}
           {view === 'upload' && selectedCourse && (
             <div className="result-upload-section">
               <div className="card">
                 <div className="details-header">
-                  <button className="back-btn" onClick={handleBackToList}>
-                    <FaArrowLeft style={{ marginRight: 8 }} />
-                  </button>
+                  <button className="back-btn" onClick={handleBackToList}><FaArrowLeft style={{ marginRight: 8 }} /></button>
                   <div>
-                    <h3 className="cd-title">
-                      Upload Results — {selectedCourse.code} — {selectedCourse.title}
-                    </h3>
+                    <h3 className="cd-title">Upload Results — {selectedCourse.code} — {selectedCourse.title}</h3>
                   </div>
                 </div>
-
                 <ResultUploadInterface
                   course={selectedCourse}
                   onBack={handleBackToList}
@@ -311,44 +209,48 @@ const Courses: React.FC = () => {
             </div>
           )}
 
+          {/* --- Edit Course --- */}
+          {view === 'edit' && editCourse && (
+
+            <div className="edit-course-section card">
+              <button className="back-btn" onClick={handleBackToList}><FaArrowLeft style={{ marginRight: 8 }} /></button>
+              <EditCourseDetails
+                initial={editCourse}
+                onUpdate={(updatedCourse) => {
+                  setCourses(prev => prev.map(c => c.code === updatedCourse.code ? updatedCourse : c));
+                  setView('details');
+                  setDetailsCourse(updatedCourse);
+                  setEditCourse(null);
+                }}
+                onCancel={() => { setView('details'); setEditCourse(null); }}
+              />
+            </div>
+          )}
+
         </div>
       </div>
 
+      {/* --- Delete Modal --- */}
       {showDeleteModal && (
-        <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-title"
-          onClick={closeDeleteModal}
-        >
-          <div
-            className="modal"
-            role="document"
-            onClick={(e) => e.stopPropagation()}
-            tabIndex={-1}
-          >
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title" onClick={closeDeleteModal}>
+          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
             <div className="modal-header">
               <h4 id="delete-title">Delete Course</h4>
               <button className="close-btn" aria-label="Close" onClick={closeDeleteModal}>×</button>
             </div>
-
             <div className="modal-body">
               <p className='modal-body'>
-                {courseToDelete
-                  ? <>Are you sure you want to delete <strong>{courseToDelete.code} — {courseToDelete.title}</strong>?</>
-                  : "Are you sure you want to delete this course?"}
+                {courseToDelete ? <>Are you sure you want to delete <strong>{courseToDelete.code} — {courseToDelete.title}</strong>?</> : "Are you sure you want to delete this course?"}
               </p>
             </div>
-
             <div className="modal-footer">
               <button className="btn-delete danger" onClick={confirmDelete}>Delete</button>
-
               <button className="btn-delete ghost" onClick={closeDeleteModal}>Cancel</button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };
