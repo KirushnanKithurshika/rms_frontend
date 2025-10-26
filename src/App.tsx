@@ -40,13 +40,7 @@ import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTra
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
-import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
-import AuditLog from "./pages/AuditLog/AuditLog";
-import { RequireAnonymous, RequireAuth, RequireRole } from "./routes/guards";
-import LandingRedirect from "./routes/LandingRedirect";
-import UserDropdown from "./components/UserDropdown/userdropdown";
-import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
-import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
+import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 
 
 
@@ -127,6 +121,19 @@ function App() {
            <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/course-history" element={<CourseHistory />} />
+          <Route path="/modify-results" element={<ModifyResults/>} />
+          <Route path="/signatureboard" element={<SignatureBoard />} />
+          <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
+          <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
+          
+
+
+
+
+
+
+
         </Routes>
       </div>
     </Router>
