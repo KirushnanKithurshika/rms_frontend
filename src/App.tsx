@@ -41,6 +41,14 @@ import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptAppl
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
+import { RequireAnonymous, RequireAuth, RequireRole } from "./routes/guards";
+import LandingRedirect from "./routes/LandingRedirect";
+import UserDropdown from "./components/UserDropdown/userdropdown";
+import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
+import AuditLog from "./pages/AuditLog/AuditLog";
+import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
+import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
+import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
 
 
 
@@ -56,7 +64,7 @@ function App() {
           <Route path="/not-authorized" element={<NotAutorized/>} />
 
           {/* Login, verification, reset - accessible only if NOT logged in */}
-          <Route element={<RequireAnonymous />}>
+          <Route element={<RequireAnonymous/>}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/verification" element={<TwoStepVerification />} />
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -121,8 +129,8 @@ function App() {
            <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="/course-history" element={<CourseHistory />} />
-          <Route path="/modify-results" element={<ModifyResults/>} />
+          <Route path="/course-history" element={<CoursesHistory />} />
+          <Route path="/modify-results" element={<ModifyCourseDetail/>} />
           <Route path="/signatureboard" element={<SignatureBoard />} />
           <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
