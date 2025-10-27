@@ -19,7 +19,7 @@
 .announcement-card {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
-  border-left: 5px solid #192a59; /* ✅ Dark blue left border */
+  border-left: 5px solid #192a59; 
   border-radius: 12px;
   padding: 15px 18px;
   margin-bottom: 15px;
@@ -29,7 +29,7 @@
 
 .announcement-card:hover {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  transform: translateX(3px); /* subtle hover motion */
+  transform: translateX(3px); 
 }
 
 .New-ann {
