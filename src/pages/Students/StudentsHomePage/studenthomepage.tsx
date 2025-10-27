@@ -12,7 +12,7 @@ const StudentDashboard = () => {
 
   return (
     <div className="lec-dashboard-container">
-      {/* Navbar */}
+   
       <div className="nav">
         <Navbarin />
       </div>

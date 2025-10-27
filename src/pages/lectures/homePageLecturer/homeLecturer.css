@@ -170,6 +170,10 @@ min-height:100%;
   .graph-title {
     font-size: 16px;
   }
+
+  .breadcrumb{
+   top:80px;
+  }
 }
 
 
