@@ -7,6 +7,7 @@ import TranscriptAvailability from "../../../components/Students/Studentsidebar/
 
 // Optional: import a local image (comment out if using a /public path)
 import readyImg from "../../../assets/transcript-ready.png"; // adjust path to your image
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 
 const StudentTranscript = () => {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ const StudentTranscript = () => {
       <div className="nav">
         <Navbarin />
       </div>
-
+ <div className="breadcrumb">
+                <BreadcrumbNav />
+            </div>
       <div className="dashboard-content-students-transcript">
         <StudentSubNav />
         <div className="subnav-divider" />

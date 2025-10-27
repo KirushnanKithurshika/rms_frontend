@@ -4,6 +4,7 @@ import StudentSubNav from "../../../components/Students/StudentsubNav/Studentsub
 
 import StudentSidebar from "../../../components/Students/Studentsidebar/Studentsidebar.tsx";
 import TranscriptStatusTimeline from "../../../components/Students/StuTraSta/StuTraSta.tsx";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 
 const TranscripStatus = () => {
  
@@ -13,6 +14,9 @@ const TranscripStatus = () => {
       <div className="nav">
         <Navbarin />
       </div>
+       <div className="breadcrumb">
+                <BreadcrumbNav />
+            </div>
 
       <div className="dashboard-content-students-transcript">
         <StudentSubNav />
