@@ -6,6 +6,7 @@ import StudentSubNav from "../../../components/Students/StudentsubNav/Studentsub
 import "./studentscoursesinterface.css";
 import SemesterCourses from "../../../components/Students/StudentCourseInterface/studentcourses";
 import { selectUserId } from "../../../features/auth/selectors";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav";
 
 const StudentCoursesPage = () => {
   const dispatch = useAppDispatch();
@@ -25,7 +26,9 @@ const StudentCoursesPage = () => {
       <div className="nav">
         <Navbarin />
       </div>
-
+      <div className="breadcrumb">
+        <BreadcrumbNav />
+      </div>
       <div className="dashboard-content">
         <StudentSubNav />
         <div className="subnav-divider"></div>

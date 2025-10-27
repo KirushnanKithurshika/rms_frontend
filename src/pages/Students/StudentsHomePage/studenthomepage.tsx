@@ -9,6 +9,7 @@ import { selectUserId } from "../../../features/auth/selectors.ts";
 import { fetchStudentResultsSheet } from "../../../features/studentResults/studentResultsSlice.ts";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store.ts";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 
 const StudentDashboard = () => {
   const dispatch = useAppDispatch();
@@ -32,9 +33,9 @@ const StudentDashboard = () => {
         <Navbarin />
       </div>
 
-      {/* <div className="breadcrumb">
-        <BreadcrumbNav />
-      </div>*/}
+       <div className="breadcrumb">
+        <BreadcrumbNav/>
+      </div>
 
       <div className="dashboard-content">
         <StudentSubNav />
