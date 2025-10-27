@@ -41,7 +41,7 @@ import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
 import UserDropdown from "./components/UserDropdown/userdropdown";
 
-// ---------- Guards ----------
+// ---------- Guards ---------
 import { RequireAuth, RequireRole, RequireAnonymous } from "./routes/guards";
 import LandingRedirect from "./routes/LandingRedirect";
 import AuditLog from "./pages/AuditLog/AuditLog";
