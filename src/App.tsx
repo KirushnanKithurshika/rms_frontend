@@ -37,7 +37,7 @@ import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTra
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 
-// Shared / users
+// Shared / user
 import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
 import UserDropdown from "./components/UserDropdown/userdropdown";
 
