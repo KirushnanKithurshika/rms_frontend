@@ -51,9 +51,15 @@
 
 
 @media (max-width: 768px) {
+
+  .rounded-nav-container {
+
+
+  margin-top: 130px;
+
+}
   .rounded-nav {
     position: absolute;   
-    top: 20px;
     right: 10px;
     background: #fff;
     flex-direction: column;
