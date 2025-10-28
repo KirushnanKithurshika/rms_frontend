@@ -78,7 +78,7 @@ function App() {
             />
           </Route>
 
-          {/* ------------------ AUTHENTICATED AREA ----------------- */}
+          {/* ------------------ AUTHENTICATED AREA --------------- */}
           <Route element={<RequireAuth />}>
             {/* Generic pages (accessible to all logged-in users) */}
             <Route path="/dashboard" element={<AdminDashboard />} />
