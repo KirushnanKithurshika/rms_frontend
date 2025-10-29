@@ -1,11 +1,6 @@
 // src/App.tsx
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
 // ---------- Pages ----------
@@ -23,8 +18,7 @@ import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultsprevi
 import AnalizePage from "./pages/lectures/analysepage/analysepage";
 import CreateCourseForm from "./components/createcourseform/createcourseform";
 import CoursesHistory from "./pages/lectures/History/History";
-import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycoursedetails";
-
+// import ModifyCourseDetail from "./pages/lectures/modifycoursedetails/modifycoursedetails";
 
 // Admin
 import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
@@ -50,23 +44,26 @@ import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/ApprovalHistorypage";
 import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
 
-
+const NotAuthorized = () => (
+  <div style={{ padding: "2rem", textAlign: "center" }}>
+    <h2>403 – Not Authorized</h2>
+    <p>You don’t have permission to access this page.</p>
+  </div>
+);
 
 function App() {
   return (
-    <Router>
       <div className="mt-16">
-
         <Routes>
           {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/welcomepage" element={<WelcomePage />} />
-          <Route path="/not-authorized" element={<NotAutorized/>} />
+          <Route path="/not-authorized" element={<NotAuthorized />} />
 
           {/* Login, verification, reset - accessible only if NOT logged in */}
-          <Route element={<RequireAnonymous/>}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/verification" element={<TwoStepVerification />} />
+          <Route element={<RequireAnonymous />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/verification" element={<TwoStepVerification />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/reset-password-mail"
@@ -78,19 +75,20 @@ function App() {
           <Route element={<RequireAuth />}>
             {/* Generic pages (accessible to all logged-in users) */}
             <Route path="/dashboard" element={<AdminDashboard />} />
-            <Route path="/landing" element={<LandingRedirect/>} />
-            <Route path="/drop" element={<UserDropdown/>} />
-          <Route path="/account-setting" element={<AccountSettings />} />
+            <Route path="/landing" element={<LandingRedirect />} />
+            <Route path="/drop" element={<UserDropdown />} />
+            <Route path="/account-setting" element={<AccountSettings />} />
 
             {/* Lecturer routes */}
-          <Route path="/lecturerhome" element={<LecturerDashboard />} />
+            <Route path="/lecturerhome" element={<LecturerDashboard />} />
             <Route path="/createcourse" element={<CreateCourseForm />} />
-          <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/results-preview" element={<ResultsPreviewPage />} />
-          <Route path="/results-analysis" element={<AnalizePage />} />
+            <Route path="/createcourseui" element={<CreateCourseUI />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/results-preview" element={<ResultsPreviewPage />} />
+            <Route path="/results-analysis" element={<AnalizePage />} />
             <Route path="/course-history" element={<CoursesHistory />} />
-            <Route path="/editcourse-details" element={<ModifyCourseDetail />} />
+            {/** Edit course page temporarily disabled */}
+            {/** <Route path="/editcourse-details" element={<ModifyCourseDetail />} /> */}
             {/* Student routes */}
             <Route
               path="/student/student-dashboard"
@@ -114,37 +112,34 @@ function App() {
 
           {/* ------------------ ADMIN-ONLY AREA ------------------ */}
           <Route element={<RequireRole roles={["ADMIN"]} />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/user-management" element={<UserManagement />} />
-          <Route path="/admin/role-management" element={<RoleManagement />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/user-management" element={<UserManagement />} />
+            <Route path="/admin/role-management" element={<RoleManagement />} />
             <Route
               path="/admin/student-management"
               element={<StudentManagement />}
             />
-            <Route path="/admin/audit-logs" element={<AuditLog/>} />
+            <Route path="/admin/audit-logs" element={<AuditLog />} />
           </Route>
           {/* ------------------ APPROVAL ------------------ */}
           <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
-           <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
+          <Route
+            path="/results-approval-requests"
+            element={<ResultsApprovalPage />}
+          />
           {/* ------------------ FALLBACK ------------------ */}
           <Route path="*" element={<Navigate to="/" replace />} />
           <Route path="/course-history" element={<CoursesHistory />} />
-          <Route path="/modify-results" element={<ModifyCourseDetail/>} />
+          {/** <Route path="/modify-results" element={<ModifyCourseDetail />} /> */}
           <Route path="/signatureboard" element={<SignatureBoard />} />
-          <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
+          <Route
+            path="/results-approval-requests"
+            element={<ResultsApprovalPage />}
+          />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
-          
-
-
-
-
-
-
-
         </Routes>
       </div>
-    </Router>
   );
 }
 

@@ -8,11 +8,7 @@ import ActivityHistoryPage from '../../../components/Lecturer/LecCourseHis/LecCo
 
 
 
-<<<<<<< HEAD
-const CoursesHistory: React.FC = () => {
-=======
 const Courses: React.FC = () => {
->>>>>>> dev_kithu
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleBackdropClick = () => setSidebarOpen(false);
@@ -53,8 +49,4 @@ const Courses: React.FC = () => {
     );
 };
 
-<<<<<<< HEAD
-export default CoursesHistory;
-=======
 export default Courses;
->>>>>>> dev_kithu

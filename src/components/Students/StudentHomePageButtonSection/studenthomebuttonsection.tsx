@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { FaSearch, FaChevronDown } from "react-icons/fa";
 import StudentResultsSheet from "../Studentsresultsheet/StudentResultsSheet";
-<<<<<<< HEAD
+import StudentsConAss from "../StudentsCA/StudentsCA";
 import "./studenthomebuttonsection.css";
 import type { RootState } from "../../../app/store";
-=======
-import StudentsConAss from "../StudentsCA/StudentsCA";
->>>>>>> dev_kithu
 
 const ResultsTabsButtomSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"CA" | "EXAM">("CA");
@@ -95,7 +92,6 @@ const ResultsTabsButtomSection: React.FC = () => {
                     <FaChevronDown className="sem-arrow" aria-hidden="true" />
                   </button>
 
-<<<<<<< HEAD
                   <div
                     id={`sem-panel-${index}`}
                     className="sem-panel"
@@ -104,26 +100,34 @@ const ResultsTabsButtomSection: React.FC = () => {
                     aria-label={`${semester.semesterName} results`}
                   >
                     <div className="results-sheet-host">
-                      <StudentResultsSheet
-                        university={resultsSheet?.university ?? ""} // <-- fallback
-                        facultyLine={resultsSheet?.facultyLine ?? ""}
-                        specialization={resultsSheet?.specialization ?? ""}
-                        sheetTitle={resultsSheet?.sheetTitle ?? ""}
-                        provisionalLine={resultsSheet?.provisionalLine ?? ""}
-                        core={semester.core}
-                        electives={semester.electives}
-                        student={{
-                          ...resultsSheet?.student!,
-                          gradesByCode:
-                            resultsSheet?.student?.gradesByCode ?? {}, // default empty object
-                        }}
-                        modulesCountingForGPA={{
-                          core: semester.core.map((c) => c.code),
-                          electives: semester.electives.map((c) => c.code),
-                        }}
-                        gradeByCode={semester.gradesByCode}
-                        note={resultsSheet?.note ?? ""}
-                      />
+                      {activeTab === "CA" ? (
+                        <StudentsConAss />
+                      ) : (
+                        <StudentResultsSheet
+                          university={resultsSheet?.university ?? ""}
+                          facultyLine={resultsSheet?.facultyLine ?? ""}
+                          specialization={resultsSheet?.specialization ?? ""}
+                          sheetTitle={resultsSheet?.sheetTitle ?? ""}
+                          provisionalLine={resultsSheet?.provisionalLine ?? ""}
+                          core={semester.core}
+                          electives={semester.electives}
+                          student={{
+                            ...(resultsSheet?.student ?? {
+                              name: "",
+                              regNo: "",
+                              gradesByCode: {},
+                            }),
+                            gradesByCode:
+                              resultsSheet?.student?.gradesByCode ?? {},
+                          }}
+                          modulesCountingForGPA={{
+                            core: semester.core.map((c) => c.code),
+                            electives: semester.electives.map((c) => c.code),
+                          }}
+                          gradeByCode={semester.gradesByCode}
+                          note={resultsSheet?.note ?? ""}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -132,27 +136,6 @@ const ResultsTabsButtomSection: React.FC = () => {
         ) : (
           <p>No semester data available.</p>
         )}
-=======
-              <div
-                id={`sem-panel-${n}`}
-                className="sem-panel"
-                hidden={!open}
-                role="region"
-                aria-label={`Semester ${n} results`}
-              >
-                {/* The panel is exactly the same width as the band, but the sheet is centered inside */}
-                <div className="results-sheet-host">
-  {activeTab === "CA" ? (
-    <StudentsConAss />
-  ) : (
-    <StudentResultsSheet  />
-  )}
-</div>
-              </div>
-            </div>
-          );
-        })}
->>>>>>> dev_kithu
       </div>
     </div>
   );

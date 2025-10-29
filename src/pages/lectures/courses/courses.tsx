@@ -8,56 +8,48 @@ import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav";
 import ResultUploadInterface from "../../../components/resultuploadinterface/ResultUploadInterface";
 import FileUploadCard from "../../../components/fileuploadcard/fileuploadcard";
-import EditCourseDetails from "../../../components/EditCourseDetails/EditCourseDetails";
-import { FaEdit, FaTrash, FaInfoCircle, FaArrowLeft } from "react-icons/fa";
-import type { Course } from "../../../features/lecturerCourses/course";
+import { FaEdit, FaTrash, FaInfoCircle } from "react-icons/fa";
 import "./courses.css";
+import type { Course } from "../../../features/lecturerCourses/course";
 
 const Courses: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  // Redux state
+  
   const { courses, loading, error } = useAppSelector(
     (state) => state.lecturerCourses
   );
   const userId = useAppSelector(selectUserId);
 
-  // Local state
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [editCourse, setEditCourse] = useState<Course | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState<number | null>(null);
 
-  // Edit / view state
-  const [view, setView] = useState<'list' | 'edit' | 'details'>('list');
-  const [detailsCourse, setDetailsCourse] = useState<Course | null>(null);
 
-  // Delete modal state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
-
-  // Fetch courses
   useEffect(() => {
     if (userId) {
       dispatch(fetchLecturerCourses(userId));
     }
   }, [dispatch, userId]);
 
-  // Filter courses
+
   const filteredCourses = courses.filter(
     (c) =>
       c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Click outside dropdown
+ 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setActiveMenuIndex(null);
       }
     };
@@ -65,41 +57,13 @@ const Courses: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handlers
+  
   const handleCourseClick = (course: Course) => {
     setSelectedCourse(course);
     setUploadedFileName(null);
   };
-
-  const handleBackToList = () => {
-    setSelectedCourse(null);
-    setEditCourse(null);
-    setView('list');
-    setUploadedFileName(null);
-  };
-
-  const handleDropdownToggle = (idx: number) => {
-    setActiveMenuIndex(prev => (prev === idx ? null : idx));
-  };
-
-  const handleCreateCourse = () => {
-    navigate('/createcourseui');
-  };
-
-  const openDeleteModal = (course: Course) => {
-    setCourseToDelete(course);
-    setShowDeleteModal(true);
-  };
-
-  const closeDeleteModal = () => {
-    setShowDeleteModal(false);
-    setCourseToDelete(null);
-  };
-
-  const confirmDelete = () => {
-    // Add dispatch to delete course here if needed
-    closeDeleteModal();
-  };
+ const handleBackdropClick = () => setSidebarOpen(false);
+  const handleCreateCourse = () => navigate("/createcourseui");
 
   return (
     <div className="lec-dashboard-container">
@@ -115,17 +79,26 @@ const Courses: React.FC = () => {
 
       {/* Sidebar + Main */}
       <div className="main-area">
+        <div
+        className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`}
+        onClick={handleBackdropClick}
+      ></div>
+
+      
         <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
           <LectureSidebar />
         </div>
 
+
         <div className="dashboard-content">
+       
           {loading ? (
             <div>Loading courses...</div>
           ) : error ? (
             <div>Error: {error}</div>
-          ) : !selectedCourse && view === 'list' ? (
+          ) : !selectedCourse ? (
             <div className="cardcourse">
+              {/* Header */}
               <div className="courses-header">
                 <h3>Courses</h3>
                 <div className="search-bar">
@@ -138,6 +111,7 @@ const Courses: React.FC = () => {
                 </div>
               </div>
 
+              {/* Course Cards */}
               <div className="dashboard-cardscourse">
                 {filteredCourses.length > 0 ? (
                   filteredCourses.map((course, idx) => (
@@ -151,7 +125,9 @@ const Courses: React.FC = () => {
                           className="card-options"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDropdownToggle(idx);
+                            setActiveMenuIndex(
+                              activeMenuIndex === idx ? null : idx
+                            );
                           }}
                         >
                           ⋮
@@ -159,14 +135,14 @@ const Courses: React.FC = () => {
 
                         {activeMenuIndex === idx && (
                           <div className="card-dropdown" ref={dropdownRef}>
-                            <div className="dropdown-item" onClick={() => { setEditCourse(course); setView('edit'); }}>
-                              <FaEdit className="iconcard" /> Edit
-                            </div>
-                            <div className="dropdown-item" onClick={() => openDeleteModal(course)}>
-                              <FaTrash className="iconcard" /> Delete
+                            <div className="dropdown-item">
+                              <FaEdit className="iconcard" />
                             </div>
                             <div className="dropdown-item">
-                              <FaInfoCircle className="iconcard" /> Info
+                              <FaTrash className="iconcard" />
+                            </div>
+                            <div className="dropdown-item">
+                              <FaInfoCircle className="iconcard" />
                             </div>
                           </div>
                         )}
@@ -183,76 +159,27 @@ const Courses: React.FC = () => {
                 )}
               </div>
 
+              {/* Create Course Button */}
               <div className="create-course-btn">
                 <button onClick={handleCreateCourse}>Create Course +</button>
               </div>
             </div>
-          ) : view === 'edit' && editCourse ? (
-            <div className="edit-course-section card">
-              <button className="back-btn" onClick={handleBackToList}>
-                <FaArrowLeft style={{ marginRight: 8 }} />
-              </button>
-              <EditCourseDetails
-                initial={editCourse}
-                onUpdate={(updatedCourse) => {
-                  // Update local courses array
-                  // Assuming courses is from Redux, you may dispatch update here
-                  setEditCourse(null);
-                  setView('list');
-                  setDetailsCourse(updatedCourse);
-                }}
-                onCancel={handleBackToList}
-              />
-            </div>
-          ) : selectedCourse ? (
+          ) : (
+            // ✅ Selected Course View
             <div className="result-upload-section">
-              <button className="back-btn" onClick={handleBackToList}>
-                <FaArrowLeft style={{ marginRight: 8 }} />
-              </button>
-              <div className="card">
-                <ResultUploadInterface
-                  course={selectedCourse}
-                  onBack={handleBackToList}
-                  onFileUpload={(name: string) => setUploadedFileName(name)}
-                />
-                {uploadedFileName && <FileUploadCard fileName={uploadedFileName} />}
-              </div>
+              <ResultUploadInterface
+                course={selectedCourse}
+                onBack={() => setSelectedCourse(null)}
+                onFileUpload={(name: string) => setUploadedFileName(name)}
+              />
+              {uploadedFileName && (
+                <FileUploadCard fileName={uploadedFileName} />
+              )}
             </div>
-          ) : null}
+          )}
         </div>
-      </div>
-
-      {/* Delete Modal */}
-      {showDeleteModal && (
-        <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-title"
-          onClick={closeDeleteModal}
-        >
-          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
-            <div className="modal-header">
-              <h4 id="delete-title">Delete Course</h4>
-              <button className="close-btn" aria-label="Close" onClick={closeDeleteModal}>×</button>
-            </div>
-            <div className="modal-body">
-              <p>
-                {courseToDelete ? (
-                  <>
-                    Are you sure you want to delete <strong>{courseToDelete.code} — {courseToDelete.title}</strong>?
-                  </>
-                ) : "Are you sure you want to delete this course?"}
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button className="btn-delete danger" onClick={confirmDelete}>Delete</button>
-              <button className="btn-delete ghost" onClick={closeDeleteModal}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </div></div>
+  
   );
 };
 
