@@ -106,7 +106,7 @@ const Courses: React.FC = () => {
 
         <div className="dashboard-content">
 
-          {/* --- Course List --- */}
+         
           {view === 'list' && (
             <div className="cardcourse">
               <div className="courses-header">
