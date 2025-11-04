@@ -42,7 +42,12 @@ const ResultsTabsButtomSection: React.FC = () => {
           </button>
         </div>
 
-        <form className="search" onSubmit={handleSearch} role="search" aria-label="Search semester">
+        <form
+          className="search"
+          onSubmit={handleSearch}
+          role="search"
+          aria-label="Search semester"
+        >
           <input
             type="text"
             inputMode="search"
@@ -68,10 +73,12 @@ const ResultsTabsButtomSection: React.FC = () => {
                 type="button"
                 className="sem-head"
                 onClick={() => toggleSemester(n)}
-                aria-expanded={open}
+                aria-expanded={open ? 'true' : 'false'}
                 aria-controls={`sem-panel-${n}`}
               >
-                <span className="sem-title">Semester {String(n).padStart(2, "0")}</span>
+                <span className="sem-title">
+                  Semester {String(n).padStart(2, "0")}
+                </span>
                 <FaChevronDown className="sem-arrow" aria-hidden="true" />
               </button>
 
@@ -84,12 +91,12 @@ const ResultsTabsButtomSection: React.FC = () => {
               >
                 {/* The panel is exactly the same width as the band, but the sheet is centered inside */}
                 <div className="results-sheet-host">
-  {activeTab === "CA" ? (
-    <StudentsConAss />
-  ) : (
-    <StudentResultsSheet  />
-  )}
-</div>
+                  {activeTab === "CA" ? (
+                    <StudentsConAss />
+                  ) : (
+                    <StudentResultsSheet />
+                  )}
+                </div>
               </div>
             </div>
           );
