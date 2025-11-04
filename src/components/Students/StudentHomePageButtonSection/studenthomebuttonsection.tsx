@@ -7,7 +7,7 @@ import StudentsConAss from "../StudentsCA/StudentsCA";
 const ResultsTabsButtomSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"CA" | "EXAM">("CA");
   const [q, setQ] = useState("");
-  const [openSemester, setOpenSemester] = useState<number | null>(null); // single-open
+  const [openSemester, setOpenSemester] = useState<number | null>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +23,7 @@ const ResultsTabsButtomSection: React.FC = () => {
     <div className="results-wrap">
       <h3 className="results-title">Results</h3>
 
-      {/* Tabs + Search */}
+
       <div className="results-toolbar">
         <div className="tabs-SH">
           <button
@@ -58,7 +58,7 @@ const ResultsTabsButtomSection: React.FC = () => {
         </form>
       </div>
 
-      {/* Accordion: Semesters 01 - 06 */}
+
       <div className="sem-accordion">
         {semesters.map((n) => {
           const open = openSemester === n;
@@ -84,12 +84,12 @@ const ResultsTabsButtomSection: React.FC = () => {
               >
                 {/* The panel is exactly the same width as the band, but the sheet is centered inside */}
                 <div className="results-sheet-host">
-  {activeTab === "CA" ? (
-    <StudentsConAss />
-  ) : (
-    <StudentResultsSheet  />
-  )}
-</div>
+                  {activeTab === "CA" ? (
+                    <StudentsConAss />
+                  ) : (
+                    <StudentResultsSheet />
+                  )}
+                </div>
               </div>
             </div>
           );
