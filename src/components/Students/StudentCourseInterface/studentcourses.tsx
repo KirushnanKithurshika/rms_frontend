@@ -3,43 +3,32 @@ import { FaSearch } from "react-icons/fa";
 import "./studentcourses.css";
 
 type Course = { code: string; name: string; credits: number; status: string };
-type Semester = { title: string; courses: Course[] };
+type Semester = { semesterName: string; courses: Course[] };
 
-const semestersData: Semester[] = [
-  {
-    title: "Semester 06",
-    courses: Array.from({ length: 6 }).map(() => ({
-      code: "EE6701",
-      name: "Embedded System",
-      credits: 2,
-      status: "Pending", 
-    })),
-  },
-  {
-    title: "Semester 05",
-    courses: Array.from({ length: 6 }).map(() => ({
-      code: "EE5701",
-      name: "Embedded System",
-      credits: 2,
-      status: "Updated",
-    })),
-  },
- 
-];
+interface Props {
+  semesters: Semester[];
+  student?: {
+    id: number;
+    name: string;
+    registrationNumber: string;
+    batchName: string;
+    departmentName: string;
+  } | null;
+}
 
-const SemesterCourses: React.FC = () => {
+const SemesterCourses: React.FC<Props> = ({ semesters, student }) => {
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
-    if (!term) return semestersData;
+    if (!term) return semesters;
 
-    return semestersData
+    return semesters
       .map((s) => ({
         ...s,
         courses: s.courses.filter(
           (c) =>
-            s.title.toLowerCase().includes(term) ||
+            s.semesterName.toLowerCase().includes(term) ||
             c.code.toLowerCase().includes(term) ||
             c.name.toLowerCase().includes(term) ||
             String(c.credits).includes(term) ||
@@ -47,47 +36,51 @@ const SemesterCourses: React.FC = () => {
         ),
       }))
       .filter((s) => s.courses.length > 0);
-  }, [q]);
-
-  const onSubmit = (e: React.FormEvent) => e.preventDefault();
+  }, [q, semesters]);
 
   return (
     <div className="sc-wrap">
-      {/* search on the right */}
       <div className="sc-toolbar">
-        <form className="sc-search" onSubmit={onSubmit} role="search" aria-label="Search semesters or courses">
+        <form className="sc-search" onSubmit={(e) => e.preventDefault()}>
           <input
             className="sc-input"
             type="text"
             placeholder="Search Semester"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            inputMode="search"
-            aria-label="Search Semester"
           />
-          <button className="sc-btn" type="submit" aria-label="Search">
+          <button className="sc-btn" type="submit">
             <FaSearch className="sc-ico" />
           </button>
         </form>
       </div>
 
-      {filtered.map((sem) => (
-        <section key={sem.title} className="sc-card">
-          <header className="sc-head">{sem.title}</header>
+      {/* {student && (
+        <div className="student-info">
+          <h3>{student.name}</h3>
+          <p>
+            Reg. No: {student.registrationNumber} | Batch: {student.batchName} |{" "}
+            Dept: {student.departmentName}
+          </p>
+        </div>
+      )} */}
 
+      {filtered.map((sem) => (
+        <section key={sem.semesterName} className="sc-card">
+          <header className="sc-head">{sem.semesterName}</header>
           <div className="sc-table-wrap">
-            <table className="sc-table" aria-label={`${sem.title} taken courses`}>
+            <table className="sc-table">
               <thead>
                 <tr>
                   <th>Module Code</th>
                   <th>Module&nbsp;Name</th>
                   <th>Credits</th>
-                  <th>Results Status</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {sem.courses.map((c, i) => (
-                  <tr key={`${sem.title}-${i}`}>
+                  <tr key={`${sem.semesterName}-${i}`}>
                     <td>{c.code}</td>
                     <td>{c.name}</td>
                     <td className="sc-center">{c.credits}</td>

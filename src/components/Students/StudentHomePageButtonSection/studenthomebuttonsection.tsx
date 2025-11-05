@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-import "./studenthomebuttonsection.css";
+import { useSelector } from "react-redux";
 import { FaSearch, FaChevronDown } from "react-icons/fa";
 import StudentResultsSheet from "../Studentsresultsheet/StudentResultsSheet";
 import StudentsConAss from "../StudentsCA/StudentsCA";
+import "./studenthomebuttonsection.css";
+import type { RootState } from "../../../app/store";
 
 const ResultsTabsButtomSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"CA" | "EXAM">("CA");
   const [q, setQ] = useState("");
   const [openSemester, setOpenSemester] = useState<number | null>(null); // single-open
+
+  const resultsSheet = useSelector(
+    (state: RootState) => state.studentResults.resultsSheet
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +23,8 @@ const ResultsTabsButtomSection: React.FC = () => {
   const toggleSemester = (n: number) =>
     setOpenSemester((cur) => (cur === n ? null : n));
 
-  const semesters = [1, 2, 3, 4, 5, 6];
+  // Use semesters from resultsSheet
+  const semesters = resultsSheet?.semesters ?? [];
 
   return (
     <div className="results-wrap">
@@ -63,7 +70,7 @@ const ResultsTabsButtomSection: React.FC = () => {
         </form>
       </div>
 
-      {/* Accordion: Semesters 01 - 06 */}
+      {/* Accordion: Dynamic Semesters */}
       <div className="sem-accordion">
         {semesters.map((n) => {
           const open = openSemester === n;

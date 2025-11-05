@@ -1,69 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./verification.css";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-type LocState = { username?: string };
-
-
-const roleHome = (role?: string) => {
-  const r = role?.toUpperCase?.();
-  if (r === "ADMIN") return "/admin/dashboard";
-  if (r === "LECTURER") return "/lecturerhome";
-  if (r === "STUDENT") return "/student/student-dashboard";
-  return "/";
-};
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { verifyOtpThunk, resetError } from "../../features/auth/authSlice";
+import {
+  selectAuthError,
+  selectAuthStatus,
+  selectPendingUsername,
+} from "../../features/auth/selectors";
+import { showError, showSuccess } from "../../utils/toast";
 
 const TwoStepVerification: React.FC = () => {
+  const [otp, setOtp] = useState("");
+  const [uiUsername, setUiUsername] = useState("");
+
+  const dispatch = useAppDispatch();
+  const status = useAppSelector(selectAuthStatus);
+  const error = useAppSelector(selectAuthError);
+  const pendingUsername = useAppSelector(selectPendingUsername);
+
   const navigate = useNavigate();
   const location = useLocation();
 
-  
-  const fromState = (location.state as LocState | undefined)?.username ?? "";
-  const [username] = useState<string>(
-    fromState || sessionStorage.getItem("pending_username") || ""
-  );
-
-  const [otp, setOtp] = useState("");
-  const [showOtp, setShowOtp] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const fromState = (location.state as any)?.username;
+    setUiUsername(fromState || pendingUsername || "");
+  }, [location.state, pendingUsername]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
-    setOtp(value);
+    const value = e.target.value;
+    if (/^\d*$/.test(value) && value.length <= 6) setOtp(value);
   };
 
-  // 🔒 Pure-frontend “verify”: just check presence & 6 digits, then navigate.
-  const handleVerify = () => {
-    setError(null);
+  const handleVerify = async () => {
+    if (!uiUsername)
+      return showError("Username missing — please log in again.");
+    if (otp.length !== 6) return showError("Please enter a valid 6-digit OTP.");
 
-    const u = username.trim();
-    const code = otp.trim();
+    dispatch(resetError());
+    const res = await dispatch(verifyOtpThunk({ username: uiUsername, otp }));
 
-    if (!u) {
-      setError("Missing username. Please log in again.");
-      return;
+    if (verifyOtpThunk.fulfilled.match(res)) {
+      // navigate("/dashboard", { replace: true });
+      navigate("/landing", { replace: true });
     }
-    if (code.length !== 6) {
-      setError("Enter the 6-digit code.");
-      return;
-    }
-
-    setSubmitting(true);
-
-  
-    const role = sessionStorage.getItem("pending_role") || "STUDENT";
-
-   
-    navigate(roleHome(role), { replace: true });
-    setSubmitting(false);
   };
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === "Enter" && !submitting) handleVerify();
-  };
+  const loading = status === "loading";
 
   return (
     <div className="page-wrapper">
@@ -73,46 +58,36 @@ const TwoStepVerification: React.FC = () => {
 
       <div className="verification-container">
         <div className="verification-box">
-          <span className="verificationH">Verification</span>
-          <p>
-            For added security, enter the verification code sent to your
-            registered email.
-          </p>
+          <span className="verificationH">Two Step Verification</span>
+          <p>Enter the 6-digit code sent to your email.</p>
 
-          <div className="otp-wrapper">
-            <input
-              type={showOtp ? "text" : "password"}
-              maxLength={6}
-              value={otp}
-              onChange={handleChange}
-              onKeyDown={onKeyDown}
-              className="otp-input"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              aria-label="6-digit verification code"
-              disabled={submitting}
-            />
+          {uiUsername && (
+            <p style={{ fontSize: 12, opacity: 0.7, marginTop: -6 }}>
+              Verifying: <b>{uiUsername}</b>
+            </p>
+          )}
 
-            <button
-              type="button"
-              className="eye-button"
-              onClick={() => setShowOtp((v) => !v)}
-              disabled={submitting}
-              aria-label={showOtp ? "Hide code" : "Show code"}
-              title={showOtp ? "Hide code" : "Show code"}
-            >
-              {showOtp ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
+          <input
+            type="password"
+            maxLength={6}
+            value={otp}
+            onChange={handleChange}
+            className="otp-input"
+            inputMode="numeric"
+          />
 
-          {error && <div className="error-text">{error}</div>}
+          {error && (
+            <p style={{ color: "crimson", marginTop: 8, fontSize: 14 }}>
+              {error}
+            </p>
+          )}
 
           <button
             className="verify-button"
             onClick={handleVerify}
-            disabled={submitting || otp.length !== 6}
+            disabled={loading}
           >
-            {submitting ? "Verifying..." : "Verify"}
+            {loading ? "Verifying..." : "Verify"}
           </button>
         </div>
       </div>

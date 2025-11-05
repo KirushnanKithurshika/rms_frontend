@@ -1,79 +1,290 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./adduserform.css";
-import { FaArrowLeft, FaChevronDown, FaUpload, FaCheckCircle } from "react-icons/fa";
+import { FaArrowLeft, FaUpload, FaCheckCircle } from "react-icons/fa";
+import { Form, Input, Button, Select, DatePicker, Radio, message } from "antd";
+import dayjs from "dayjs";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+type Gender = "MALE" | "FEMALE";
+type Address = {
+  lane1: string;
+  lane2?: string;
+  city: string;
+  district: string;
+  postalCode: string;
+};
+
+type StudentRegisterRequest = {
+  firstName: string;
+  lastName: string;
+  registrationNumber: string;
+  email: string;
+  phoneNumber: string;
+  departmentId: number;
+  batchId: number;
+  gender: Gender;
+  dateOfBirth: string;
+  address: Address
+};
+
+type StudentUpdateRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  departmentId: number;
+  batchId: number;
+  gender: Gender;
+  dateOfBirth: string;
+  address: Address;
+};
 
 interface AddStudentFormProps {
+  mode: 'create' | 'view' | 'edit';
+  studentId?: number;
   onClose: () => void;
-  onCreate: (student: {
-    username: string;
-    password: string;
-    fullName: string;
-    email: string;
-  }) => void;
+  onCreate?: (student: StudentRegisterRequest) => void;
+  onUpdate?: () => void;
 }
 
-const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-
-  const [showManualForm, setShowManualForm] = useState(true);
-
-  // File upload states
+const AddStudentForm: React.FC<AddStudentFormProps> = ({ mode, studentId, onClose, onCreate, onUpdate }) => {
+  const [form] = Form.useForm();
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploaded, setIsUploaded] = useState(false);
+  const [batchOptions, setBatchOptions] = useState<{ label: string; value: number }[]>([]);
+  const [loadingBatches, setLoadingBatches] = useState(false);
+  const [departmentSelectionOptions, setDepartmentSelectionOptions] = useState<{ label: string; value: number }[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-      setIsUploaded(false);
-      setUploadProgress(0);
+  const token = localStorage.getItem("token");
+  const isView = mode === 'view';
+  const isEdit = mode === 'edit';
+  const isCreate = mode === 'create';
 
-      // Simulate upload progress
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsUploaded(true);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 200);
+  useEffect(() => {
+    if (!token) {
+      messageApi.error("You are not authenticated");
+      return;
     }
-  };
+    const headers = { Authorization: `Bearer ${token}` };
 
-  const handleSubmit = () => {
-    if (!username || !password || !fullName || !email) {
-      alert("Please fill all fields!");
+    const fetchDropdownData = async () => {
+      try {
+        setLoadingBatches(true);
+        setLoadingDepartments(true);
+
+        const [batchRes, deptRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/v1/batches/GetAll`, { headers }),
+          axios.get(`${API_BASE_URL}/v1/departments/GetAll`, { headers }),
+        ]);
+
+        const batches = Array.isArray(batchRes.data?.data) ? batchRes.data.data : [];
+        const departments = Array.isArray(deptRes.data?.data) ? deptRes.data.data : [];
+
+        setBatchOptions(
+          batches.map((b: any) => ({ label: b.name, value: b.id }))
+        );
+        setDepartmentSelectionOptions(
+          departments.map((d: any) => ({ label: d.departmentName, value: d.departmentId }))
+        );
+
+      } catch (error) {
+        console.error("Failed to load dropdown data:", error);
+        setBatchOptions([]);
+        setDepartmentSelectionOptions([]);
+      } finally {
+        setLoadingBatches(false);
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchDropdownData();
+  }, [messageApi, token]);
+
+  //Fetch student when viewing OR editing
+  useEffect(() => {
+    if (!(isView || isEdit) || !studentId) return;
+
+    if (!token) {
+      messageApi.error("You are not authenticated");
       return;
     }
 
-    onCreate({ username, password, fullName, email });
+    const headers = { Authorization: `Bearer ${token}` };
 
-    // Reset form
-    setUsername("");
-    setPassword("");
-    setFullName("");
-    setEmail("");
-    setFile(null);
-    setUploadProgress(0);
+    const fetchStudent = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/v1/students/${studentId}`, { headers });
+        const s = res?.data?.data;
+        if (!s) return messageApi.error("Student not found");
+
+        form.setFieldsValue({
+          firstName: s.firstName,
+          lastName: s.lastName,
+          registrationNumber: s.registrationNumber,
+          email: s.email,
+          phoneNumber: s.phoneNumber,
+          gender: s.gender,
+          dateOfBirth: s.dateOfBirth ? dayjs(s.dateOfBirth, "YYYY-MM-DD") : undefined,
+          departmentId: s.department?.departmentId,
+          batchId: s.batch?.id,
+          studentStatus: s.studentStatus,
+          address: {
+            lane1: s.address?.lane1,
+            lane2: s.address?.lane2,
+            city: s.address?.city,
+            district: s.address?.district,
+            postalCode: s.address?.postalCode,
+          },
+        });
+      } catch (e: any) {
+        messageApi.error(e?.response?.data?.message || "Failed to retrieve student");
+      }
+    };
+
+    fetchStudent();
+  }, [isView, isEdit, studentId, form, messageApi, token]);
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
     setIsUploaded(false);
-    onClose();
+    setUploadProgress(0);
+
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsUploaded(true);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
   };
 
-  return (
+  // const handleFinish = async (values: any) => {
+  //   if (mode !== 'create') return;
+
+  //   const payload: StudentRegisterRequest = {
+  //     firstName: values.firstName,
+  //     lastName: values.lastName,
+  //     registrationNumber: values.registrationNumber,
+  //     email: values.email,
+  //     phoneNumber: values.phoneNumber,
+  //     departmentId: values.departmentId,
+  //     batchId: values.batchId,
+  //     gender: values.gender,
+  //     dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format("YYYY-MM-DD") : "",
+  //     address: values.address,
+  //   };
+
+
+  //   if (!token) return messageApi.error("You are not authenticated");
+
+  //   try {
+  //     setSubmitting(true);
+  //     await axios.post(`${API_BASE_URL}/v1/students`, payload, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     messageApi.success("Student registered successfully");
+  //     form.resetFields();
+  //     onCreate?.(payload);
+  //   } catch (err: any) {
+  //     const msg = err?.response?.data?.message || err?.message || "Failed to register student";
+  //     messageApi.error(msg);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+
+
+  const handleFinish = async (values: any) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      messageApi.error("You are not authenticated");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      if (isCreate) {
+        const payload: StudentRegisterRequest = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          registrationNumber: values.registrationNumber,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          departmentId: values.departmentId,
+          batchId: values.batchId,
+          gender: values.gender,
+          dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
+          address: values.address,
+        };
+
+        await axios.post(`${API_BASE_URL}/v1/students`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        messageApi.success("Student registered successfully");
+        form.resetFields();
+        onCreate?.(payload);
+      }
+
+      if (isEdit && studentId) {
+        // Align with your PUT spec
+        const payload: StudentUpdateRequest = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          departmentId: values.departmentId,
+          batchId: values.batchId,
+          gender: values.gender,
+          dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || "",
+          address: values.address,
+        };
+
+        await axios.put(`${API_BASE_URL}/v1/students/${studentId}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        messageApi.success("Student updated successfully");
+        onUpdate?.();
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Operation failed";
+      messageApi.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const title =
+    isCreate ? "Add Student" :
+      isEdit ? "Edit Student" :
+        "View Student";
+
+  const submitLabel = isCreate ? "Create" : "Save changes";
+
+
+  return <div>
+    {contextHolder}
     <div className="dashboard-cards">
       <div className="add-user-form-container">
         {/* Header */}
         <div className="add-user-form-header">
-          <button type="button" className="add-user-back-btn" onClick={onClose}>
+          <button type="button" className="add-user-back-btn" onClick={onClose} aria-label="Back">
             <FaArrowLeft className="add-user-back-icon" />
           </button>
-          <span className="add-user-title">Add Student</span>
+          <span className="add-user-title">{title}</span>
         </div>
 
         {/* File Upload */}
@@ -98,10 +309,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
               <span className="file-name">{file.name}</span>
 
               <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
+                <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
               </div>
 
               <span className="progress-text">{uploadProgress}%</span>
@@ -111,81 +319,181 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onClose, onCreate }) =>
         </div>
 
         {/* Divider */}
-        <div
-          className="add-user-divider"
-          onClick={() => setShowManualForm((prev) => !prev)}
-        >
+        <div className="add-user-divider">
           <span className="add-user-divider-title">Add manually</span>
-          <FaChevronDown
-            className={`add-user-divider-arrow ${showManualForm ? "open" : ""}`}
-          />
         </div>
 
-        {/* Manual Form */}
-        {showManualForm && (
-          <div className="add-user-form-grid">
-            <div className="add-user-form-group">
-              <label className="add-user-label">Username</label>
-              <input
-                type="text"
-                className="add-user-input"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
+        {/* Student Registration Form */}
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          requiredMark="optional"
+          className="add-user-form-grid"
+          disabled={isView}
+        >
+          <div className="add-user-two-col">
+            <Form.Item
+              label="First Name"
+              name="firstName"
+              rules={[{ required: true, message: "Please enter first name" }]}
+            >
+              <Input placeholder="First name" />
+            </Form.Item>
 
-            <div className="add-user-form-group">
-              <label className="add-user-label">Password</label>
-              <input
-                type="password"
-                className="add-user-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            <div className="add-user-form-group">
-              <label className="add-user-label">Email</label>
-              <input
-                type="email"
-                className="add-user-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div className="add-user-form-group add-user-full-width">
-              <label className="add-user-label">Full Name</label>
-              <input
-                type="text"
-                className="add-user-input"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-              />
-            </div>
+            <Form.Item
+              label="Last Name"
+              name="lastName"
+              rules={[{ required: true, message: "Please enter last name" }]}
+            >
+              <Input placeholder="Last name" />
+            </Form.Item>
           </div>
-        )}
+
+          <div className="add-user-two-col">
+            <Form.Item
+              label="Registration Number"
+              name="registrationNumber"
+              rules={[{ required: true, message: "Please enter registration number" }]}
+            >
+              <Input placeholder="eg: EG/20XX/XXXX" disabled={mode !== 'create'} />
+            </Form.Item>
+
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: "Please enter email" },
+                { type: "email", message: "Enter a valid email" },
+              ]}
+            >
+              <Input placeholder="name@example.com" />
+            </Form.Item>
+          </div>
+
+          <div className="add-user-two-col">
+            <Form.Item
+              label="Phone Number"
+              name="phoneNumber"
+              rules={[{ required: true, message: "Please enter phone number" }]}
+            >
+              <Input placeholder="07XXXXXXXX" />
+            </Form.Item>
+
+            <Form.Item
+              label="Gender"
+              name="gender"
+              rules={[{ required: true, message: "Please select gender" }]}
+            >
+              <Radio.Group>
+                <Radio value="MALE">Male</Radio>
+                <Radio value="FEMALE">Female</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </div>
+
+          <div className="add-user-two-col">
+            <Form.Item
+              label="Department"
+              name="departmentId"
+              rules={[{ required: true, message: "Please select department" }]}
+            >
+              <Select options={departmentSelectionOptions} placeholder="Select department" allowClear />
+            </Form.Item>
+
+            <Form.Item
+              label="Batch"
+              name="batchId"
+              rules={[{ required: true, message: "Please select batch" }]}
+            >
+              <Select
+                options={batchOptions}
+                loading={loadingBatches}
+                placeholder="Select batch"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+              />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            label="Date of Birth"
+            name="dateOfBirth"
+            rules={[{ required: true, message: "Please select date of birth" }]}
+          >
+            <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabledDate={(d) => d && d.isAfter(dayjs())} />
+          </Form.Item>
+
+          <div className="add-user-divider small-gap">
+            <span className="add-user-divider-title">Address</span>
+          </div>
+
+          <Form.Item
+            label="Lane 1"
+            name={["address", "lane1"]}
+            rules={[{ required: true, message: "Please enter lane 1" }]}
+          >
+            <Input placeholder="No. 123, Main Street" />
+          </Form.Item>
+
+          <Form.Item label="Lane 2" name={["address", "lane2"]}>
+            <Input placeholder="Apartment / Suite / Optional" />
+          </Form.Item>
+
+          <div className="add-user-three-col">
+            <Form.Item
+              label="City"
+              name={["address", "city"]}
+              rules={[{ required: true, message: "Please enter city" }]}
+            >
+              <Input placeholder="City" />
+            </Form.Item>
+
+            <Form.Item
+              label="District"
+              name={["address", "district"]}
+              rules={[{ required: true, message: "Please enter district" }]}
+            >
+              <Input placeholder="District" />
+            </Form.Item>
+
+            <Form.Item
+              label="Postal Code"
+              name={["address", "postalCode"]}
+              rules={[{ required: true, message: "Please enter postal code" }]}
+            >
+              <Input placeholder="Postal code" />
+            </Form.Item>
+
+            {isView && (
+              <Form.Item label="Status" name="studentStatus">
+                <Input disabled />
+              </Form.Item>
+            )}
+          </div>
+        </Form>
 
         {/* Actions */}
         <div className="add-user-form-actions">
-          <button
-            type="button"
-            className="add-user-create-btn"
-            onClick={handleSubmit}
-          >
-            Create
-          </button>
-          <button
-            type="button"
-            className="add-user-cancel-btn"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
+          {!isView && (
+            <Button
+              type="primary"
+              onClick={() => form.submit()}
+              loading={submitting}
+              className="add-user-create-btn"
+            >
+              {submitLabel}
+            </Button>
+          )}
+
+          <Button onClick={onClose} className="add-user-cancel-btn">
+            {isView ? 'Close' : 'Cancel'}
+          </Button>
         </div>
       </div>
     </div>
-  );
+  </div>;
 };
 
 export default AddStudentForm;

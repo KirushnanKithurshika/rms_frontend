@@ -1,40 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+
 import Navbar from "../../components/Navbar/navbar";
-import "./loginpage.css";
+import "./LoginPage.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  loginThunk,
+  setPendingUsername,
+  resetError,
+} from "../../features/auth/authSlice";
+import {
+  selectAuthError,
+  selectAuthStatus,
+} from "../../features/auth/selectors";
+
 const LoginPage: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState(""); // <-- add
+  const [password, setPassword] = useState(""); // <-- add
+  const dispatch = useAppDispatch();
+  const status = useAppSelector(selectAuthStatus);
+  const error = useAppSelector(selectAuthError);
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const loading = status === "loading";
 
-  useEffect(() => setSubmitting(false), []);
+  const handleLogin = async () => {
+    if (!username || !password) return;
+    dispatch(resetError());
+    dispatch(setPendingUsername(username));
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    if (submitting) return;
-
-    setError(null);
-    setSubmitting(true);
-
-    // Simple front-end validation only
-    const u = username.trim();
-    if (!u || !password) {
-      setError("Please enter username and password.");
-      setSubmitting(false);
-      return;
+    const res = await dispatch(loginThunk({ username, password }));
+    if (loginThunk.fulfilled.match(res)) {
+      navigate("/verification", { state: { username } });
     }
-
-    // No API: just persist username and move to verification
-    sessionStorage.setItem("pending_username", u);
-    navigate("/verification", { state: { username: u }, replace: true });
   };
-
   return (
     <div className="page-wrapper">
       <div className="navcon">
@@ -45,62 +47,51 @@ const LoginPage: React.FC = () => {
         <div className="login-box">
           <h2>Login</h2>
 
-          <form className="login-form" onSubmit={handleSubmit} autoComplete="on" noValidate>
-            <label htmlFor="username">User Name</label>
+          <label htmlFor="username">User Name</label>
+          <input
+            type="text"
+            id="username"
+            className="login-input"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+            required
+          />
+
+          <label htmlFor="password">Password</label>
+          <div className="password-wrapper">
             <input
-              id="username"
-              type="text"
+              type={showPassword ? "text" : "password"}
+              id="password"
               className="login-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
-              autoCapitalize="none"
-              autoCorrect="off"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               required
-              disabled={submitting}
             />
+            <span
+              className="toggle-icon"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
-            <label htmlFor="password">Password</label>
-            <div className="password-wrapper">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                className="login-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-                disabled={submitting}
-              />
-              <span
-                className="toggle-icon"
-                role="button"
-                tabIndex={0}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                onClick={() => !submitting && setShowPassword((v) => !v)}
-                style={submitting ? { pointerEvents: "none", opacity: 0.6 } : undefined}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
-            </div>
+          {error && (
+            <p className="error" style={{ color: "crimson" }}>
+              {error}
+            </p>
+          )}
 
-            {error && <div className="error-text">{error}</div>}
-            <div className="button-wrapper">
-              <button
-                className="login-button"
-                type="button"
-                onClick={() => {
-                 
-                 
-                  navigate("/verification");
-                }}
-                disabled={submitting}
-              >
-                {submitting ? "Processing…" : "Log in"}
-              </button>
-            </div>
-
-          </form>
+          <div className="button-wrapper">
+            <button
+              className="login-button"
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Log in"}
+            </button>
+          </div>
 
           <div>
             <span className="forgot-text">

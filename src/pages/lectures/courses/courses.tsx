@@ -1,5 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { fetchLecturerCourses } from "../../../features/lecturerCourses/lecturerCoursesSlice";
+import { selectUserId } from "../../../features/auth/selectors";
+import Navbarin from "../../../components/Navbar/navbarin";
+import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav";
+import ResultUploadInterface from "../../../components/resultuploadinterface/ResultUploadInterface";
+import FileUploadCard from "../../../components/fileuploadcard/fileuploadcard";
+import { FaEdit, FaTrash, FaInfoCircle } from "react-icons/fa";
+import "./courses.css";
+import type { Course } from "../../../features/lecturerCourses/course";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import "./courses.css";
 import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar.tsx";
@@ -99,6 +112,17 @@ const courseData: Course[] = [
 type ViewMode = "list" | "details" | "upload" | "edit";
 
 const Courses: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // ✅ Redux state
+  const { courses, loading, error } = useAppSelector(
+    (state) => state.lecturerCourses
+  );
+  const userId = useAppSelector(selectUserId);
+
+  // ✅ Local state
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [courses, setCourses] = useState<Course[]>(courseData);
@@ -110,6 +134,19 @@ const Courses: React.FC = () => {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   const [activeMenuIndex, setActiveMenuIndex] = useState<number | null>(null);
+
+  // ✅ Fetch lecturer’s courses on mount
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchLecturerCourses(userId));
+    }
+  }, [dispatch, userId]);
+
+  // ✅ No need for .data anymore
+  const filteredCourses = courses.filter(
+    (c) =>
+      c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.title.toLowerCase().includes(searchTerm.toLowerCase())
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -189,6 +226,14 @@ const Courses: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ✅ Event Handlers
+  const handleCourseClick = (course: Course) => {
+    setSelectedCourse(course);
+    setUploadedFileName(null);
+  };
+
+  const handleCreateCourse = () => navigate("/createcourseui");
+
   // --- Close modal on Escape ---
   useEffect(() => {
     if (!showDeleteModal) return;
@@ -220,11 +265,17 @@ const Courses: React.FC = () => {
 
 
          
-          {view === 'list' && (
+          {/* Loading / Error / Main content */}
+          {loading ? (
+            <div>Loading courses...</div>
+          ) : error ? (
+            <div>Error: {error}</div>
+          ) : view === 'list' && (
 
         
 
             <div className="cardcourse">
+              {/* Header */}
               <div className="courses-header">
                 <h3>Courses</h3>
                 <div className="search-bar">
@@ -240,18 +291,23 @@ const Courses: React.FC = () => {
                 </div>
               </div>
 
+              {/* Course Cards */}
               <div className="dashboard-cardscourse">
                 {filteredCourses.length > 0 ? (
                   filteredCourses.map((course, idx) => (
                     <div
                       className="course-card"
-                      key={`${course.code}-${idx}`}
+                      key={course.id ?? idx}
                       onClick={() => handleCourseClick(course)}
                     >
                       <div className="card-top">
                         <div
                           className="card-options"
                           onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenuIndex(
+                              activeMenuIndex === idx ? null : idx
+                            );
                             e.stopPropagation();
                             handleDropdownToggle(idx);
                           }}
@@ -306,6 +362,7 @@ const Courses: React.FC = () => {
                 )}
               </div>
 
+              {/* Create Course Button */}
               <div className="create-course-btn">
                 <button onClick={handleCreateCourse}>Create Course +</button>
               </div>
@@ -381,6 +438,7 @@ const Courses: React.FC = () => {
 
           {/* --- Result Upload --- */}
           {view === "upload" && selectedCourse && (
+            // ✅ Selected Course View
             <div className="result-upload-section">
               <div className="card">
                 <div className="details-header">
