@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import "./Transcript.css";
 import unilogo from "../../../assets/logoT.png";
 import SemesterTables from "./SemResTable/SemResTable";
+import TranscriptExplanation from "./TranscriptExplaination/TranscriptExplanation";
 
 export type ContactInfo = {
   telephone?: string;
@@ -45,12 +46,9 @@ export type TranscriptData = {
   issueDate?: string;
   registrarTitle?: string;
   footerNotes?: string[];
- 
+
 };
 
-/* =========================
-   Defaults + Sample Data
-   ========================= */
 const DEFAULT_UNI: UniversityInfo = {
   nameLine1: "UNIVERSITY OF RUHUNA,  SRI LANKA",
   nameLine2: "FACULTY OF ENGINEERING",
@@ -193,7 +191,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
           </div>
 
           <div className="pstrip">
-          
+
             <div className="pstrip-row prow1">
               <div className="ppair">
                 <span className="lab">Full Name :</span>
@@ -201,7 +199,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
               </div>
             </div>
 
-           
+
             <div className="pstrip-row pgridPairs3">
               <div className="ppair">
                 <span className="lab">Registration No :</span>
@@ -217,7 +215,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
               </div>
             </div>
 
-         
+
             <div className="pstrip-row prow1">
               <div className="ppair">
                 <span className="lab">Field of Specialization :</span>
@@ -227,14 +225,36 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
           </div>
 
         </div>
-     <SemesterTables/>
+        <SemesterTables />
+
+        <section className="footer-block">
+          <div className="cols">
+            <div className="left">
+              <div className="sig-line" />
+              <div className="sig-text">
+                <div className="sig-name"></div>
+                <div className="sig-role">
+                  {data?.registrarTitle || "Assistant Registrar / Faculty of Engineering"}
+                </div>
+                <div className="mutedT ">(Not valid without the embossed seal)</div>
+              </div>
+            </div>
+
+            <div className="right">
+              <div className="date-stamp">{data?.issueDate || ""}</div>
+              <div className="date-line"></div>
+              <div className="mutedTD">Date of Issue</div>
+            </div>
+          </div>
+        </section>
       </section>
-
-      <section className="sheet a4">{/* intentionally blank */}</section>
-
     
-      <section className="sheet a4">{/* intentionally blank */}</section>
-    </>
+      <section className="sheet a4">
+
+
+        <TranscriptExplanation />
+      </section>
+  </>
   );
 };
 

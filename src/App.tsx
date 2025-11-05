@@ -35,6 +35,8 @@ import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/R
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
+import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
+
 
 
 
@@ -64,6 +66,7 @@ function App() {
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
+        <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
           <Route path="/student/transcript" element={<StudentTranscript />} />

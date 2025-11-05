@@ -1,0 +1,245 @@
+/* src/components/Students/Transcript/TranscriptExplanation.css */
+
+.txp-wrap{
+  font-family: "Calibri", Arial, sans-serif;
+  color:#111;
+}
+
+/* Title centered like the scan */
+.txp-title{
+  text-align:center;
+  font-weight:700;
+  font-size:18px;
+  margin: 6mm 0 4mm;
+}
+
+/* Outer bordered box */
+.txp-box{
+  border:none;
+  border-radius:2px;
+ 
+  display:grid;
+  grid-template-columns: 42mm 1fr; /* narrow left, wide right */
+  gap:2mm;
+}
+.txp-left,
+.txp-right{
+  background: #fff;
+  border: 1px solid #6e6e6e;
+  border-radius: 2px;
+  padding: 4mm;
+  box-shadow: none;                  /* keep print-friendly */
+}
+
+
+.txp-left{
+  padding: 4mm 3.5mm;
+  background: transparent;        /* no panel border */
+  box-shadow: none;
+}
+
+.txp-left-head{
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0 0 3mm 0;
+}
+
+.txp-subhead{
+  font-weight: 600;
+  font-size: 12px;
+  margin: 2.5mm 0 1.5mm;
+}
+
+
+.txp-table{
+  width: 100%;
+  border-collapse: separate;  
+  border-spacing: 0;         
+  font-size: 11.5px;
+  margin: 0 0 3mm 0;
+}
+
+.txp-table thead th{
+  font-weight: 600;
+  padding: 0 0 1mm 0;       
+}
+
+.txp-table td, 
+.txp-table th{
+  border: 0;                  
+  padding: 1.2mm 0;           
+}
+
+
+.txp-table td:first-child,
+.txp-table th:first-child{
+  text-align: left;
+  padding-right: 6mm;
+}
+
+.txp-table td:last-child,
+.txp-table th:last-child{
+  text-align: right;
+}
+
+/* Keep the whole left panel visually tight */
+.txp-left > .txp-table:last-of-type{
+  margin-bottom: 0;
+}
+
+
+.txp-right{
+  font-size:12.2px;
+  line-height:1.35;
+}
+
+.txp-list{
+  margin: 0;
+  padding: 0;
+  font-family: "Calibri", Arial, sans-serif;
+  font-size: 12px;
+}
+.txp-list > div{
+  display: grid;
+  grid-template-columns: 10mm 6mm minmax(0,1fr); /* code | dash | text */
+  column-gap: 2mm;
+  align-items: baseline;
+  text-align: left;
+  line-height: 1.25;
+  padding: 0.5mm 0;
+}
+.txp-list > div::before{
+
+  grid-column: 2;
+  text-align:left;
+  color: #333;
+}
+
+
+.txp-list dt{
+  grid-column: 1;
+  margin: 0;
+  font-weight: 600;
+}
+
+
+.txp-list dd{
+  grid-column: 3;
+  margin: 0;            
+  font-weight: 400;
+}
+
+
+.txp-h3{
+  margin:4mm 0 2mm;
+  text-align: left;
+  font-size:13.5px;
+  font-weight:700;
+}
+
+.txp-para{
+  margin:3mm 0 3mm;
+  text-align:justify;
+}
+
+
+.txp-standing{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+.txp-standing td{
+  text-align: left;
+  padding:1.5mm 3mm;
+}
+.txp-standing td:first-child{
+  width:45mm;
+}
+
+
+@media print{
+  .txp-title{ margin-top: 8mm; }
+}
+
+
+.txp-req{
+  font-family: "Calibri", Arial, sans-serif;
+  font-size: 12px;
+  color:#111;
+  border: 0.5pt solid #777;
+  border-radius: 3px;
+  padding: 6mm 7mm;
+  margin-top: 2mm;
+  background: #fff;
+  page-break-inside: avoid; 
+}
+
+.txp-req-head{
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  margin: 0 0 3mm 0;
+}
+
+.txp-para{
+  margin: 0 0 3mm 0;
+  line-height: 1.3;
+}
+.txp-small{ font-size: 11px; }
+.nowrap{ white-space: nowrap; }
+
+
+.txp-ol{
+ text-align: left;
+  margin: 0 0 4mm 0;
+  padding-left: 6mm;               
+  counter-reset: item;
+}
+.txp-ol > li{
+  text-align: left;
+  list-style: decimal;
+  margin: 0 0 2mm 0;
+  padding-left: 1mm;
+}
+
+
+.txp-eq{
+  
+  display: inline-flex;
+  align-items:center;
+  gap: 3mm;
+  margin: 2mm 0 3mm 0;
+  font-size: 12.5px;
+}
+.txp-eq-symbol{ font-weight: 700; }
+.txp-sum{ font-family: "Cambria Math", "Times New Roman", serif; }
+
+.txp-frac{
+    
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  line-height: 1.05;
+  font-family: "Cambria Math", "Times New Roman", serif;
+}
+.txp-frac-top, .txp-frac-bot{ text-align: center; padding: 0 1mm; }
+.txp-frac-bar{
+  height: 1px;
+  background: #000;
+  margin: 0.6mm 0;
+}
+
+
+.txp-weights{
+  margin: 0;
+  padding-left: 6mm;
+}
+.txp-weights > li{
+    text-align: left;
+  margin: 0 0 1.5mm 0;
+}
+
+@media print{
+  .txp-req{ break-inside: avoid; }
+}
