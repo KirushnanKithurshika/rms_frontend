@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { fetchStudentCourses } from "../../../features/studentCourses/studentCoursesSlice";
-import Navbarin from "../../../components/Navbar/navbarin";
-import StudentSubNav from "../../../components/Students/StudentsubNav/Studentsubnav";
 import "./studentscoursesinterface.css";
 import SemesterCourses from "../../../components/Students/StudentCourseInterface/studentcourses";
 import { selectUserId } from "../../../features/auth/selectors";
@@ -12,7 +10,6 @@ import StudentSubNav from '../../../components/Students/StudentsubNav/Studentsub
 import './studentscoursesinterface.css';
 import StudentMetrics from '../../../components/Students/studenthomepagegraphs/studenthomepagegraph.tsx';
 import ResultsTabsButtomSection from '../../../components/Students/StudentHomePageButtonSection/studenthomebuttonsection.tsx';
-import SemesterCourses from '../../../components/Students/StudentCourseInterface/studentcourses.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 
 

@@ -59,91 +59,106 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   );
 };
 
-/* ---------- Page/Form component ---------- */
-type CourseDraft = {
+/* ---------- Types shared with parent ---------- */
+export type CourseView = {
+  id?: number | string;
   code: string;
   title: string;
-  academicYear: string;
-  department: string;
-  semester: string;
-  degreeProgram: string;
-  creditValue: string;
-  coordinator: string;
-  coordinatorId: string;
-  email: string;
-  assessments: string[];
+  academicYear?: string;
+  department?: string;
+  semester?: string;
+  degreeProgram?: string;
+  credits?: number;           // numeric in the view (input uses string)
+  coordinator?: string;
+  coordinatorId?: string;
+  email?: string;
+  assessments?: string[];
 };
 
 type Props = {
-  /** Optional initial values when editing an existing course */
-  initial?: Partial<CourseDraft>;
-  /** Bubble up actions if you want to handle in parent */
-  onUpdate?: (payload: CourseDraft) => void;
+  
+  initial?: Partial<CourseView>;
+
+  onUpdate?: (payload: CourseView) => void;
   onCancel?: () => void;
 };
 
 const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => {
-  // static options
+  // Static options
   const academicYears = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
   const departments = ["Computer Engineering","Electrical Engineering","Mechanical Engineering","Marine Engineering","Civil Engineering"];
   const semesters = ["Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7","Semester 8"];
 
-  // build initial snapshot (what “Cancel” restores)
-  const initialSnapshot: CourseDraft = useMemo(
-    () => ({
-      code: initial?.code ?? "",
-      title: initial?.title ?? "",
-      academicYear: initial?.academicYear ?? "",
-      department: initial?.department ?? "",
-      semester: initial?.semester ?? "",
-      degreeProgram: initial?.degreeProgram ?? "",
-      creditValue: initial?.creditValue ?? "",
-      coordinator: initial?.coordinator ?? "",
-      coordinatorId: initial?.coordinatorId ?? "",
-      email: initial?.email ?? "",
-      assessments: initial?.assessments ?? [],
-    }),
-    [initial]
-  );
+  // Build snapshot compatible with parent
+  const initialSnapshot = useMemo<CourseView>(() => ({
+    id: initial?.id,
+    code: initial?.code ?? "",
+    title: initial?.title ?? "",
+    academicYear: initial?.academicYear ?? "",
+    department: initial?.department ?? "",
+    semester: initial?.semester ?? "",
+    degreeProgram: initial?.degreeProgram ?? "",
+    credits: initial?.credits,
+    coordinator: initial?.coordinator ?? "",
+    coordinatorId: initial?.coordinatorId ?? "",
+    email: initial?.email ?? "",
+    assessments: initial?.assessments ?? [],
+  }), [initial]);
 
-  // form state
+  // Local form state (credit as string for the input)
   const [code, setCode] = useState(initialSnapshot.code);
   const [title, setTitle] = useState(initialSnapshot.title);
-  const [academicYear, setAcademicYear] = useState(initialSnapshot.academicYear);
-  const [department, setDepartment] = useState(initialSnapshot.department);
-  const [semester, setSemester] = useState(initialSnapshot.semester);
-  const [degreeProgram, setDegreeProgram] = useState(initialSnapshot.degreeProgram);
-  const [creditValue, setCreditValue] = useState(initialSnapshot.creditValue);
-  const [coordinator, setCoordinator] = useState(initialSnapshot.coordinator);
-  const [coordinatorId, setCoordinatorId] = useState(initialSnapshot.coordinatorId);
-  const [email, setEmail] = useState(initialSnapshot.email);
-  const [assessments, setAssessments] = useState<string[]>(initialSnapshot.assessments);
+  const [academicYear, setAcademicYear] = useState(initialSnapshot.academicYear ?? "");
+  const [department, setDepartment] = useState(initialSnapshot.department ?? "");
+  const [semester, setSemester] = useState(initialSnapshot.semester ?? "");
+  const [degreeProgram, setDegreeProgram] = useState(initialSnapshot.degreeProgram ?? "");
+  const [creditValue, setCreditValue] = useState(
+    initialSnapshot.credits != null ? String(initialSnapshot.credits) : ""
+  );
+  const [coordinator, setCoordinator] = useState(initialSnapshot.coordinator ?? "");
+  const [coordinatorId, setCoordinatorId] = useState(initialSnapshot.coordinatorId ?? "");
+  const [email, setEmail] = useState(initialSnapshot.email ?? "");
+  const [assessments, setAssessments] = useState<string[]>(initialSnapshot.assessments ?? []);
 
-  // assessment input
-  const [assessmentInput, setAssessmentInput] = useState("");
+  // Sync form whenever a different course is passed in
+  useEffect(() => {
+    setCode(initialSnapshot.code);
+    setTitle(initialSnapshot.title);
+    setAcademicYear(initialSnapshot.academicYear ?? "");
+    setDepartment(initialSnapshot.department ?? "");
+    setSemester(initialSnapshot.semester ?? "");
+    setDegreeProgram(initialSnapshot.degreeProgram ?? "");
+    setCreditValue(initialSnapshot.credits != null ? String(initialSnapshot.credits) : "");
+    setCoordinator(initialSnapshot.coordinator ?? "");
+    setCoordinatorId(initialSnapshot.coordinatorId ?? "");
+    setEmail(initialSnapshot.email ?? "");
+    setAssessments(initialSnapshot.assessments ?? []);
+  }, [initialSnapshot]);
 
-  // detect “dirty” (any change vs. snapshot)
+  // Dirty detection
   const isDirty = useMemo(() => {
     const snap = initialSnapshot;
+    const snapCredit = snap.credits != null ? String(snap.credits) : "";
     return !(
       code === snap.code &&
       title === snap.title &&
-      academicYear === snap.academicYear &&
-      department === snap.department &&
-      semester === snap.semester &&
-      degreeProgram === snap.degreeProgram &&
-      creditValue === snap.creditValue &&
-      coordinator === snap.coordinator &&
-      coordinatorId === snap.coordinatorId &&
-      email === snap.email &&
-      JSON.stringify(assessments) === JSON.stringify(snap.assessments)
+      (academicYear ?? "") === (snap.academicYear ?? "") &&
+      (department ?? "") === (snap.department ?? "") &&
+      (semester ?? "") === (snap.semester ?? "") &&
+      (degreeProgram ?? "") === (snap.degreeProgram ?? "") &&
+      creditValue === snapCredit &&
+      (coordinator ?? "") === (snap.coordinator ?? "") &&
+      (coordinatorId ?? "") === (snap.coordinatorId ?? "") &&
+      (email ?? "") === (snap.email ?? "") &&
+      JSON.stringify(assessments) === JSON.stringify(snap.assessments ?? [])
     );
   }, [
-    code, title, academicYear, department, semester, degreeProgram, creditValue,
-    coordinator, coordinatorId, email, assessments, initialSnapshot
+    code, title, academicYear, department, semester, degreeProgram,
+    creditValue, coordinator, coordinatorId, email, assessments, initialSnapshot
   ]);
 
-  // helpers: assessments
+  // Assessment helpers
+  const [assessmentInput, setAssessmentInput] = useState("");
   const addAssessment = (raw: string) => {
     const v = raw.trim().replace(/\s+/g, " ");
     if (!v) return;
@@ -163,48 +178,48 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
     }
   };
 
-  // actions
+  // Actions
   const handleUpdate = () => {
-    const payload: CourseDraft = {
+    const creditsNum =
+      creditValue.trim() === "" ? undefined : Number(creditValue.trim());
+
+    const payload: CourseView = {
+      id: initialSnapshot.id,
       code,
       title,
-      academicYear,
-      department,
-      semester,
-      degreeProgram,
-      creditValue,
-      coordinator,
-      coordinatorId,
-      email,
+      academicYear: academicYear || undefined,
+      department: department || undefined,
+      semester: semester || undefined,
+      degreeProgram: degreeProgram || undefined,
+      credits: Number.isFinite(creditsNum) ? (creditsNum as number) : undefined,
+      coordinator: coordinator || undefined,
+      coordinatorId: coordinatorId || undefined,
+      email: email || undefined,
       assessments,
     };
-    if (onUpdate) onUpdate(payload);
-    else console.log("UPDATE course payload:", payload);
+    onUpdate?.(payload);
   };
 
   const handleCancel = () => {
     // restore snapshot
     setCode(initialSnapshot.code);
     setTitle(initialSnapshot.title);
-    setAcademicYear(initialSnapshot.academicYear);
-    setDepartment(initialSnapshot.department);
-    setSemester(initialSnapshot.semester);
-    setDegreeProgram(initialSnapshot.degreeProgram);
-    setCreditValue(initialSnapshot.creditValue);
-    setCoordinator(initialSnapshot.coordinator);
-    setCoordinatorId(initialSnapshot.coordinatorId);
-    setEmail(initialSnapshot.email);
-    setAssessments(initialSnapshot.assessments);
-    setAssessmentInput("");
-    if (onCancel) onCancel();
+    setAcademicYear(initialSnapshot.academicYear ?? "");
+    setDepartment(initialSnapshot.department ?? "");
+    setSemester(initialSnapshot.semester ?? "");
+    setDegreeProgram(initialSnapshot.degreeProgram ?? "");
+    setCreditValue(initialSnapshot.credits != null ? String(initialSnapshot.credits) : "");
+    setCoordinator(initialSnapshot.coordinator ?? "");
+    setCoordinatorId(initialSnapshot.coordinatorId ?? "");
+    setEmail(initialSnapshot.email ?? "");
+    setAssessments(initialSnapshot.assessments ?? []);
+    onCancel?.();
   };
 
   return (
     <div className="form-wrapper">
       <div className="form-header-row">
         <h2 className="form-title">Edit Course</h2>
-
-       
       </div>
 
       <form
@@ -359,7 +374,6 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
           )}
         </div>
 
-        {/* Bottom actions (same as top for convenience) */}
         <div className="form-actions bottom-actions">
           <button type="button" className="btn ghost" onClick={handleCancel}>
             Cancel

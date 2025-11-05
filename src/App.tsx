@@ -67,124 +67,90 @@ import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/Results
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
 
-
-
 function App() {
   return (
-    <Router>
+    <div className="mt-16">
+      <Routes>
+        {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/welcomepage" element={<WelcomePage />} />
+        <Route path="/not-authorized" element={<NotAuthorized />} />
 
-      <div className="mt-16">
-
-        <Routes>
-          {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/welcomepage" element={<WelcomePage />} />
-          <Route path="/not-authorized" element={<NotAuthorized />} />
-
-          {/* Login, verification, reset - accessible only if NOT logged in */}
-          <Route element={<RequireAnonymous />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/verification" element={<TwoStepVerification />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/reset-password-mail"
-              element={<ResetPasswordEmail />}
-            />
-          </Route>
-
-          {/* ------------------ AUTHENTICATED AREA ------------------ */}
-          <Route element={<RequireAuth />}>
-            {/* Generic pages (accessible to all logged-in users) */}
-            <Route path="/dashboard" element={<AdminDashboard />} />
-            <Route path="/landing" element={<LandingRedirect />} />
-            <Route path="/drop" element={<UserDropdown />} />
-            <Route path="/account-setting" element={<AccountSettings />} />
-
-            {/* Lecturer routes */}
-            <Route path="/lecturerhome" element={<LecturerDashboard />} />
-            <Route path="/createcourse" element={<CreateCourseForm />} />
-            <Route path="/createcourseui" element={<CreateCourseUI />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/results-preview" element={<ResultsPreviewPage />} />
-            <Route path="/results-analysis" element={<AnalizePage />} />
-
-            {/* Student routes */}
-            <Route
-              path="/student/student-dashboard"
-              element={<StudentDashboard />}
-            />
-            <Route
-              path="/StudentResultsSheet"
-              element={<StudentResultsSheet />}
-            />
-            <Route path="/student-courses" element={<StudentCoursesPage />} />
-            <Route path="/student/transcript" element={<StudentTranscript />} />
-            <Route
-              path="/student/transcript/request"
-              element={<StudentTranscriptRequestForm />}
-            />
-            <Route
-              path="/student/transcript/status"
-              element={<TranscripStatus />}
-            />
-          </Route>
-
-          {/* ------------------ ADMIN-ONLY AREA ------------------ */}
-          <Route element={<RequireRole roles={["ADMIN"]} />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/user-management" element={<UserManagement />} />
-            <Route path="/admin/role-management" element={<RoleManagement />} />
-            <Route
-              path="/admin/student-management"
-              element={<StudentManagement />}
-            />
-            <Route path="/admin/audit-logs" element={<AuditLog />} />
-          </Route>
-
-
-          {/* ------------------ FALLBACK ------------------ */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-          {/* Public */}
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/drop" element={<UserDropdown />} />
+        {/* Login, verification, reset - accessible only if NOT logged in */}
+        <Route element={<RequireAnonymous />}>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/verification" element={<TwoStepVerification />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
-          <Route path="/student/student-dashboard" element={<StudentDashboard />} />
-          <Route path="/verification" element={<TwoStepVerification />} />
+        </Route>
+
+        {/* ------------------ AUTHENTICATED AREA ------------------ */}
+        <Route element={<RequireAuth />}>
+          {/* Generic pages (accessible to all logged-in users) */}
+          <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="/landing" element={<LandingRedirect />} />
+          <Route path="/drop" element={<UserDropdown />} />
           <Route path="/account-setting" element={<AccountSettings />} />
+
+          {/* Lecturer routes */}
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/createcourse" element={<CreateCourseForm />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
-          <Route path="/createcourse" element={<CreateCourseForm />} />
+
+          {/* Student routes */}
+          <Route
+            path="/student/student-dashboard"
+            element={<StudentDashboard />}
+          />
+          <Route
+            path="/StudentResultsSheet"
+            element={<StudentResultsSheet />}
+          />
+          <Route path="/student-courses" element={<StudentCoursesPage />} />
+          <Route path="/student/transcript" element={<StudentTranscript />} />
+          <Route
+            path="/student/transcript/request"
+            element={<StudentTranscriptRequestForm />}
+          />
+          <Route
+            path="/student/transcript/status"
+            element={<TranscripStatus />}
+          />
+        </Route>
+
+        {/* ------------------ ADMIN-ONLY AREA ------------------ */}
+        <Route element={<RequireRole roles={["ADMIN"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
-          <Route path="/admin/student-management" element={<StudentManagement />} />
-          <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
-          <Route path="/student-courses" element={<StudentCoursesPage />} />
-          <Route path="/student/transcript" element={<StudentTranscript />} />
-          <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
-          <Route path="/student/transcript/status" element={<TranscripStatus />} />
-          <Route path="/approval-requests" element={<ApprovalPage />} />
-          <Route path="/approval-history" element={<ApprovalHistory />} />
-          <Route path="/course-history" element={<CourseHistory />} />
-          <Route path="/modify-results" element={<ModifyResults/>} />
-          <Route path="/signatureboard" element={<SignatureBoard />} />
-          <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
-          <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
-          
+          <Route
+            path="/admin/student-management"
+            element={<StudentManagement />}
+          />
+          <Route path="/admin/audit-logs" element={<AuditLog />} />
+        </Route>
 
+        {/* ------------------ FALLBACK ------------------ */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Public */}
+        <Route path="/" element={<WelcomePage />} />
 
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-
-
-
-
-        </Routes>
-      </div>
+        <Route path="/approval-requests" element={<ApprovalPage />} />
+        <Route path="/approval-history" element={<ApprovalHistory />} />
+        <Route path="/course-history" element={<CourseHistory />} />
+        <Route path="/modify-results" element={<ModifyResults />} />
+        <Route path="/signatureboard" element={<SignatureBoard />} />
+        <Route
+          path="/results-approval-requests"
+          element={<ResultsApprovalPage />}
+        />
+        <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
+      </Routes>
     </div>
   );
 }
