@@ -5,11 +5,13 @@ import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 import CourseSearchBarlechome from "../../../components/SearchDropdown/searchdropdown.tsx";
 import "./modifyresults.css"; // add styles as needed
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { fetchLecturerCourses } from "../../../features/lecturerCourses/lecturerCoursesSlice";
+import type { Course as LecCourse } from "../../../features/lecturerCourses/course";
+import { selectUserId } from "../../../features/auth/selectors";
+import api from "../../../services/api";
 
-// The imported component may not have proper prop types; create a loose-typed alias to allow passing props here.
-const CourseSearchBarlechomeAny = CourseSearchBarlechome as unknown as React.ComponentType<any>;
-
-type Course = {
+type SelectedCourseInfo = {
     id: string;
     code?: string;
     title?: string;
@@ -27,8 +29,13 @@ type Result = {
 };
 
 const ModifyResults: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const userId = useAppSelector(selectUserId);
+    const { courses: coursesData = [], loading: coursesLoading, error: coursesError } = useAppSelector((s) => s.lecturerCourses);
+
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const [selectedCourse, setSelectedCourse] = useState<SelectedCourseInfo | null>(null);
+    const [selectedCourseId, setSelectedCourseId] = useState<string>("");
 
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<Result[]>([]);
@@ -41,9 +48,14 @@ const ModifyResults: React.FC = () => {
 
     const handleBackdropClick = () => setSidebarOpen(false);
 
+    // Load lecturer courses on mount/user change
+    useEffect(() => {
+        if (userId) dispatch(fetchLecturerCourses(userId));
+    }, [dispatch, userId]);
+
     // When a course is chosen, fetch its results
     useEffect(() => {
-        if (!selectedCourse) {
+        if (!selectedCourseId) {
             setResults([]);
             return;
         }
@@ -52,9 +64,8 @@ const ModifyResults: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await fetch(`/api/courses/${selectedCourse.id}/results`);
-                if (!res.ok) throw new Error(`Failed to load results (${res.status})`);
-                const data: Result[] = await res.json();
+                const res = await api.get<Result[]>(`/courses/${selectedCourseId}/results`);
+                const data = res.data as unknown as Result[];
                 setResults(data);
             } catch (err: any) {
                 setError(err.message || "Failed to load results");
@@ -64,7 +75,7 @@ const ModifyResults: React.FC = () => {
         };
 
         fetchResults();
-    }, [selectedCourse]);
+    }, [selectedCourseId]);
 
     // Open editor for a result
     const openEdit = (r: Result) => {
@@ -109,26 +120,14 @@ const ModifyResults: React.FC = () => {
         setResults((r) => r.map((it) => (it.id === toSave.id ? toSave : it)));
 
         try {
-            const res = await fetch(`/api/results/${toSave.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    project: toSave.project,
-                    quiz1: toSave.quiz1,
-                    quiz2: toSave.quiz2,
-                    total: toSave.total,
-                    status: toSave.status,
-                }),
+            const res = await api.put<Result>(`/results/${toSave.id}`, {
+                project: toSave.project,
+                quiz1: toSave.quiz1,
+                quiz2: toSave.quiz2,
+                total: toSave.total,
+                status: toSave.status,
             });
-
-            if (!res.ok) {
-                // revert optimistic update
-                setResults(prevResults);
-                const text = await res.text();
-                throw new Error(text || `Save failed (${res.status})`);
-            }
-
-            const updated: Result = await res.json();
+            const updated: Result = res.data as unknown as Result;
             // make sure UI shows backend canonical result
             setResults((r) => r.map((it) => (it.id === updated.id ? updated : it)));
             closeEdit();
@@ -164,10 +163,17 @@ const ModifyResults: React.FC = () => {
 
                 <div className="dashboard-content">
                     <div className="card">
-                        <CourseSearchBarlechomeAny
-                            // assume this component accepts onCourseSelect
-                            onCourseSelect={(c: Course) => setSelectedCourse(c)}
-                            selectedCourse={selectedCourse}
+                        <CourseSearchBarlechome
+                            courses={coursesData.map((c: LecCourse) => ({
+                                courseId: String(c.id),
+                                courseDisplayName: `${c.code} - ${c.title}`,
+                            }))}
+                            selectedCourseId={selectedCourseId}
+                            onCourseSelect={(id: string) => {
+                                setSelectedCourseId(id);
+                                const found = coursesData.find((c) => String(c.id) === id);
+                                setSelectedCourse(found ? { id, code: found.code, title: found.title } : null);
+                            }}
                         />
 
 
@@ -181,7 +187,7 @@ const ModifyResults: React.FC = () => {
                         {loading && <p>Loading results...</p>}
                         {error && <div className="error">{error}</div>}
 
-                        {!loading && selectedCourse && results.length === 0 && <p>No results found for this course.</p>}
+                        {!loading && selectedCourseId && results.length === 0 && <p>No results found for this course.</p>}
 
                         {!loading && results.length > 0 && (
                             <div className="results-table-wrapper">

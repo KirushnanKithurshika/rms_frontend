@@ -1,4 +1,4 @@
-﻿import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AuthState, LoginPayload, VerifyOtpPayload } from "./types";
 import api from "../../services/api";
 import { showSuccess, showError } from "../../utils/toast";
@@ -123,29 +123,32 @@ export const logoutThunk = createAsyncThunk<
 /*                              STATE INITIALIZER                             */
 /* -------------------------------------------------------------------------- */
 
-// ✅ Restore user automatically if token exists in localStorage
+// Restore user only within the current browser session after a successful login
+// We use sessionStorage flag to differentiate a fresh app start vs. in-session refresh.
 const storedToken = localStorage.getItem("token");
-let restoredUser = null;
-
-if (storedToken) {
-  const claims = decodeJwt(storedToken);
-  if (claims) {
-    restoredUser = {
-      id: claims.userId ?? undefined,
-      username: claims.sub || "",
-      roles: claims.roles || [],
-      authorities: claims.authorities || [],
-    };
-  }
-}
+const storedClaims = decodeJwt(storedToken);
+const tokenValid = Boolean(storedClaims?.exp) && Date.now() / 1000 < (storedClaims!.exp as number);
+const rehydrateSession = sessionStorage.getItem("sessionAuthed") === "1";
 
 const initialState: AuthState = {
-  status: storedToken ? "authenticated" : "idle",
-  token: storedToken,
+  status: tokenValid && rehydrateSession ? "authenticated" : "idle",
+  token: tokenValid && rehydrateSession ? storedToken : null,
   pendingUsername: localStorage.getItem("pendingUsername"),
   error: null,
-  currentUser: restoredUser,
+  currentUser: tokenValid && rehydrateSession
+    ? {
+        id: storedClaims?.userId ?? undefined,
+        username: storedClaims?.sub || "",
+        roles: storedClaims?.roles || [],
+        authorities: storedClaims?.authorities || [],
+      }
+    : null,
 };
+
+// If token is invalid/expired, clear it from storage to avoid confusing refresh behavior
+if (!tokenValid) {
+  localStorage.removeItem("token");
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   SLICE                                   */
@@ -191,6 +194,8 @@ const slice = createSlice({
       localStorage.setItem("token", a.payload);
       s.pendingUsername = null;
       localStorage.removeItem("pendingUsername");
+      // Mark this browser session as authenticated so refresh stays on the same page
+      try { sessionStorage.setItem("sessionAuthed", "1"); } catch {}
 
       const claims = decodeJwt(a.payload);
       const id = claims?.userId ?? undefined;
