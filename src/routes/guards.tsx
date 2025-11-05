@@ -31,7 +31,8 @@ function isTokenValid(token: string | null): boolean {
   const claims = parseClaims(token);
   if (!claims) return false;
   const { exp } = claims;
-  return !exp || Date.now() / 1000 < exp;
+  // Require an explicit expiration and that it is in the future
+  return Boolean(exp) && Date.now() / 1000 < (exp as number);
 }
 
 function rolesFromToken(token: string | null): string[] {
@@ -59,8 +60,7 @@ function hasAll(required: string[], mine: string[]): boolean {
 
 // Blocks unauthenticated users.
 export function RequireAuth() {
-  const reduxToken = useAppSelector(selectToken);
-  const token = reduxToken ?? localStorage.getItem("token");
+  const token = useAppSelector(selectToken);
   const location = useLocation();
 
   const ok = useMemo(() => isTokenValid(token), [token]);
@@ -72,8 +72,7 @@ export function RequireAuth() {
 
 // Blocks users who lack ANY of the required roles (logical OR).
 export function RequireRole({ roles }: { roles: string[] }) {
-  const reduxToken = useAppSelector(selectToken);
-  const token = reduxToken ?? localStorage.getItem("token");
+  const token = useAppSelector(selectToken);
   const location = useLocation();
 
   const authed = useMemo(() => isTokenValid(token), [token]);
@@ -83,9 +82,7 @@ export function RequireRole({ roles }: { roles: string[] }) {
 
   // Prefer roles already stored in Redux (from /auth/me), fallback to JWT
   const reduxRoles = useAppSelector(selectUserRoles);
-  const effectiveRoles = reduxRoles?.length
-    ? reduxRoles
-    : rolesFromToken(token);
+  const effectiveRoles = reduxRoles ?? [];
 
   const allowed = useMemo(
     () => hasAny(roles, effectiveRoles),
@@ -97,8 +94,7 @@ export function RequireRole({ roles }: { roles: string[] }) {
 
 // Same as RequireRole, but requires ALL roles (logical AND).
 export function RequireAllRoles({ roles }: { roles: string[] }) {
-  const reduxToken = useAppSelector(selectToken);
-  const token = reduxToken ?? localStorage.getItem("token");
+  const token = useAppSelector(selectToken);
   const location = useLocation();
 
   const authed = useMemo(() => isTokenValid(token), [token]);
@@ -107,9 +103,7 @@ export function RequireAllRoles({ roles }: { roles: string[] }) {
   }
 
   const reduxRoles = useAppSelector(selectUserRoles);
-  const effectiveRoles = reduxRoles?.length
-    ? reduxRoles
-    : rolesFromToken(token);
+  const effectiveRoles = reduxRoles ?? [];
 
   const allowed = useMemo(
     () => hasAll(roles, effectiveRoles),
@@ -121,8 +115,7 @@ export function RequireAllRoles({ roles }: { roles: string[] }) {
 
 // Keeps authenticated users away from /login or /verification.
 export function RequireAnonymous() {
-  const reduxToken = useAppSelector(selectToken);
-  const token = reduxToken ?? localStorage.getItem("token");
+  const token = useAppSelector(selectToken);
   const authed = useMemo(() => isTokenValid(token), [token]);
   return authed ? <Navigate to="/dashboard" replace /> : <Outlet />;
 }

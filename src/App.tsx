@@ -119,6 +119,17 @@ function App() {
             path="/student/transcript/status"
             element={<TranscripStatus />}
           />
+
+          <Route path="/approval-requests" element={<ApprovalPage />} />
+          <Route path="/approval-history" element={<ApprovalHistory />} />
+          <Route path="/course-history" element={<CourseHistory />} />
+          <Route path="/modify-results" element={<ModifyResults />} />
+          <Route path="/signatureboard" element={<SignatureBoard />} />
+          <Route
+            path="/results-approval-requests"
+            element={<ResultsApprovalPage />}
+          />
+          <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
         </Route>
 
         {/* ------------------ ADMIN-ONLY AREA ------------------ */}
@@ -135,21 +146,6 @@ function App() {
 
         {/* ------------------ FALLBACK ------------------ */}
         <Route path="*" element={<Navigate to="/" replace />} />
-        {/* Public */}
-        <Route path="/" element={<WelcomePage />} />
-
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-        <Route path="/approval-requests" element={<ApprovalPage />} />
-        <Route path="/approval-history" element={<ApprovalHistory />} />
-        <Route path="/course-history" element={<CourseHistory />} />
-        <Route path="/modify-results" element={<ModifyResults />} />
-        <Route path="/signatureboard" element={<SignatureBoard />} />
-        <Route
-          path="/results-approval-requests"
-          element={<ResultsApprovalPage />}
-        />
-        <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
       </Routes>
     </div>
   );
