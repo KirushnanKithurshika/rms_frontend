@@ -101,22 +101,4 @@
     border-left: 1px solid #c7ced6;
 }
 
-/* Print helpers */
-@media print {
-    .tsem-wrap {
-        margin: 4mm 0 6mm 0;
-    }
 
-    .tsem-title {
-        background: #eaeef2 !important;
-    }
-
-    .tsem-table thead {
-        display: table-header-group;
-    }
-
-    /* repeat headers */
-    .tsem-table tfoot {
-        display: table-footer-group;
-    }
-}

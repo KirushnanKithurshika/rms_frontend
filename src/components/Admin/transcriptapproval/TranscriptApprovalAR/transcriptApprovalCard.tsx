@@ -9,6 +9,7 @@ type Props = {
   onClick: () => void;
 };
 
+
 const TranscriptApprovalCard: React.FC<Props> = ({
   studentName,
   batch,
@@ -17,6 +18,7 @@ const TranscriptApprovalCard: React.FC<Props> = ({
 }) => {
   return (
     <div className="taAR-card" role="group" aria-label={`Transcript: ${studentName}`}>
+      
       <div className="taAR-card-left">
         <FaRegFilePdf className="taAR-icon" aria-hidden="true" />
         <div className="taAR-title" title={`${studentName} ${batch} ${subtitle}`}>

@@ -1,11 +1,11 @@
-/* src/components/Students/Transcript/TranscriptExplanation.css */
+
 
 .txp-wrap{
   font-family: "Calibri", Arial, sans-serif;
   color:#111;
 }
 
-/* Title centered like the scan */
+
 .txp-title{
   text-align:center;
   font-weight:700;
@@ -13,13 +13,12 @@
   margin: 6mm 0 4mm;
 }
 
-/* Outer bordered box */
 .txp-box{
   border:none;
   border-radius:2px;
  
   display:grid;
-  grid-template-columns: 42mm 1fr; /* narrow left, wide right */
+  grid-template-columns: 42mm 1fr; 
   gap:2mm;
 }
 .txp-left,
@@ -157,12 +156,6 @@
   width:45mm;
 }
 
-
-@media print{
-  .txp-title{ margin-top: 8mm; }
-}
-
-
 .txp-req{
   font-family: "Calibri", Arial, sans-serif;
   font-size: 12px;
@@ -240,6 +233,4 @@
   margin: 0 0 1.5mm 0;
 }
 
-@media print{
-  .txp-req{ break-inside: avoid; }
-}
+

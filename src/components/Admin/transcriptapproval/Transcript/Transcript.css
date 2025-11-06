@@ -1,8 +1,11 @@
 /* ===== A4 canvas ===== */
 @page {
     size: A4;
-    margin: 10mm 10mm 12mm 10mm;
+    margin: 5mm 5mm 5mm 5mm;
 }
+
+
+
 
 
 * {
@@ -26,22 +29,6 @@ body {
     box-shadow: 0 2mm 8mm rgba(0, 0, 0, .08);
 }
 
-@media print {
-    body {
-        background: #fff;
-    }
-
-    .sheet.a4 {
-        margin: 0;
-        box-shadow: none;
-        page-break-after: always;
-      break-after: page;
-    }
-    .sheet.a4:last-of-type {
-    page-break-after: auto;
-    break-after: auto;
-  }
-}
 
 .uni-header {
     display: grid;
@@ -52,8 +39,8 @@ body {
 }
 
 .seal-img {
-    width: 40mm;
-    height: 40mm;
+    width: 30mm;
+    height:auto;
     object-fit: contain;
 }
 
@@ -111,9 +98,7 @@ body {
   color:#555;
   margin-right:6px;
 }
-@media print {
-  .contact-grid { break-inside: avoid; }
-}
+
 
 .serial {
     justify-self: end;

@@ -1,14 +1,14 @@
 import React from "react";
 import "./SemResTable.css";
 
-/* ===== Types (exported so Transcript.tsx can import if needed) ===== */
+/* ===== Types (exported) ===== */
 export type ModuleRow = {
   moduleNo: string;
   moduleTitle: string;
   credits: number | string;
   grade?: string;
   gradePoint?: number | string;
-  attemptNote?: string; // "(2nd)" etc.
+  attemptNote?: string;
 };
 
 export type SemesterSection =
@@ -16,18 +16,23 @@ export type SemesterSection =
   | { kind: "rows"; rows: ModuleRow[] };
 
 export type SemesterData = {
-  title: string;          // "Semester 1"
-  period?: string;        // "(May 2020 - Mar 2021)"
+  title: string;
+  period?: string;
   sections: SemesterSection[];
-  sgpa?: string;          // "2.59"
+  sgpa?: string;
 };
 
 type Props = {
   semesters?: SemesterData[];
+  /** Show semesters in [startIndex, endIndex). Omit endIndex to go till the end. */
+  startIndex?: number;
+  endIndex?: number;
+  /** Optional: hard page break AFTER this zero-based index within the shown slice */
+  breakAfterIndex?: number;
 };
 
-/* Optional fallback (used only if you render component with no props) */
-const SAMPLE_SEMESTERS: SemesterData[] = [
+/* ===== Sample (also exported so Transcript can reuse) ===== */
+export const SAMPLE_SEMESTERS: SemesterData[] = [
   {
     title: "Development Programme",
     sections: [
@@ -42,8 +47,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
       },
     ],
   },
-
-  // ===== Semester 1 =====
   {
     title: "Semester 1",
     period: "(May 2020 - Mar 2021)",
@@ -64,8 +67,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "2.48",
   },
-
-  // ===== Semester 2 =====
   {
     title: "Semester 2",
     period: "(Nov 2020 - Aug 2021)",
@@ -85,8 +86,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "2.59",
   },
-
-  // ===== Semester 3 =====
   {
     title: "Semester 3",
     period: "(2021/2022)",
@@ -104,8 +103,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "3.15",
   },
-
-  // ===== Semester 4 =====
   {
     title: "Semester 4",
     period: "(2022)",
@@ -123,8 +120,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "3.20",
   },
-
-  // ===== Semester 5 =====
   {
     title: "Semester 5",
     period: "(2022/2023)",
@@ -142,8 +137,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "3.40",
   },
-
-  // ===== Semester 6 =====
   {
     title: "Semester 6",
     period: "(2023)",
@@ -161,8 +154,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "3.48",
   },
-
-  // ===== Semester 7 =====
   {
     title: "Semester 7",
     period: "(2023/2024)",
@@ -176,10 +167,10 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
           { moduleNo: "CS5103", moduleTitle: "Advanced Networks", credits: 3, grade: "B", gradePoint: 3.0 },
           { moduleNo: "CS5101", moduleTitle: "Deep Learning", credits: 3, grade: "A", gradePoint: 4.0 },
           { moduleNo: "CS5102", moduleTitle: "Parallel & High-Performance Computing", credits: 3, grade: "B+", gradePoint: 3.3 },
-        { moduleNo: "CS5101", moduleTitle: "Deep Learning", credits: 3, grade: "A", gradePoint: 4.0 },
+          { moduleNo: "CS5101", moduleTitle: "Deep Learning", credits: 3, grade: "A", gradePoint: 4.0 },
           { moduleNo: "CS5102", moduleTitle: "Parallel & High-Performance Computing", credits: 3, grade: "B+", gradePoint: 3.3 },
           { moduleNo: "CS5103", moduleTitle: "Advanced Networks", credits: 3, grade: "B", gradePoint: 3.0 },
-                ],
+        ],
       },
       { kind: "group", title: "Electives" },
       {
@@ -192,8 +183,6 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
     ],
     sgpa: "3.62",
   },
-
-  // ===== Semester 8 =====
   {
     title: "Semester 8",
     period: "(2024/2025)",
@@ -219,13 +208,21 @@ const SAMPLE_SEMESTERS: SemesterData[] = [
   },
 ];
 
+const SemesterTables: React.FC<Props> = ({
+  semesters = SAMPLE_SEMESTERS,
+  startIndex = 0,
+  endIndex,
+  breakAfterIndex,
+}) => {
+  const slice = semesters.slice(startIndex, endIndex ?? semesters.length);
 
-const SemesterTables: React.FC<Props> = ({ semesters = SAMPLE_SEMESTERS }) => {
   return (
     <div className="tsem-root">
-      {semesters.map((sem, si) => (
-        <div className="tsem-wrap" key={si}>
-          {/* Title band */}
+      {slice.map((sem, localIdx) => (
+        <div
+          className={`tsem-wrap ${breakAfterIndex === localIdx ? "page-break-after" : ""}`}
+          key={`${startIndex + localIdx}-${sem.title}`}
+        >
           <div className="tsem-title">
             <span className="tsem-title-left">{sem.title}</span>
             {sem.period && <span className="tsem-title-right">{sem.period}</span>}

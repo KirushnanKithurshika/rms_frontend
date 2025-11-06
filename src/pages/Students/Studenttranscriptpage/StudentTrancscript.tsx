@@ -6,7 +6,7 @@ import StudentSidebar from "../../../components/Students/Studentsidebar/Students
 import TranscriptAvailability from "../../../components/Students/Studentsidebar/TranscriptAvailability/TranscriptAvailability.tsx";
 import readyImg from "../../../assets/transcript-ready.png"; // adjust path to your image
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
-import Transcript from "../../../components/Students/Transcript/Transcript.tsx";
+
 
 const StudentTranscript = () => {
   const navigate = useNavigate();
@@ -36,9 +36,7 @@ const StudentTranscript = () => {
           <div className="sidebar-student">
             <StudentSidebar />
           </div>
-          <div className="card-students-trsnscript">
-          <Transcript />
-        </div>
+        
         <div className="card-students-trsnscript">
           <TranscriptAvailability
             status="available"

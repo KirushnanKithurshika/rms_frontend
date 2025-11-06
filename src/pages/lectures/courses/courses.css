@@ -1,4 +1,5 @@
 .cardcourse {
+  min-height: 100vh;
   flex: 1 1 200px;
   background-color: #fff;
   border-radius: 10px;

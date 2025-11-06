@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import "./Transcript.css";
-import unilogo from "../../../assets/logoT.png";
-import SemesterTables from "./SemResTable/SemResTable";
+import unilogo from "../../../../assets/logoT.png";
+import SemesterTables, { SAMPLE_SEMESTERS } from "./SemResTable/SemResTable";
+import type { SemesterData } from "./SemResTable/SemResTable";
 import TranscriptExplanation from "./TranscriptExplaination/TranscriptExplanation";
 
 export type ContactInfo = {
@@ -46,7 +47,6 @@ export type TranscriptData = {
   issueDate?: string;
   registrarTitle?: string;
   footerNotes?: string[];
-
 };
 
 const DEFAULT_UNI: UniversityInfo = {
@@ -85,8 +85,6 @@ const SAMPLE_DATA: TranscriptData = {
 
 type Props = { data?: TranscriptData };
 
-
-
 const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
   const u: UniversityInfo = useMemo(() => {
     const incoming = data?.university ?? ({} as UniversityInfo);
@@ -104,13 +102,18 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
   const serial = data?.serialNo ?? s?.serialNo;
   const ogpa = p?.overallGPA ?? p?.overallGradePointAverage;
 
-  // captions for the strip on page 2
-  const leftCaption = "Academic Transcript";
-  const rightCaption = u?.nameLine1 || "University";
+  /* ======= CHOOSE HOW TO SPLIT SEMESTERS =======
+     We’ll split after index 4 (zero-based, exclusive end), i.e.
+     Page 2 -> items [0..4)  (first 4 blocks)
+     Page 3 -> items [4..end) (remaining blocks)
+     Adjust SPLIT_AFTER to what fits your layout best.
+  */
+  const SPLIT_AFTER = 4; // change to 5 etc. if you need more/less on page 2
+  const semesters: SemesterData[] = SAMPLE_SEMESTERS; // or pass your real data here
 
   return (
     <>
-      {/* ===== Page 1 ===== */}
+      {/* ===== Page 1: Cover & profile ===== */}
       <section className="sheet a4">
         <header className="uni-header">
           <div className="seal">
@@ -132,7 +135,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
         </header>
 
         <div className="serial">
-          {serial ? <>Serial No :{serial}</> : null}
+          {serial ? <>Serial No : {serial}</> : null}
         </div>
 
         <div className="banner">ACADEMIC TRANSCRIPT</div>
@@ -182,7 +185,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
         </section>
       </section>
 
-      {/* ===== Page 2 ===== */}
+      {/* ===== Page 2: Semesters (part 1) ===== */}
       <section className="sheet a4">
         <div className="strip">
           <div className="pstrip-caption">
@@ -191,14 +194,12 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
           </div>
 
           <div className="pstrip">
-
             <div className="pstrip-row prow1">
               <div className="ppair">
                 <span className="lab">Full Name :</span>
                 <span className="val">{s.fullName}</span>
               </div>
             </div>
-
 
             <div className="pstrip-row pgridPairs3">
               <div className="ppair">
@@ -215,7 +216,6 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
               </div>
             </div>
 
-
             <div className="pstrip-row prow1">
               <div className="ppair">
                 <span className="lab">Field of Specialization :</span>
@@ -223,9 +223,10 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
               </div>
             </div>
           </div>
-
         </div>
-        <SemesterTables />
+
+        {/* First half */}
+        <SemesterTables semesters={semesters} startIndex={0} endIndex={SPLIT_AFTER} />
 
         <section className="footer-block">
           <div className="cols">
@@ -248,13 +249,77 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
           </div>
         </section>
       </section>
-    
+
+      {/* ===== Page 3: Semesters (part 2) ===== */}
       <section className="sheet a4">
+        <div className="strip">
+          <div className="pstrip-caption">
+            <span className="left">Academic Transcript</span>
+            <span className="right">{u.nameLine1}</span>
+          </div>
 
+          <div className="pstrip">
+            <div className="pstrip-row prow1">
+              <div className="ppair">
+                <span className="lab">Full Name :</span>
+                <span className="val">{s.fullName}</span>
+              </div>
+            </div>
 
+            <div className="pstrip-row pgridPairs3">
+              <div className="ppair">
+                <span className="lab">Registration No :</span>
+                <span className="val">{s.registrationNo}</span>
+              </div>
+              <div className="ppair">
+                <span className="lab">Date of Birth :</span>
+                <span className="val">{s.dateOfBirth}</span>
+              </div>
+              <div className="ppair">
+                <span className="lab">Gender :</span>
+                <span className="val">{s.gender}</span>
+              </div>
+            </div>
+
+            <div className="pstrip-row prow1">
+              <div className="ppair">
+                <span className="lab">Field of Specialization :</span>
+                <span className="val">{p.fieldOfSpecialization}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Second half */}
+        <SemesterTables semesters={semesters} startIndex={SPLIT_AFTER} />
+
+        <section className="footer-block">
+          <div className="cols">
+            <div className="left">
+              <div className="sig-line" />
+              <div className="sig-text">
+                <div className="sig-name"></div>
+                <div className="sig-role">
+                  {data?.registrarTitle || "Assistant Registrar / Faculty of Engineering"}
+                </div>
+                <div className="mutedT ">(Not valid without the embossed seal)</div>
+              </div>
+            </div>
+
+            <div className="right">
+              <div className="date-stamp">{data?.issueDate || ""}</div>
+              <div className="date-line"></div>
+              <div className="mutedTD">Date of Issue</div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      {/* ===== Page 4: Explanation / Legend ===== */}
+      <section className="sheet a4">
         <TranscriptExplanation />
       </section>
-  </>
+    </>
   );
 };
 
