@@ -123,7 +123,7 @@
 .table tbody tr:nth-child(even) { background: #f5f7fa; }
 .table tbody tr:nth-child(odd)  { background: #ffffff; }
 
-.th-sort { cursor: pointer; user-select: none; }
+
 
 /* Actions with small bordered buttons */
 .actions {

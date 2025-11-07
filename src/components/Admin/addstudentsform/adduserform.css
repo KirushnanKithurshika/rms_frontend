@@ -1,4 +1,4 @@
-.add-user-form-container {
+/* .add-user-form-container {
   background: white;
   padding: 10px;
   border-radius: 8px;
@@ -81,7 +81,7 @@
 .add-user-input,
 .add-user-select {
   padding: 8px;
-  height:20px;
+  height:30px;
   max-width: 500px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -410,4 +410,4 @@
   .add-user-form-container {
     gap: 15px;
   }
-}
+} */
