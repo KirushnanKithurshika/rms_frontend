@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import studentResultsReducer from "../features/studentResults/studentResultsSlice";
 import studentCourseReducer from "../features/studentCourses/studentCoursesSlice";
+import studentCAReducer from "../features/studentCA/studentCASlice";
 import lecturerDashboardReducer from "../features/lecturerDashboard/lecturerDashboardSlice";
 import lecturerCoursesReducer from "../features/lecturerCourses/lecturerCoursesSlice";
 
@@ -10,6 +11,7 @@ export const store = configureStore({
     auth: authReducer,
     studentResults: studentResultsReducer,
     studentCourses: studentCourseReducer,
+    studentCA: studentCAReducer,
     lecturerDashboard: lecturerDashboardReducer,
     lecturerCourses: lecturerCoursesReducer,
   },

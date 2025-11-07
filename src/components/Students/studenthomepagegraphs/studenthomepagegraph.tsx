@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useSelector } from "react-redux";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
@@ -59,7 +58,9 @@ const StudentMetrics: React.FC = () => {
   // Count repeated modules (assuming grade "F" or "N" means repeated)
   const repeatedModules = semesters
     .flatMap((s) => Object.entries(s.gradesByCode))
-    .filter(([_, grade]) => grade === "E" || grade === "N").length;
+    .filter(
+      ([_, grade]) => grade === "E" || grade === "F" || grade === "N"
+    ).length;
 
   return (
     <div className="metrics-container">
