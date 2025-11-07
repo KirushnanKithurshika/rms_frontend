@@ -23,8 +23,9 @@ const ResultsTabsButtomSection: React.FC = () => {
   const toggleSemester = (n: number) =>
     setOpenSemester((cur) => (cur === n ? null : n));
 
-  // Use semesters from resultsSheet
-  const semesters = resultsSheet?.semesters ?? [];
+  // Build a simple numeric list of semesters for the accordion
+  const semestersCount = resultsSheet?.semesters?.length ?? 0;
+  const semesters = Array.from({ length: semestersCount }, (_, i) => i + 1);
 
   return (
     <div className="results-wrap">
@@ -72,7 +73,7 @@ const ResultsTabsButtomSection: React.FC = () => {
 
       {/* Accordion: Dynamic Semesters */}
       <div className="sem-accordion">
-        {semesters.map((n) => {
+        {semesters.map((n: number) => {
           const open = openSemester === n;
           return (
             <div key={n} className={`sem-item ${open ? "open" : ""}`}>

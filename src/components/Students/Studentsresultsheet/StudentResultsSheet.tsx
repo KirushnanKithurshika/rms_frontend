@@ -1,5 +1,7 @@
 import React from "react";
 import "./StudentResultsSheet.css";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../app/store";
 
 type Item = { code: string; name: string; credits: number };
 type Student = {
@@ -23,19 +25,31 @@ type Props = {
   gradeByCode?: Record<string, string>;
 };
 
-const StudentResultsSheet: React.FC<Props> = ({
-  university,
-  facultyLine,
-  specialization,
-  sheetTitle,
-  provisionalLine,
-  core,
-  electives,
-  student,
-  modulesCountingForGPA,
-  note,
-  gradeByCode,
-}) => {
+const StudentResultsSheet: React.FC<Props> = (props) => {
+  // Pull results from Redux when props not provided
+  const rs = useSelector((s: RootState) => s.studentResults.resultsSheet);
+
+  // Prefer props when passed, otherwise fall back to Redux sheet
+  const university = props.university ?? rs?.university;
+  const facultyLine = props.facultyLine ?? rs?.facultyLine;
+  const specialization = props.specialization ?? rs?.specialization;
+  const sheetTitle = props.sheetTitle ?? rs?.sheetTitle;
+  const provisionalLine = props.provisionalLine ?? rs?.provisionalLine;
+  const note = props.note ?? rs?.note;
+
+  // Choose a semester to display when not passed in props: latest one
+  const latestSemester = rs?.semesters && rs.semesters.length
+    ? rs.semesters[rs.semesters.length - 1]
+    : undefined;
+
+  const core = props.core ?? latestSemester?.core ?? [];
+  const electives = props.electives ?? latestSemester?.electives ?? [];
+  const student = props.student ?? rs?.student ?? { name: "", regNo: "", gradesByCode: {} };
+  const modulesCountingForGPA = props.modulesCountingForGPA ?? {
+    core: core.map((c) => c.code),
+    electives: electives.map((e) => e.code),
+  };
+  const gradeByCode = props.gradeByCode ?? (latestSemester?.gradesByCode || rs?.student?.gradesByCode || {} as Record<string, string>);
   const gradeRow = [
     "A+",
     "A",

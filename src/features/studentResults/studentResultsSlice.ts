@@ -56,9 +56,15 @@ export const fetchStudentResultsSheet = createAsyncThunk<
   { rejectValue: string }
 >("student/fetchResultsSheet", async (userId, thunkAPI) => {
   try {
-    const response = await api.get(`/students/${userId}/results-sheet`);
-    // unwrap your data from backend
-    return response.data.data as StudentResultsSheet;
+    // Primary path
+    try {
+      const response = await api.get(`/students/${userId}/results-sheet`);
+      return (response.data?.data ?? response.data) as StudentResultsSheet;
+    } catch (e) {
+      // Fallback path under /v1
+      const response = await api.get(`/v1/students/${userId}/results-sheet`);
+      return (response.data?.data ?? response.data) as StudentResultsSheet;
+    }
   } catch (err: any) {
     return thunkAPI.rejectWithValue(err.message ?? "Failed to fetch results");
   }
