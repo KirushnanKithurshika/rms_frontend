@@ -13,7 +13,7 @@ import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import ResultUploadInterface from "../../../components/resultuploadinterface/ResultUploadInterface.tsx";
 import FileUploadCard from "../../../components/fileuploadcard/fileuploadcard.tsx";
 import EditCourseDetails from "../../../components/EditCourseDetails/EditCourseDetails.tsx";
-import { FaEdit, FaTrash, FaInfoCircle, FaArrowLeft } from "react-icons/fa";
+import { FaEdit, FaTrash, FaInfoCircle, FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 
 // Extend Course with optional fields used in this view
 type CourseEx = Course & {
@@ -194,7 +194,7 @@ const Courses: React.FC = () => {
                     filteredCourses.map((course, idx) => (
                       <div
                         className="course-card"
-                        key={course.id}
+                        key={`${course.code}-${idx}`}
                         onClick={() => handleCourseClick(course)}
                       >
                         <div className="card-top">
@@ -202,14 +202,10 @@ const Courses: React.FC = () => {
                             className="card-options"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setActiveMenuIndex(
-                                activeMenuIndex === idx ? null : idx
-                              );
-                              e.stopPropagation();
                               handleDropdownToggle(idx);
                             }}
                           >
-                            â‹®
+                            <FaEllipsisV className="eclipse" />
                           </div>
 
                           {activeMenuIndex === idx && (
@@ -227,12 +223,14 @@ const Courses: React.FC = () => {
                                 }}
                               >
                                 <FaEdit className="iconcard" />
+                                
                               </div>
                               <div
                                 className="dropdown-item"
                                 onClick={() => openDeleteModal(course)}
                               >
                                 <FaTrash className="iconcard" />
+                                
                               </div>
                               <div
                                 className="dropdown-item"
@@ -243,6 +241,7 @@ const Courses: React.FC = () => {
                                 }}
                               >
                                 <FaInfoCircle className="iconcard" />
+                                
                               </div>
                             </div>
                           )}

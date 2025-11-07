@@ -129,9 +129,11 @@
 .card-options {
   cursor: pointer;
   font-size: 20px;
-  position: relative;
+ position: relative;
 }
-
+.eclipse{
+  font-size: 14px;
+}
 .card-dropdown {
   position: absolute;
   right: 20px;
