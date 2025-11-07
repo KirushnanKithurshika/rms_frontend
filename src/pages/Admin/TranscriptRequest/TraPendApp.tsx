@@ -126,13 +126,13 @@ const TrasncriptApprovalsAR: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* ⬇️ ONLY this area is rendered into the PDF */}
+         
                   <div className="tAR-inline-body" ref={printRootRef} id="tAR-print-root">
                     <Transcript data={sampleData} />
                   </div>
                 </div>
               )}
-              {/* end inline */}
+       
             </div>
           </div>
         </div>

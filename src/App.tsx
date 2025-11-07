@@ -26,7 +26,7 @@ import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
 import CourseHistory from "./pages/lectures/History/History";
-import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
+import SignatureBoard from "./components/SignatureCanvas/SignatureCanvas";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";

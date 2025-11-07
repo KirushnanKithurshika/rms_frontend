@@ -148,7 +148,7 @@ body {
 
 .grid-2 dt {
   font-weight: 600;
-  min-width: 130px;  /* adjust width */
+  min-width: 130px;  
   font-family: "Calibri", sans-serif;
 }
 
@@ -193,14 +193,14 @@ body {
     width: 75mm;
     border-top: 1px solid #222;
     height: 0;
-    margin-top: 10mm;
+ 
 }
 
 .date-line {
     width: 30mm;
     border-top: 1px solid #222;
     height: 0;
-    margin-top: 5mm;
+    margin-top: -5mm;
 }
 .sig-text .sig-role {
     font-family: "Calibri", sans-serif;
@@ -208,8 +208,12 @@ body {
     margin-top: 2mm;
     font-size:16px;
 }
-
+.date{
+  margin-top: -5mm;
+  margin-bottom: 5mm;
+}
 .date-stamp {
+  
     font-family: "Calibri", sans-serif;
     min-width: 30mm;
     text-align: center;
@@ -274,3 +278,8 @@ body {
 .lab{ font-weight:600; white-space:nowrap; }
 .val{ font-weight:400; }
 
+.canvas{
+  width:75mm;
+  height:100px;
+ 
+}

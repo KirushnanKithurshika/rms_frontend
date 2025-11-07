@@ -11,7 +11,7 @@ import {
   FaGavel,
   FaMoneyBillAlt,
   FaBuilding,
-  FaCommentDots,
+  FaBullhorn,
   FaChevronLeft,
   FaChevronRight,
   FaScroll,     
@@ -102,8 +102,8 @@ const AdminSidebar: React.FC = () => {
           </NavLink>
 
           <NavLink to="/admin/feedback" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <FaCommentDots className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Feedback</span>}
+            <FaBullhorn className="sidebar-icon" />
+            {sidebarState === 'expanded' && <span>Announcement</span>}
           </NavLink>
         </>
       )}

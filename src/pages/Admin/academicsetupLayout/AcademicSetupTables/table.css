@@ -207,7 +207,7 @@
 .app-grid--2 { grid-column: span 2; }
 
 .app-field { display: grid; gap: .35rem; }
-.app-label { font-weight: 600; color: #2b2b55; font-size: 12px; }
+.app-label { font-weight: 600; color: #2b2b55; font-size: 12px;text-align: left; }
 .app-input {
   padding: .55rem .6rem;
   border: 1px solid #d6dae1;
