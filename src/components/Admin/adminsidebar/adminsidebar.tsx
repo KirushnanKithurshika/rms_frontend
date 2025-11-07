@@ -71,7 +71,7 @@ const AdminSidebar: React.FC = () => {
           </NavLink>
 
           {/* NEW: Academic Setup panel (University / Semester / Faculty / Departments / Batches) */}
-          <NavLink to="/admin/academic-setup" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/admin/academicsetup" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaUniversity className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Academic Setup </span>}
           </NavLink>
