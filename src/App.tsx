@@ -72,12 +72,11 @@ function App() {
     <div className="mt-16">
       <Routes>
         {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/welcomepage" element={<WelcomePage />} />
         <Route path="/not-authorized" element={<NotAuthorized />} />
 
-        {/* Login, verification, reset - accessible only if NOT logged in */}
+        {/* Welcome + auth pages: only for anonymous users */}
         <Route element={<RequireAnonymous />}>
+          <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/verification" element={<TwoStepVerification />} />
           <Route path="/reset-password" element={<ResetPassword />} />

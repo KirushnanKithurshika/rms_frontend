@@ -4,6 +4,7 @@
     align-items: center;
     margin-bottom: 16px;
     gap: 10px;
+    color: #0a2558;
     flex-wrap: wrap;
 }
 
@@ -242,6 +243,62 @@
     width: 100%;
     overflow-x: auto;
 }
+
+
+.student-action-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.action-btn {
+
+  border-radius: 5px;
+  border: none;
+  font-size: 14px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.view-btn {
+  background-color:none; 
+  color: #1e40af;
+}
+
+.view-btn:hover {
+  background-color: #dbe8f8; 
+
+}
+
+.edit-btn {
+  background-color:none; 
+  color: #039b54; 
+}
+
+.edit-btn:hover {
+  background-color: #e1faee; 
+}
+
+.delete-btn {
+  background-color: none; 
+  color: #b30606; 
+}
+
+.delete-btn:hover {
+  background-color: #ffe8e8; 
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 
 @media (max-width: 768px) {
     .table-wrapper {

@@ -15,19 +15,19 @@
 
 .breadcrumb {
   position: fixed;
-  top: 100px;
+  top: 80px;
   left: 0;
   right: 0;
   z-index: 999;
   background-color: #fff;
-  padding: 8px 20px;
+  padding: 1px 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .main-area {
   display: flex;
   flex: 1;
-  margin-top: 160px;
+  margin-top: 130px;
   height: calc(100vh - 110px);
   background-color: #e4e4e4;
   overflow: hidden;
@@ -43,7 +43,7 @@
 
 .dashboard-content {
   flex: 1;
-  padding: 1rem;
+  padding: 8px;
   overflow-y: auto;
 }
 
@@ -164,13 +164,13 @@
 
   .breadcrumb{
    top:80px;
+   
   }
 }
 
 @media screen and (max-width: 768px) {
   .sidebar {
     position: fixed;
-    top: 160px;
     left: 0;
     width: 240px;
     height: calc(100vh - 100px);
@@ -190,6 +190,7 @@
   }
 
   .main-area {
+    margin-top: 130px;
     flex-direction: column;
     position: relative;
   }

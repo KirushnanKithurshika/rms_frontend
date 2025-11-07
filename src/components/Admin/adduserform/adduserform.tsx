@@ -4,10 +4,27 @@ import { FaArrowLeft, FaChevronDown, FaUpload, FaCheckCircle } from "react-icons
 
 interface AddUserFormProps {
   onClose: () => void;
+  mode?: 'create' | 'edit';
+  initial?: {
+    id?: number;
+    username?: string;
+    fullName?: string;
+    email?: string;
+    roleName?: string;
+    roleId?: number;
+  } | null;
   onCreate?: (user: {
     username: string;
     password: string;
     roleId: number;
+    fullName?: string;
+    email?: string;
+  }) => void;
+  onUpdate?: (user: {
+    id?: number;
+    username?: string;
+    roleId?: number | null;
+    roleLabel?: string;
     fullName?: string;
     email?: string;
   }) => void;
@@ -33,7 +50,7 @@ const FALLBACK_ROLES: Role[] = [
   { id: 12, label: "PROGRAM_COORDINATOR" },
 ];
 
-const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
+const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate, onUpdate, mode = 'create', initial }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -52,6 +69,19 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
 
   const selectedRoleLabel =
     roles.find((r) => r.id === selectedRoleId)?.label ?? "Select a role";
+
+  // Prefill when editing
+  useEffect(() => {
+    if (!initial) return;
+    if (initial.username) setUsername(initial.username);
+    if (initial.fullName) setFullName(initial.fullName);
+    if (initial.email) setEmail(initial.email);
+    if (initial.roleId) setSelectedRoleId(initial.roleId);
+    else if (initial.roleName) {
+      const match = roles.find(r => r.label.toUpperCase() === String(initial.roleName).toUpperCase());
+      if (match) setSelectedRoleId(match.id);
+    }
+  }, [initial, roles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -74,16 +104,20 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
   };
 
   const handleSubmit = () => {
-    if (!username || !password || !selectedRoleId) {
+    if (!username || (!password && mode === 'create') || !selectedRoleId) {
       alert("Please fill required fields");
       return;
     }
 
     setSubmitting(true);
 
-    // just simulate success
+    // simulate success
     setTimeout(() => {
-      onCreate?.({ username, password, roleId: selectedRoleId, fullName, email });
+      if (mode === 'edit') {
+        onUpdate?.({ id: initial?.id, username, roleId: selectedRoleId, roleLabel: selectedRoleLabel, fullName, email });
+      } else {
+        onCreate?.({ username, password, roleId: selectedRoleId, fullName, email });
+      }
 
       setUsername("");
       setPassword("");
@@ -95,7 +129,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
 
       setSubmitting(false);
       onClose();
-    }, 1000);
+    }, 600);
   };
 
   return (
@@ -105,7 +139,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           <button type="button" className="add-user-back-btn" onClick={onClose}>
             <FaArrowLeft className="add-user-back-icon" />
           </button>
-          <span className="add-user-title">Add Staff User</span>
+          <span className="add-user-title">{mode === 'edit' ? 'Edit User' : 'Add Staff User'}</span>
         </div>
 
         {/* File Upload */}
@@ -142,7 +176,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
 
         {/* Manual Form */}
         <div className="add-user-divider">
-          <span className="add-user-divider-title">Add manually</span>
+          <span className="add-user-divider-title">{mode === 'edit' ? 'Edit manually' : 'Add manually'}</span>
           <FaChevronDown className="add-user-divider-arrow open" />
         </div>
 
@@ -158,7 +192,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
           </div>
 
           <div className="add-user-form-group">
-            <label className="add-user-label">Password</label>
+            <label className="add-user-label">Password{mode === 'edit' ? ' (leave blank to keep)' : ''}</label>
             <input
               type="password"
               className="add-user-input"
@@ -225,7 +259,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate }) => {
             onClick={handleSubmit}
             disabled={submitting || !selectedRoleId}
           >
-            {submitting ? "Creating..." : "Create"}
+            {submitting ? (mode === 'edit' ? 'Saving...' : 'Creating...') : (mode === 'edit' ? 'Save changes' : 'Create')}
           </button>
           <button
             type="button"

@@ -269,7 +269,7 @@ const AuditLogTable: React.FC = () => {
 
 
     return (
-        <div className="auditlog-card" style={{ background: "#f0f2f5", borderRadius: 12, padding: 10 }}>
+        <div className="cardcourse" >
             <div className="audit-filters" style={{ marginBottom: 12 }}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontSize: 12, color: "#666" }}>Name</span>
@@ -356,7 +356,6 @@ const AuditLogTable: React.FC = () => {
                 </Space>
             </div>
 
-            {/* Table */}
             <Table<AuditLog>
                 rowKey="id"
                 dataSource={data}

@@ -3,7 +3,6 @@ import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import AdminSidebar from '../../../components/Admin/adminsidebar/adminsidebar.tsx';
 import RolesPanel from '../../../components/Admin/rolescomponent/rolecomponent.tsx';
-import RolePrivilegesTable from '../../../components/Admin/rolepreviliagetable/rolepreviliagetable.tsx';
 import './rolemanagement.css';
 
 
@@ -43,9 +42,9 @@ const RoleManagement: React.FC = () => {
                     <div className="dashboard-cards">
 
                         <div className="cardcourse">
+                            <h3 className="user-management-header">Roles</h3>
                             <div className="roles-page-container">
                                 <RolesPanel />
-                                <RolePrivilegesTable />
                             </div>
                         </div>
                     </div>

@@ -1,66 +1,55 @@
 
 .roles-container {
-  width: 250px;
-  background-color: #1b4b7a; 
-  border-radius: 4px;
-  overflow: hidden;
+  width: 100%;
+  background: transparent;
   font-family: Arial, sans-serif;
 }
 
 
-.roles-subheader {
-  background-color: #2ea3b5;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  color: white;
-  font-weight: bold;
+.roles-subheader { display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px; }
+.roles-subheader .left-group { display:flex; align-items:center; gap:8px; }
+.roles-subheader .right-group { display:flex; align-items:center; gap:8px; }
+
+.new-role-btn { background: #e5e7eb; color:#0a2558; border:1px solid #cbd5e1; border-radius: 6px; padding: 8px 14px; cursor:pointer; font-weight:600; font-size:13px; transition: .15s; }
+.new-role-btn:hover { background:#dbeafe; border-color:#bfdbfe; }
+.new-role-btn.primary { background:#0a2558; color:#fff; border-color:#0a2558; }
+.new-role-btn.primary:hover { background:#0b4c72; border-color:#1d4ed8; }
+
+
+
+.roles-table-wrapper {
+  background:#fff; border:1px solid #e5e7eb; border-radius:6px;
 }
 
-.new-role-btn {
-  background-color: white;
-  color: #0d336c;
-  border: 1px solid #919191;
-  border-radius: 20px;
-  padding: 6px 15px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  transition: 0.2s;
+/* NEW: local scroll only for the table area */
+.roles-table-scroll {
+  overflow:auto;                /* enables local scroll (x & y) */
+  max-inline-size:100%;
+  overscroll-behavior:contain;  /* prevents page from being pulled with it */
 }
 
-.new-role-btn:hover {
-  color: white;
-  background-color: #787878;
-  border: 1px solid white;
-}
-
-
-.roles-list {
-  background-color: white;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.role-item {
-  font-size: 13px;
-  color: rgb(182, 107, 15);
-  padding: 8px 12px;
-  border-bottom: 1px solid #e0e0e0;
-  cursor: pointer;
+/* Table sizing: allow horizontal scroll when too wide */
+.roles-table {
   text-align: left;
-  transition: background-color 0.2s, color 0.2s;
+  border-collapse:collapse;
+  min-width: 840px;             /* set your natural width here */
+  width: max(100%, 840px);      /* fill container but keep min width */
 }
 
-.role-item:not(.active-role):hover {
-  background-color: #f2f2f2;
-}
-.active-role {
-  background-color: #1b4b7a; 
-  color: white;
-  font-weight: bold;
-}
+/* Optional: limit table height to keep header visible and add y-scroll */
+.roles-table-scroll--tall { max-block-size: 60vh; }
+
+/* Your existing styles */
+
+
+
+.priv-cell { max-width: 420px; }              
+.priv-chips { display:flex; gap:8px; flex-wrap:wrap; max-width:100%; }
+
+
+
+html, body { overflow-x: clip; } 
+
 
 
 .modal-overlay {
@@ -79,7 +68,7 @@
 .modal-content {
   background: white;
   padding: 20px;
-  width: 300px;
+  width: 580px;
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -94,7 +83,7 @@
 }
 
 .modal-content input {
-  width: 90%;
+  width: 95%;
   padding: 8px;
   margin: 5px 0 20px 0;
   border: 1px solid #ccc;
@@ -142,6 +131,12 @@
   background-color: #ccc;
   color: black;
 }
+
+/* privilege picker in modal */
+.privileges-picker { text-align: left; margin: 10px 4px 0 4px; }
+.picker-header { font-weight: 600; color: #374151; margin-bottom: 6px; }
+.picker-body { max-height: 360px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.priv-item { display: flex; align-items: center; gap: 8px; font-size: 12px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 999px; padding: 6px 10px; }
 /* rolecomponent.css additions */
 .error-text {
   margin-top: 8px;
@@ -163,3 +158,107 @@
   font-size: 12px;
 }
 
+/* ---------- Table sizing & local scroll ---------- */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;           /* local, not page-level */
+  overscroll-behavior: contain;
+}
+
+.user-table.user-table--roles {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 1000px;          /* prevents layout jump on narrow screens */
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #0a2558;
+}
+
+/* Column widths for the 4 columns: ID, Name, Privileges, Actions */
+.user-table--roles th:nth-child(1),
+.user-table--roles td:nth-child(1) { width: 80px;  }
+.user-table--roles th:nth-child(2),
+.user-table--roles td:nth-child(2) { width: 220px; }
+.user-table--roles th:nth-child(4),
+.user-table--roles td:nth-child(4) { width: 120px; }
+
+/* ---------- Header look ---------- */
+.user-table thead {
+  position: sticky;           /* stays visible if wrapper gets tall */
+  top: 0;
+  z-index: 2;
+}
+
+.user-table thead th {
+  background: #1b4b7a;
+  color: #ffffff;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid #153a5c;
+  white-space: nowrap;
+}
+
+/* Optional subtle gradient head */
+.user-table--roles thead th {
+  background: linear-gradient(180deg, #1b4b7a 0%, #173f68 100%);
+}
+
+/* ---------- Body cells ---------- */
+.user-table th,
+.user-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e5e5;
+  vertical-align: middle;
+}
+
+.user-table tbody tr:nth-child(even) { background-color: #f5f7fa; }
+.user-table tbody tr:nth-child(odd)  { background-color: #ffffff; }
+.user-table tbody tr:hover           { background: #f0f4ff; }
+
+/* Text treatments */
+.user-table--roles td:nth-child(1) { color: #153a5c; font-weight: 600; }  /* ID */
+.user-table--roles td:nth-child(2) { font-weight: 600; }                  /* Name */
+
+/* Long text handling for Name/Privileges */
+.user-table--roles td:nth-child(2),
+.user-table--roles td:nth-child(3) {
+  max-width: 100%;
+}
+.user-table--roles .truncate {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Privileges chip row (fits your theme) */
+.priv-chips { display: flex; gap: 8px; flex-wrap: wrap; max-width: 100%; }
+.chip {
+  background: #eef2f7;
+  color: #334155;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+/* Actions column */
+.actions-col, .user-table--roles td.actions-col,
+.user-table--roles td:nth-child(4) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+/* Keep the page itself from sideways scrollbars on tiny screens */
+html, body { overflow-x: clip; }
+
+/* Responsive tweak: allow table to breathe on phones */
+@media (max-width: 768px) {
+  .user-table { font-size: 12px; }
+  .user-table thead th { padding: 8px 10px; }
+}
