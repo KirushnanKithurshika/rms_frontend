@@ -59,13 +59,20 @@ const NotAuthorized = () => (
 // ==========================================================
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
-
 import CourseHistory from "./pages/lectures/History/History";
-import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
 import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
+import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
+
+// Academic Setup (with nested tabs)
+import AcademicSetup from "./pages/Admin/academicsetupLayout/academicsetup";
+import UniversitiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/University";
+import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/FacultyTable";
+import DepartmentsTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/DepartmentTable";
+import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/SemesterTable";
+import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 
 function App() {
   return (
