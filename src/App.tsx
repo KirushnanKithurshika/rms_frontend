@@ -147,9 +147,17 @@ function App() {
             path="/admin/student-management"
             element={<StudentManagement />}
           />
+          <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
           <Route path="/admin/audit-logs" element={<AuditLog />} />
         </Route>
-
+          <Route path="/admin/academicsetup" element={<AcademicSetup />}>
+            <Route index element={<Navigate to="universities" replace />} />
+            <Route path="universities" element={<UniversitiesTable />} />
+            <Route path="faculties" element={<FacultiesTable />} />
+            <Route path="departments" element={<DepartmentsTable />} />
+            <Route path="semesters" element={<SemestersTable />} />
+            <Route path="batches" element={<BatchesTable/>} />
+          </Route>
         {/* ------------------ FALLBACK ------------------ */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

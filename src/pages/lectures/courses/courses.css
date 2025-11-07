@@ -1,9 +1,5 @@
 .cardcourse {
-<<<<<<< HEAD
   min-height:calc(100dvh - 180px);
-=======
-  min-height: 100vh;
->>>>>>> dev_kithu
   flex: 1 1 200px;
   background-color: #fff;
   border-radius: 10px;

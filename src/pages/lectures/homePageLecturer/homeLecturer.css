@@ -43,11 +43,7 @@
 
 .dashboard-content {
   flex: 1;
-<<<<<<< HEAD
-  padding: 8px;
-=======
   padding: 5px;
->>>>>>> dev_kithu
   overflow-y: auto;
 }
 
@@ -175,11 +171,7 @@
 @media screen and (max-width: 768px) {
   .sidebar {
     position: fixed;
-<<<<<<< HEAD
     left: 0;
-=======
-   left: 0;
->>>>>>> dev_kithu
     width: 240px;
     height: calc(100vh - 100px);
     background-color: #fff;
@@ -198,11 +190,8 @@
   }
 
   .main-area {
-<<<<<<< HEAD
+
     margin-top: 130px;
-=======
-    margin-top: 140px;
->>>>>>> dev_kithu
     flex-direction: column;
     position: relative;
   }
