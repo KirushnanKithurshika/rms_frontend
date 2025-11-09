@@ -1,41 +1,27 @@
-// SemesterTable.tsx
+﻿// SemesterTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
-import {
-  FaSearch,
-  FaPlus,
-  FaTimes,
-  FaSort,
-  FaSortUp,
-  FaSortDown,
-  FaEye,
-} from "react-icons/fa";
+import api from "../../../../services/api";
+import { FaSearch, FaPlus, FaSort, FaSortUp, FaSortDown, FaEye, FaTimes } from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
-import "./table.css"; // reuses the same shared styles/classes
+import "./table.css";
 
-type Semester = {
+// Matches backend response fields
+export type Semester = {
   id: number;
-  code: string;            // e.g., "Y1S1"
-  name: string;            // e.g., "Semester 1"
-  academicYear: string;    // e.g., "2025/2026"
-  startDate: string;       // ISO or display string
-  endDate: string;         // ISO or display string
-  status?: "Upcoming" | "Active" | "Completed";
-  coordinator?: string;
+  name: string;
+  year: number;
+  number: number;
+  batchId: number;
 };
 
-const SAMPLE_SEMESTERS: Semester[] = [
-  { id: 1, code: "Y1S1", name: "Semester 1", academicYear: "2025/2026", startDate: "2025-08-12", endDate: "2025-12-05", status: "Upcoming", coordinator: "Dr. N. Fernando" },
-  { id: 2, code: "Y1S2", name: "Semester 2", academicYear: "2025/2026", startDate: "2026-01-10", endDate: "2026-05-20", status: "Upcoming", coordinator: "Dr. H. Jayawardena" },
-  { id: 3, code: "Y2S1", name: "Semester 3", academicYear: "2024/2025", startDate: "2024-08-14", endDate: "2024-12-06", status: "Completed", coordinator: "Dr. S. Gunasekara" },
-  { id: 4, code: "Y2S2", name: "Semester 4", academicYear: "2024/2025", startDate: "2025-01-08", endDate: "2025-05-22", status: "Completed", coordinator: "Prof. T. Perera" },
-  { id: 5, code: "Y3S1", name: "Semester 5", academicYear: "2025/2026", startDate: "2025-08-12", endDate: "2025-12-05", status: "Upcoming", coordinator: "Dr. R. Wijesinghe" },
-];
+type SortKey = keyof Pick<Semester, "name" | "year" | "number" | "batchId">;
 
-type SortKey = keyof Pick<
-  Semester,
-  "code" | "name" | "academicYear" | "startDate" | "endDate" | "status" | "coordinator"
->;
+type SemesterCreatePayload = {
+  name: string;
+  year: number;
+  number: number;
+  batchId: number;
+};
 
 function useDraggable() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -67,200 +53,327 @@ export default function SemesterTable() {
   const [rows, setRows] = useState<Semester[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [sortBy, setSortBy] = useState<SortKey>("code");
+  const searchRef = useRef<HTMLInputElement | null>(null);
+
+  // server paging (0-based)
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
 
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-
-  const [editing, setEditing] = useState<Semester | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [viewing, setViewing] = useState<Semester | null>(null);
+  // view + delete + create
+  const [viewing, setViewing] = useState<any>(null);
+  const [viewingError, setViewingError] = useState<string | null>(null);
   const viewDrag = useDraggable();
+  const [showDelete, setShowDelete] = useState(false);
+  const [toDelete, setToDelete] = useState<Semester | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [creatingError, setCreatingError] = useState<string | null>(null);
+  const [savingCreate, setSavingCreate] = useState(false);
+  const [editing, setEditing] = useState<Semester | null>(null);
+  const [editingError, setEditingError] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // Delete modal state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [semesterToDelete, setSemesterToDelete] = useState<Semester | null>(null);
-
+  // Load a page from backend
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get<Semester[]>("/api/semesters");
-        setRows(Array.isArray(data) && data.length ? data : SAMPLE_SEMESTERS);
+        const res = await api.get(`/v1/semesters/GetAll?page=${page}&size=${pageSize}`);
+        const payload: any = res?.data?.data;
+        const content = Array.isArray(payload?.content) ? payload.content : [];
+        const mapped: Semester[] = content.map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          year: s.year,
+          number: s.number,
+          batchId: s.batchId,
+        }));
+        setRows(mapped.slice().sort((a, b) => a.id - b.id));
+        setTotalPages(Number(payload?.totalPages ?? 1));
       } catch {
-        setRows(SAMPLE_SEMESTERS);
+        setRows([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [page, pageSize, reloadKey]);
 
+  // client filter + sort within current page
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
     const f = t
       ? rows.filter((r) =>
-          [
-            r.code,
-            r.name,
-            r.academicYear,
-            r.startDate,
-            r.endDate,
-            r.status,
-            r.coordinator,
-          ]
-            .filter(Boolean)
+          [r.name, r.year, r.number, r.batchId]
+            .filter((v) => v !== undefined && v !== null)
             .some((v) => String(v).toLowerCase().includes(t))
         )
       : rows;
 
+    if (!sortBy) return f;
+
     const s = [...f].sort((a, b) => {
-      const av = (a[sortBy] ?? "").toString().toLowerCase();
-      const bv = (b[sortBy] ?? "").toString().toLowerCase();
-      if (av < bv) return sortAsc ? -1 : 1;
-      if (av > bv) return sortAsc ? 1 : -1;
+      const av = a[sortBy] as any;
+      const bv = b[sortBy] as any;
+      if (typeof av === "number" && typeof bv === "number") {
+        return sortAsc ? av - bv : bv - av;
+      }
+      const as = String(av ?? "").toLowerCase();
+      const bs = String(bv ?? "").toLowerCase();
+      if (as < bs) return sortAsc ? -1 : 1;
+      if (as > bs) return sortAsc ? 1 : -1;
       return 0;
     });
 
     return s;
   }, [rows, q, sortBy, sortAsc]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const view = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const view = filtered; // backend already paginates
 
   const toggleSort = (key: SortKey) => {
     if (key === sortBy) setSortAsc((v) => !v);
-    else {
-      setSortBy(key);
-      setSortAsc(true);
-    }
+    else { setSortBy(key); setSortAsc(true); }
   };
 
-  const sortIcon = (key: SortKey) =>
-    sortBy !== key ? <FaSort /> : sortAsc ? <FaSortUp /> : <FaSortDown />;
+  const sortIcon = (key: SortKey) => (sortBy !== key ? <FaSort /> : sortAsc ? <FaSortUp /> : <FaSortDown />);
 
-  // Delete modal handlers
-  const askDelete = (s: Semester) => {
-    setSemesterToDelete(s);
-    setShowDeleteModal(true);
-  };
-
-  const closeDeleteModal = () => {
-    setShowDeleteModal(false);
-    setSemesterToDelete(null);
-  };
-
-  const confirmDelete = async () => {
-    if (!semesterToDelete) return;
+  // view details
+  const handleView = async (id: number) => {
+    setViewingError(null);
     try {
-      await axios.delete(`/api/semesters/${semesterToDelete.id}`);
-    } catch {
-      return; // optionally toast error
+      const res = await api.get(`/v1/semesters/GetById/${id}`);
+      const data = res?.data?.data ?? res?.data;
+      if (data) {
+        setViewing(data);
+        return;
+      }
+      throw new Error("Empty response");
+    } catch (e: any) {
+      const local = rows.find((x) => x.id === id) || null;
+      if (local) setViewing(local);
+      const d = e?.response?.data;
+      const msg = (d?.message || (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) || d?.error || e?.message || "An unexpected error occurred");
+      setViewingError(String(msg));
     }
-    setRows((r) => r.filter((x) => x.id !== semesterToDelete.id));
-    closeDeleteModal();
   };
 
-  const handleCreate = async (payload: Omit<Semester, "id">) => {
-    const { data } = await axios.post<Semester>("/api/semesters", payload);
-    setRows((r) => [data, ...r]);
-    setCreating(false);
+  // delete
+  const askDelete = (s: Semester) => { setToDelete(s); setDeleteError(null); setShowDelete(true); };
+  const closeDelete = () => { setShowDelete(false); setToDelete(null); };
+  const confirmDelete = async () => {
+    if (!toDelete) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await api.delete(`/v1/semesters/Delete/${toDelete.id}`);
+      if (res && res.status >= 200 && res.status < 300) {
+        setRows((prev) => prev.filter((x) => x.id !== toDelete.id));
+        closeDelete();
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
+      setDeleteError(String(msg));
+    } finally {
+      setDeleting(false);
+    }
   };
 
-  const handleUpdate = async (id: number, payload: Omit<Semester, "id">) => {
-    const { data } = await axios.put<Semester>(`/api/semesters/${id}`, payload);
-    setRows((r) => r.map((x) => (x.id === id ? data : x)));
-    setEditing(null);
+  // create
+  // open edit with fresh details
+  const handleOpenEdit = async (id: number) => {
+    setEditingError(null);
+    try {
+      const res = await api.get(`/v1/semesters/GetById/${id}`);
+      const d = res?.data?.data ?? res?.data;
+      if (d) {
+        const mapped: Semester = { id: d.id, name: d.name, year: d.year, number: d.number, batchId: d.batchId ?? (d.batch?.id ?? 0) };
+        setEditing(mapped);
+        return;
+      }
+      throw new Error('Empty response');
+    } catch (e: any) {
+      const local = rows.find((x) => x.id === id) || null;
+      if (local) setEditing(local);
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined) || data?.error || e?.message || 'An unexpected error occurred');
+      setEditingError(String(msg));
+    }
   };
 
-  useEffect(() => {
-    setPage(1);
-  }, [q]);
+  // update
+  const handleUpdate = async (id: number, payload: SemesterCreatePayload) => {
+    setEditingError(null);
+    setSavingEdit(true);
+    const body: SemesterCreatePayload = {
+      name: payload.name.trim(),
+      year: Number(payload.year),
+      number: Number(payload.number),
+      batchId: Number(payload.batchId),
+    };
+    try {
+      const res = await api.put(`/v1/semesters/Update/${id}`, body);
+      const d = res?.data?.data ?? res?.data;
+      if (res && res.status >= 200 && res.status < 300) {
+        if (d) {
+          const mapped: Semester = {
+            id: d.id,
+            name: d.name,
+            year: d.year,
+            number: d.number,
+            batchId: d.batchId ?? (d.batch?.id ?? body.batchId),
+          };
+          setRows((prev) => prev
+            .map((x) => (x.id === id ? mapped : x))
+            .slice()
+            .sort((a, b) => a.id - b.id)
+          );
+        }
+        setEditing(null);
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined) || data?.error || e?.message || 'An unexpected error occurred');
+      setEditingError(String(msg));
+    } finally {
+      setSavingEdit(false);
+    }
+  }; 
+  const handleCreate = async (payload: SemesterCreatePayload) => {
+    setCreatingError(null);
+    setSavingCreate(true);
+    const body: SemesterCreatePayload = {
+      name: payload.name.trim(),
+      year: Number(payload.year),
+      number: Number(payload.number),
+      batchId: Number(payload.batchId),
+    };
+    try {
+      const res = await api.post(`/v1/semesters/Create`, body);
+      if (res && res.status >= 200 && res.status < 300) {
+        setCreating(false);
+        setReloadKey((k) => k + 1);
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
+      setCreatingError(String(msg));
+    } finally {
+      setSavingCreate(false);
+    }
+  };
 
   return (
     <div>
-      {/* Toolbar (reusing your common classes) */}
+      {/* Top toolbar (shared classes) */}
       <div className="user-management-header">
         <div className="custom-searchbar">
           <input
+            ref={searchRef}
             type="text"
-            placeholder="Search…"
+            placeholder="Search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <FaSearch className="search-icon" />
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Search"
+            title="Search"
+            onClick={() => {
+              const val = searchRef.current?.value ?? "";
+              setQ(val.trim());
+              searchRef.current?.focus();
+            }}
+            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+          >
+            <FaSearch className="search-icon" />
+          </button>
         </div>
 
         <div className="filters">
-          <button className="add-user-btn" onClick={() => setCreating(true)}>
+          <label className="app-field" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span className="app-label">Page</span>
+            <input
+              className="app-input"
+              type="number"
+              min={0}
+              value={page}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setPage(Number.isFinite(v) && v >= 0 ? v : 0);
+              }}
+              style={{ width: 90 }}
+            />
+          </label>
+
+          <label className="app-field" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
+            <span className="app-label">Size</span>
+            <select
+              className="app-input"
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+              style={{ width: 110 }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </label>
+
+          <button className="add-user-btn" onClick={() => setCreating(true)} style={{ marginLeft: 8 }}>
             <FaPlus style={{ marginRight: 6 }} />
             Add Semester
           </button>
         </div>
       </div>
 
-      {/* Table (reusing classes) */}
+      {/* Table */}
       <div className="table-wrapper">
         <table className="user-table">
           <thead>
             <tr>
               <th>Id</th>
-              <th onClick={() => toggleSort("code")}>
-                Semester ID {sortIcon("code")}
-              </th>
-              <th onClick={() => toggleSort("name")}>
-                Name {sortIcon("name")}
-              </th>
-              <th onClick={() => toggleSort("academicYear")}>
-                Academic Year {sortIcon("academicYear")}
-              </th>
-              <th onClick={() => toggleSort("startDate")}>
-                Start Date {sortIcon("startDate")}
-              </th>
-              <th onClick={() => toggleSort("endDate")}>
-                End Date {sortIcon("endDate")}
-              </th>
-              <th onClick={() => toggleSort("status")}>
-                Status {sortIcon("status")}
-              </th>
-              <th onClick={() => toggleSort("coordinator")}>
-                Coordinator {sortIcon("coordinator")}
-              </th>
+              <th onClick={() => toggleSort("name")}>Name {sortIcon("name")}</th>
+              <th onClick={() => toggleSort("year")}>Year {sortIcon("year")}</th>
+              <th onClick={() => toggleSort("number")}>Number {sortIcon("number")}</th>
+              <th onClick={() => toggleSort("batchId")}>Batch Id {sortIcon("batchId")}</th>
               <th>Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={9}>Loading…</td>
+                <td colSpan={6}>Loading...</td>
               </tr>
             )}
 
             {!loading && view.length === 0 && (
               <tr>
-                <td colSpan={9}>No data</td>
+                <td colSpan={6}>No data</td>
               </tr>
             )}
 
             {!loading &&
-              view.map((s, i) => (
+              view.map((s) => (
                 <tr key={s.id}>
-                  <td>{(page - 1) * pageSize + i + 1}</td>
-                  <td>{s.code}</td>
+                  <td>{s.id}</td>
                   <td>{s.name}</td>
-                  <td>{s.academicYear}</td>
-                  <td>{s.startDate}</td>
-                  <td>{s.endDate}</td>
-                  <td>{s.status || "-"}</td>
-                  <td>{s.coordinator || "-"}</td>
+                  <td>{s.year}</td>
+                  <td>{s.number}</td>
+                  <td>{s.batchId}</td>
                   <td className="actions">
-                    <button className="icon-btn" title="View" onClick={() => setViewing(s)}>
+                    <button className="icon-btn" title="View" onClick={() => handleView(s.id)}>
                       <FaEye className="icon view-icon" />
                     </button>
-                    <button className="icon-btn" title="Edit" onClick={() => setEditing(s)}>
-                      <MdEdit className="icon edit-icon" />
-                    </button>
+                    <button className="icon-btn" title="Edit" onClick={() => handleOpenEdit(s.id)}><MdEdit className="icon edit-icon" /></button>
                     <button className="icon-btn" title="Delete" onClick={() => askDelete(s)}>
                       <MdDelete className="icon delete-icon" />
                     </button>
@@ -269,35 +382,22 @@ export default function SemesterTable() {
               ))}
           </tbody>
         </table>
+
+        {/* Pager */}
+        <div className="table-footer">
+          <div />
+          <div className="pager">
+            <button disabled={page <= 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>Prev</button>
+            <span style={{ margin: "0 8px" }}>Page {page + 1} of {totalPages} | Size {pageSize}</span>
+            <button disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</button>
+          </div>
+        </div>
       </div>
 
-      {/* Create modal */}
-      {creating && (
-        <AppFormModal
-          title="Add Semester"
-          initial={{}}
-          onCancel={() => setCreating(false)}
-          onSubmit={(payload) => handleCreate(payload)}
-        />
-      )}
-
-      {/* Edit modal */}
-      {editing && (
-        <AppFormModal
-          title="Edit Semester"
-          initial={editing}
-          onCancel={() => setEditing(null)}
-          onSubmit={(payload) => handleUpdate(editing.id, payload)}
-        />
-      )}
-
+      {/* View modal */}
       {viewing && (
-        <div className="app-modal-backdrop" onClick={() => setViewing(null)} role="dialog" aria-modal="true">
-          <div
-            className="app-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
-          >
+        <div className="app-modal-backdrop" role="dialog" aria-modal="true">
+          <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}>
             <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
               <h3 className="app-modal__title">Semester Details</h3>
               <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
@@ -305,15 +405,62 @@ export default function SemesterTable() {
               </button>
             </div>
             <div className="app-form" style={{ paddingTop: 0 }}>
+              {viewingError && (
+                <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
+                  {viewingError}
+                </div>
+              )}
               <div className="app-grid">
-                <div className="app-field"><span className="app-label">Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.code}</div></div>
-                <div className="app-field"><span className="app-label">Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
-                <div className="app-field"><span className="app-label">Academic Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.academicYear}</div></div>
-                <div className="app-field"><span className="app-label">Start Date</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.startDate}</div></div>
-                <div className="app-field"><span className="app-label">End Date</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.endDate}</div></div>
-                <div className="app-field"><span className="app-label">Status</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.status || '-'}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">Coordinator</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.coordinator || '-'}</div></div>
+                <div className="app-field"><span className="app-label">Id</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.id)}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
+                <div className="app-field"><span className="app-label">Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.year}</div></div>
+                <div className="app-field"><span className="app-label">Number</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.number}</div></div>
+                <div className="app-field"><span className="app-label">Batch Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batchId ?? viewing.batch?.id ?? '-'}</div></div>
+
+                {viewing.batch && (
+                  <>
+                    <div className="app-field app-grid--2"><span className="app-label">Batch Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.name}</div></div>
+                    <div className="app-field"><span className="app-label">Batch Start Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.startYear}</div></div>
+                    <div className="app-field"><span className="app-label">Batch Duration Years</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.durationYears}</div></div>
+                  </>
+                )}
+
+                {viewing.batch?.faculty && (
+                  <>
+                    <div className="app-field"><span className="app-label">Faculty Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.id}</div></div>
+                    <div className="app-field"><span className="app-label">Faculty Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.code}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">Faculty Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.facultyName}</div></div>
+                    <div className="app-field"><span className="app-label">Degree Title</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.degreeTitle || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Short Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.shortName || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.email || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.phone || '-'}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.website || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Faculty Active</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.batch.faculty.active ?? true)}</div></div>
+                  </>
+                )}
+
+                {viewing.batch?.faculty?.university && (
+                  <>
+                    <div className="app-field"><span className="app-label">University Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.id}</div></div>
+                    <div className="app-field"><span className="app-label">University Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.code}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">University Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.name}</div></div>
+                    <div className="app-field"><span className="app-label">Short Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.shortName || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.email || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.phone || '-'}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.website || '-'}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">Address Line 1</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.addressLine1 || '-'}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">Address Line 2</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.addressLine2 || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">City</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.city || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">State</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.state || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Country</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.country || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Postal Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.postalCode || '-'}</div></div>
+                    <div className="app-field"><span className="app-label">Established Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.establishedYear ?? '-'}</div></div>
+                    <div className="app-field app-grid--2"><span className="app-label">Logo</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.logoUrl ? <img src={viewing.batch.faculty.university.logoUrl} alt="logo" style={{maxHeight:50}} /> : '-'}</div></div>
+                    <div className="app-field"><span className="app-label">University Active</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.batch.faculty.university.active ?? true)}</div></div>
+                  </>
+                )}
               </div>
+
               <div className="app-modal__actions">
                 <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>
               </div>
@@ -322,53 +469,51 @@ export default function SemesterTable() {
         </div>
       )}
 
-      {/* Delete confirmation modal (uses your common modal classes) */}
-      {showDeleteModal && (
-        <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-title"
-          onClick={closeDeleteModal}
-        >
-          <div
-            className="modal"
-            role="document"
-            onClick={(e) => e.stopPropagation()}
-            tabIndex={-1}
-          >
+      {/* Create modal */}
+      {/* Edit modal */}
+      {editing && (
+        <SemesterFormModal
+          title="Edit Semester"
+          initial={{ name: editing.name, year: editing.year, number: editing.number, batchId: editing.batchId }}
+          onCancel={() => setEditing(null)}
+          onSubmit={(payload) => handleUpdate(editing.id, payload)}
+          error={editingError ?? undefined}
+          saving={savingEdit}
+        />
+      )}
+      {creating && (
+        <SemesterFormModal
+          title="Add Semester"
+          onCancel={() => setCreating(false)}
+          onSubmit={(payload) => handleCreate(payload)}
+          error={creatingError ?? undefined}
+          saving={savingCreate}
+        />
+      )}
+
+      {/* Delete confirmation modal */}
+      {showDelete && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
             <div className="modal-header">
               <h4 id="delete-title">Delete Semester</h4>
-              <button
-                className="close-btn"
-                aria-label="Close"
-                onClick={closeDeleteModal}
-              >
-                ×
-              </button>
+              <button className="close-btn" aria-label="Close" onClick={closeDelete}>A-</button>
             </div>
             <div className="modal-body">
               <p className="modal-body">
-                {semesterToDelete ? (
-                  <>
-                    Are you sure you want to delete{" "}
-                    <strong>
-                      {semesterToDelete.code} — {semesterToDelete.name}
-                    </strong>
-                    ?
-                  </>
+                {toDelete ? (
+                  <>Are you sure you want to delete <strong>{toDelete.name}</strong>?</>
                 ) : (
                   "Are you sure you want to delete this semester?"
                 )}
               </p>
+              {deleteError && (
+                <div className="app-error" style={{ color: '#b91c1c' }}>{deleteError}</div>
+              )}
             </div>
             <div className="modal-footer">
-              <button className="btn-delete danger" onClick={confirmDelete}>
-                Delete
-              </button>
-              <button className="btn-delete ghost" onClick={closeDeleteModal}>
-                Cancel
-              </button>
+              <button className="btn-delete danger" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete'}</button>
+              <button className="btn-delete ghost" onClick={closeDelete} disabled={deleting}>Cancel</button>
             </div>
           </div>
         </div>
@@ -377,55 +522,39 @@ export default function SemesterTable() {
   );
 }
 
-/** Reusable modal with the same app-* classes */
-function AppFormModal({
+function SemesterFormModal({
   title,
   initial,
   onCancel,
   onSubmit,
+  error,
+  saving,
 }: {
   title: string;
-  initial?: Partial<Omit<Semester, "id">>;
+  initial?: Partial<SemesterCreatePayload>;
   onCancel: () => void;
-  onSubmit: (payload: Omit<Semester, "id">) => void;
+  onSubmit: (payload: SemesterCreatePayload) => void;
+  error?: string;
+  saving?: boolean;
 }) {
   const drag = useDraggable();
-  const [code, setCode] = useState(initial?.code ?? "");
   const [name, setName] = useState(initial?.name ?? "");
-  const [academicYear, setAcademicYear] = useState(initial?.academicYear ?? "");
-  const [startDate, setStartDate] = useState(initial?.startDate ?? "");
-  const [endDate, setEndDate] = useState(initial?.endDate ?? "");
-  const [status, setStatus] = useState<Semester["status"]>(
-    initial?.status ?? "Upcoming"
-  );
-  const [coordinator, setCoordinator] = useState(initial?.coordinator ?? "");
+  const [year, setYear] = useState<number | "">(initial?.year ?? "");
+  const [number, setNumber] = useState<number | "">(initial?.number ?? "");
+  const [batchId, setBatchId] = useState<number | "">(initial?.batchId ?? "");
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      code,
       name,
-      academicYear,
-      startDate,
-      endDate,
-      status,
-      coordinator,
+      year: Number(year),
+      number: Number(number),
+      batchId: Number(batchId),
     });
   };
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onCancel]);
-
   return (
-    <div
-      className="app-modal-backdrop"
-      onClick={onCancel}
-      role="dialog"
-      aria-modal="true"
-    >
+    <div className="app-modal-backdrop" role="dialog" aria-modal="true">
       <div
         className="app-modal"
         onClick={(e) => e.stopPropagation()}
@@ -445,93 +574,48 @@ function AppFormModal({
         </div>
 
         <form onSubmit={submit} className="app-form">
+          {error && (
+            <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
+              {error}
+            </div>
+          )}
           <div className="app-grid">
             <label className="app-field">
-              <span className="app-label">Semester ID</span>
-              <input
-                className="app-input"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                placeholder="e.g., Y1S1"
-              />
-            </label>
-
-            <label className="app-field">
               <span className="app-label">Name</span>
-              <input
-                className="app-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="e.g., Semester 1"
-              />
+              <input className="app-input" value={name} onChange={(e) => setName(e.target.value)} required />
             </label>
 
             <label className="app-field">
-              <span className="app-label">Academic Year</span>
-              <input
-                className="app-input"
-                value={academicYear}
-                onChange={(e) => setAcademicYear(e.target.value)}
-                placeholder="e.g., 2025/2026"
-              />
+              <span className="app-label">Year</span>
+              <input className="app-input" type="number" value={year as number | ""} onChange={(e) => setYear(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
 
             <label className="app-field">
-              <span className="app-label">Start Date</span>
-              <input
-                className="app-input"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <span className="app-label">Number</span>
+              <input className="app-input" type="number" value={number as number | ""} onChange={(e) => setNumber(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
 
             <label className="app-field">
-              <span className="app-label">End Date</span>
-              <input
-                className="app-input"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </label>
-
-            <label className="app-field">
-              <span className="app-label">Status</span>
-              <select
-                className="app-input"
-                value={status ?? ""}
-                onChange={(e) => setStatus(e.target.value as Semester["status"])}
-              >
-                <option value="Upcoming">Upcoming</option>
-                <option value="Active">Active</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </label>
-
-            <label className="app-field app-grid--2">
-              <span className="app-label">Coordinator</span>
-              <input
-                className="app-input"
-                value={coordinator}
-                onChange={(e) => setCoordinator(e.target.value)}
-                placeholder="e.g., Dr. N. Fernando"
-              />
+              <span className="app-label">Batch Id</span>
+              <input className="app-input" type="number" value={batchId as number | ""} onChange={(e) => setBatchId(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
           </div>
 
           <div className="app-modal__actions">
-            <button type="submit" className="app-btn app-btn--primary">
-              Save
-            </button>
-            <button type="button" className="app-btn" onClick={onCancel}>
-              Cancel
-            </button>
+            <button type="submit" className="app-btn app-btn--primary" disabled={!!saving}>{saving ? 'Saving...' : 'Save'}</button>
+            <button type="button" className="app-btn" onClick={onCancel} disabled={!!saving}>Cancel</button>
           </div>
         </form>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
