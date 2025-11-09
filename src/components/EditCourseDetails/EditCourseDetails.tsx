@@ -4,7 +4,7 @@ import api from "../../services/api";
 import { useAppSelector } from "../../app/hooks";
 import { selectUserId } from "../../features/auth/selectors";
 import "./EditCourseDetails.css";
-import { showError } from "../../utils/toast";
+import { toast } from "react-toastify";
 
 /* ---------- Reusable dropdown ---------- */
 interface DropdownProps {
@@ -375,9 +375,12 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       const res = await api.put(`/v1/courses/Update/${id}`, body);
       const data = res.data?.data ?? res.data;
       setSuccess("Course updated successfully");
+      toast.success("Course updated successfully");
       onUpdate?.({ id, code: data.courseCode ?? code, title: data.courseName ?? title, department, credits: creditsNum });
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Course update failed");
+      const msg = e?.response?.data?.message || e?.message || "Course update failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -404,8 +407,11 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       };
       await api.put(`/v1/course-allocations/Update/${allocId}`, body);
       setSuccess("Allocation updated successfully");
+      toast.success("Allocation updated successfully");
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Allocation update failed");
+      const msg = e?.response?.data?.message || e?.message || "Allocation update failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -425,8 +431,11 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       };
       await api.put(`/v1/assessments/Update/${id}`, body);
       setSuccess("Assessment updated");
+      toast.success("Assessment updated");
     } catch (e: any) {
-      setError(e?.response?.data?.message || e?.message || "Assessment update failed");
+      const msg = e?.response?.data?.message || e?.message || "Assessment update failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -627,8 +636,8 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
           <button type="button" className="btn ghost" onClick={onCancel}>
             Cancel
           </button>
-          {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
-          {success && <div style={{ color: '#15803d' }}>{success}</div>}
+          {/* {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
+          {success && <div style={{ color: '#15803d' }}>{success}</div>} */}
         </div>
       </form>
     </div>
