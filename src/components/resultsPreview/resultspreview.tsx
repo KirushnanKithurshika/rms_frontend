@@ -166,8 +166,13 @@ const ResultsPreview: React.FC = () => {
       const fullWidthPx = table?.scrollWidth || input.scrollWidth || 794;
       const orientation = fullWidthPx > 900 ? "landscape" : "portrait"; // switch if very wide
 
+      const pageWidthMm = orientation === "portrait" ? 210 : 297;
+      const pageHeightMm = orientation === "portrait" ? 297 : 210;
+      const pageHeightPx = (fullWidthPx * pageHeightMm) / pageWidthMm;
+
       const opt = {
-        margin: [10, 10, 10, 10],
+        // Slightly smaller bottom margin to avoid rounding-caused extra page
+        margin: [10, 10, 8, 10],
         filename: `${code}_Results_${tab}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: {
@@ -182,7 +187,18 @@ const ResultsPreview: React.FC = () => {
         pagebreak: { mode: ["css", "legacy"] },
       } as any;
 
-      await (html2pdf() as any).set(opt).from(input).save();
+      // Build PDF, then prune trailing blank page heuristically
+      const worker = (html2pdf() as any).set(opt).from(input).toPdf();
+      await worker.get("pdf").then((pdf: any) => {
+        const total = pdf.internal.getNumberOfPages();
+        const contentHeightPx = input.scrollHeight;
+        const pagesNeeded = Math.ceil(contentHeightPx / pageHeightPx);
+        if (total > pagesNeeded) {
+          // Remove extra trailing page
+          pdf.deletePage(total);
+        }
+        pdf.save(opt.filename);
+      });
     } catch (e) {
       console.error("Export PDF failed", e);
     } finally {
