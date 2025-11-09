@@ -136,6 +136,7 @@ const ResultsPreview: React.FC = () => {
       <div className="rp-header no-print">
         <h3 className="rp-title">Results Preview</h3>
         <div className="rp-select-row">
+          <div className="rp-select">
           <CustomDropdownVL
             label="Select Course"
             options={courseOptions}
@@ -143,6 +144,7 @@ const ResultsPreview: React.FC = () => {
             placeholder="Select Course"
             onChange={handleCourseChange}
           />
+        </div>
         </div>
         <hr className="rp-divider" />
       </div>

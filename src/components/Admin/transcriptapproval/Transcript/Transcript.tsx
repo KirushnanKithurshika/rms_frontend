@@ -117,7 +117,6 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
 
   return (
     <>
-      {/* ===== Page 1: Cover & profile ===== */}
       <section className="sheet a4">
         <header className="uni-header">
           <div className="seal">

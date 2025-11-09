@@ -1,0 +1,303 @@
+
+/* A4 live preview sizing (optional) */
+.sheet.a4 {
+  width: 210mm;
+  min-height: 297mm;
+  box-sizing: border-box;
+  background: #fff;
+ 
+}
+
+/* Don’t let these split across pages */
+.results-table,
+.results-table tr,
+.results-table td,
+.results-table th,
+.list,
+.list tr,
+.list td,
+.list th,
+.legend,
+.rs-sign-exact,
+.rs-top {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* helpers you can add on any block you want to keep intact */
+.avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+/* Optional: force a manual break with a divider element */
+.page-break { page-break-before: always; break-before: page; }
+
+/* Print media fallback (if user presses Ctrl+P) */
+@media print {
+  @page { size: A4;  }
+  .sheet.a4 { padding: 0; box-shadow: none; }
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f6f8;
+}
+
+
+
+
+.uni-header {
+    display: grid;
+    grid-template-columns: 30mm 1fr ;
+    gap: 10mm;
+    align-items: center;
+    margin-bottom: 5mm;
+}
+
+.seal-img {
+    width: 30mm;
+    height:auto;
+    object-fit: contain;
+}
+
+.u-name {
+    text-align: left;
+    margin: 0;
+    font-weight: 700;
+    font-size:24px;
+    letter-spacing: .2px;
+    text-transform: uppercase;
+    color: #000000;
+}
+
+.u-faculty {
+    text-align: left;
+    margin-top: 2px;
+    font-weight: 500;
+    font-size: var(--h2);
+    text-transform: uppercase;
+    color: #000000;
+}
+
+.u-address-head {
+    text-align: left;
+    margin-top: 2px;
+    font-weight: 500;
+    font-size: var(--h2);
+    text-transform: uppercase;
+    
+}
+
+.contact-rows {
+    margin-top: 6px;
+    font-size: var(--small);
+    color: #444;
+}
+
+.contact-grid{
+  margin-top:6px;
+  display:grid;
+  grid-template-columns: 200px 200px;
+  row-gap: 3px;
+  align-items:start;
+  font-size:12px;
+  color:#444;
+}
+.contact-grid .cell{
+ font-style:italic;
+  text-align:left;                  /* force left alignment */
+  line-height:1.25;
+  word-break:break-word;            /* long URLs won’t overflow */
+}
+.contact-grid .cell em{
+  font-style:italic;
+  color:#555;
+  margin-right:6px;
+}
+
+
+.serial {
+    justify-self: end;
+    font-size:12px;
+    color:#000000;
+    font-family: "Calibri", sans-serif !important;   /* <-- added */
+  font-weight: 400;
+  
+}
+
+
+.banner {
+    font-size: 20px;
+    grid-column: 1 / -1;
+    background: #acc9ef;
+    color: #010101;
+    border: 2px solid #000000;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3.5mm 0;
+}
+
+
+.box {
+    border: 2px solid black;
+    background: linear-gradient(180deg, #fff 0, #fff 70%, var(--box) 100%);
+    padding: 5mm;
+    margin-top: 5mm;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 24px;
+  row-gap: 10px;
+  text-align: left;
+}
+
+
+.grid-2 > div {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 4px;
+  align-items: center;
+}
+
+.grid-2 dt {
+  font-weight: 600;
+  min-width: 130px;  
+  font-family: "Calibri", sans-serif;
+}
+
+.grid-2 dd {
+  margin: 0;
+  font-family: "Calibri", sans-serif;
+}
+
+.mutedT {
+    text-align: left;
+    margin-top: 4px;
+    font-size: 14px;
+    color: black;
+    font-family: "Calibri", sans-serif;
+
+}
+
+
+.mutedTD{
+    text-align: center;
+    margin-top: 4px;
+    font-size: 16px;
+    color: black;
+    font-family: "Calibri", sans-serif;
+
+}
+
+
+
+.footer-block {
+    margin-top: 30mm;
+}
+
+.footer-block .cols {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8mm;
+}
+
+.sig-line {
+    width: 75mm;
+    border-top: 1px solid #222;
+    height: 0;
+ 
+}
+
+.date-line {
+    width: 30mm;
+    border-top: 1px solid #222;
+    height: 0;
+    margin-top: -5mm;
+}
+.sig-text .sig-role {
+    font-family: "Calibri", sans-serif;
+    text-align: left;
+    margin-top: 2mm;
+    font-size:16px;
+}
+.date{
+  margin-top: -5mm;
+  margin-bottom: 5mm;
+}
+.date-stamp {
+  
+    font-family: "Calibri", sans-serif;
+    min-width: 30mm;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+
+/* Container */
+.pstrip{
+  --pline:#6e6e6e;
+  font-family:"Calibri", Arial, sans-serif;
+  background:#fff;
+  border:1px solid var(--pline);
+  border-radius:4px 4px 4px 4px;
+  overflow:hidden;
+  color:#111;
+  margin-top:2mm;
+}
+
+/* Caption */
+.pstrip-caption{
+  display:flex;
+  font-family:"Calibri", Arial, sans-serif;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+  color:#333;
+}
+
+
+.pstrip-row{
+  display:grid;
+  border-bottom:1px solid var(--pline);
+}
+.pstrip-row:last-child{ border-bottom:none; }
+
+.prow1{ grid-template-columns: 1fr; }
+
+
+.pgridPairs3{
+  grid-template-columns: 1fr 1fr 1fr; 
+}
+
+
+.ppair{
+  display:grid;                     /* keeps label & value aligned */
+  grid-template-columns: auto 1fr;  /* label | value */
+  align-items:center;
+  gap: 3mm;
+  padding: 2.2mm 3mm;
+  line-height: 1.15;
+  font-size: 12px;
+  font-family: "Calibri", Arial, sans-serif;
+  background: #fff;
+
+  /* THIS is the border for the box */
+  border-right: 1px solid var(--pline);
+}
+.ppair:last-child{ border-right:none; }
+
+/* inside text */
+.lab{ font-weight:600; white-space:nowrap; }
+.val{ font-weight:400; }
+
+.canvas{
+  width:75mm;
+  height:100px;
+ 
+}

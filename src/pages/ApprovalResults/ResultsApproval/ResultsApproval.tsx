@@ -1,43 +1,29 @@
-import { useMemo, useState } from "react";
+import { useState, useRef } from "react";
 import Navbarin from "../../../components/Navbar/navbarin";
 import "./ResultsApproval.css";
-import PendingApprovals, { type ApprovalItem } from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
+import PendingApprovals from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
-import ResultApprovalViewer from "../../../components/resultsApproval/FinalResults/FinalResults";
-
-const approvals: ApprovalItem[] = [
-  { id: "22-5", title: "22nd batch 5th Semester Results" },
-  { id: "22-6", title: "22nd batch 6th Semester Results" },
-];
-
-const PDF_MAP: Record<string, string> = {
-  "22-5": "/pdfs/22-5.pdf",
-  "22-6": "/pdfs/22-6.pdf",
-};
+import ResultsSheetAP from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
+import { downloadExactHtmlPdf} from "../../../utils/downloadResultsSheetPdf"; // ✅ correct util
 
 const ResultsApprovalPage = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const printRootRef = useRef<HTMLDivElement | null>(null);
 
-  const pdfUrl = useMemo(() => (selectedId ? PDF_MAP[selectedId] : ""), [selectedId]);
+  const onApprove = (id: string) => setSelectedId(id);
 
-  // From the PendingApprovals list: choose which item to open
-  const onApprove = (id: string) => {
-    setSelectedId(id);
-  };
-
-  // When the viewer approves, go back to list (you can also do API calls here)
   const handleApprove = () => {
-    if (!selectedId) return;
+    alert("Approved successfully!");
     setSelectedId(null);
   };
 
-  const handleDownload = () => {
-    if (!pdfUrl) return;
-    const a = document.createElement("a");
-    a.href = pdfUrl;
-    a.download = "";
-    a.rel = "noopener";
-    a.click();
+  const handleBack = () => setSelectedId(null);
+
+ const handleDownloadPdf = async () => {
+  await new Promise<void>((r) => requestAnimationFrame(() => r())); // ensure mounted
+
+  // Option A: by selector (simplest)
+  await downloadExactHtmlPdf("#results-pdf-root", "ResultsSheet.pdf");
   };
 
   return (
@@ -53,43 +39,62 @@ const ResultsApprovalPage = () => {
 
         <div className="main-area-approval">
           <div className="card-approval">
-            {!selectedId && (
-              <PendingApprovals items={approvals} onApprove={onApprove} />
-            )}
-
-            {selectedId && (
-              <div className="approval-topbar">
-                <button
-                  type="button"
-                  className="pa-button pa-button--ghost"
-                  onClick={() => setSelectedId(null)}
-                  aria-label="Back to Pending Approvals"
-                >
-                  ←
-                </button>
+            <div className="CAA">
+              <div className="tARD">
+                <span className="tAR-heading">Pending Results Approval</span>
               </div>
-            )}
-         
 
-            {selectedId && pdfUrl && (
-              <ResultApprovalViewer
-                pdfUrl={pdfUrl}
-                onApprove={handleApprove}
-                onSign={() => console.log("Sign flow")}
-                onDownload={handleDownload}
-                approveLabel="Approve"
-                onBack={() => setSelectedId(null)}   // viewer’s own Back also returns to list
-              />
-            )}
+              {!selectedId && (
+                <PendingApprovals
+                  items={[
+                    { id: "1", title: "Results Sheet - Batch 2023" },
+                    { id: "2", title: "Results Sheet - Batch 2024" },
+                  ]}
+                  onApprove={onApprove}
+                />
+              )}
 
-            {selectedId && !pdfUrl && (
-              <div>
-                <p>PDF not found.</p>
-                <button className="pa-button" onClick={() => setSelectedId(null)}>
-                  Back
-                </button>
-              </div>
-            )}
+              {selectedId && (
+                <>
+                  <div className="tAR-inline">
+                    <div className="tAR-inline-topbar">
+                      <button
+                        type="button"
+                        className="taAR-btn taAR-btn--ghost"
+                        onClick={handleBack}
+                      >
+                        ← Back
+                      </button>
+
+                      <div className="tAR-inline-spacer" />
+
+                      <button
+                        type="button"
+                        className="taAR-btn taAR-btn--ghost"
+                        onClick={handleDownloadPdf}
+                      >
+                        Download PDF
+                      </button>
+
+                      <button
+                        type="button"
+                        className="taAR-btn"
+                        onClick={handleApprove}
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="tAR-inline-body">
+                    <div className="rap" ref={printRootRef}>
+                      {/* Ensure ResultsTable inside ResultsSheetAP renders <table class="rs-table"> */}
+                      <ResultsSheetAP />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
