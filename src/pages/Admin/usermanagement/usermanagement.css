@@ -159,7 +159,7 @@
 .user-table td {
     padding: 5px 10px;
     text-align: left;
-    border-bottom: 1px solid #e5e5e5;
+    /* border-bottom: 1px solid #e5e5e5; */
 }
 
 

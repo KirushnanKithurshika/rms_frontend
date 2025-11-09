@@ -1,6 +1,6 @@
 // FacultyTable.tsx
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useEffect, useMemo, useRef, useState } from "react";
+import api from "../../../../services/api";
 import {
   FaSearch,
   FaPlus,
@@ -8,6 +8,7 @@ import {
   FaSort,
   FaSortUp,
   FaSortDown,
+  FaEye,
 } from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
 import "./table.css"; // reuses same classes
@@ -15,11 +16,30 @@ import "./table.css"; // reuses same classes
 type Faculty = {
   id: number;
   code: string;
-  name: string;
-  dean?: string;
-  contactNumber?: string;
+  name: string; // maps to backend facultyName
+  dean?: string; // maps to backend degreeTitle
+  contactNumber?: string; // maps to backend phone
   email?: string;
-  address?: string;
+  address?: string; // maps to backend website (for table display)
+  // details for view modal
+  shortName?: string;
+  website?: string;
+  universityId?: number;
+  universityCode?: string;
+  universityName?: string;
+  active?: boolean;
+};
+
+type FacultyCreatePayload = {
+  code: string;
+  facultyName: string;
+  degreeTitle?: string;
+  shortName?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  universityId: number;
+  active: boolean;
 };
 
 const SAMPLE_FACULTIES: Faculty[] = [
@@ -30,13 +50,40 @@ const SAMPLE_FACULTIES: Faculty[] = [
   { id: 5, code: "ART-UOJ", name: "Faculty of Arts", dean: "Dr. T. Sutharsan", contactNumber: "+94 21 222 6714", email: "arts@univ.jfn.ac.lk", address: "Thirunelvely, Jaffna" },
 ];
 
-type SortKey = keyof Pick<Faculty, "code" | "name" | "dean" | "contactNumber" | "email" | "address">;
+type SortKey = keyof Pick<Faculty, "code" | "name" | "shortName" | "dean" | "contactNumber" | "email" | "website">;
+
+function useDraggable() {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const origin = useRef({ x: 0, y: 0 });
+  const start = useRef({ x: 0, y: 0 });
+  const onMouseMove = (e: MouseEvent) => {
+    const dx = e.clientX - origin.current.x;
+    const dy = e.clientY - origin.current.y;
+    setPos({ x: start.current.x + dx, y: start.current.y + dy });
+  };
+  const onMouseUp = () => {
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+  };
+  const onMouseDown = (e: any) => {
+    origin.current = { x: e.clientX, y: e.clientY };
+    start.current = pos;
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+  useEffect(() => () => {
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+  }, []);
+  return { pos, onMouseDown };
+}
 
 export default function FacultyTable() {
   const [rows, setRows] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [sortBy, setSortBy] = useState<SortKey>("code");
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
 
   const [page, setPage] = useState(1);
@@ -44,17 +91,50 @@ export default function FacultyTable() {
 
   const [editing, setEditing] = useState<Faculty | null>(null);
   const [creating, setCreating] = useState(false);
+  const [viewing, setViewing] = useState<Faculty | null>(null);
+  const [viewingLoading, setViewingLoading] = useState(false);
+  const [viewingError, setViewingError] = useState<string | null>(null);
+  const [creatingError, setCreatingError] = useState<string | null>(null);
+  const [savingCreate, setSavingCreate] = useState(false);
+  const [editingError, setEditingError] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [universities, setUniversities] = useState<Array<{ id: number; name: string; code?: string }>>([]);
 
   // Delete modal state (reusing same class names)
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [facultyToDelete, setFacultyToDelete] = useState<Faculty | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get<Faculty[]>("/api/faculties");
-        setRows(Array.isArray(data) && data.length ? data : SAMPLE_FACULTIES);
+        // Load faculties list
+        const res = await api.get(`/faculties`);
+        const arr = Array.isArray(res?.data?.data)
+          ? res.data.data
+          : (Array.isArray(res?.data) ? res.data : []);
+
+        const mapped: Faculty[] = arr.map((f: any) => ({
+          id: f.id,
+          code: f.code,
+          name: f.facultyName ?? f.name,
+          shortName: f.shortName,
+          dean: f.degreeTitle ?? f.dean,
+          contactNumber: f.phone ?? f.contactNumber,
+          email: f.email,
+          website: f.website,
+          address: f.website ?? f.address,
+          universityId: f.universityId,
+          universityCode: f.universityCode,
+          universityName: f.universityName,
+          active: f.active,
+        }));
+        const ordered = (mapped.length ? mapped : SAMPLE_FACULTIES)
+          .slice()
+          .sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+        setRows(ordered);
       } catch {
         setRows(SAMPLE_FACULTIES);
       } finally {
@@ -63,16 +143,34 @@ export default function FacultyTable() {
     })();
   }, []);
 
+  // Load universities for the create/edit form select
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get(`/universities`);
+        const list = Array.isArray(res?.data?.data)
+          ? res.data.data
+          : (Array.isArray(res?.data) ? res.data : []);
+        setUniversities(
+          list.map((u: any) => ({ id: u.id, name: u.name, code: u.code }))
+        );
+      } catch {
+        setUniversities([]);
+      }
+    })();
+  }, []);
+
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
     const f = t
       ? rows.filter((r) =>
-          [r.code, r.name, r.dean, r.address, r.contactNumber, r.email]
+          [r.code, r.name, r.shortName, r.dean, r.website, r.contactNumber, r.email]
             .filter(Boolean)
             .some((v) => String(v).toLowerCase().includes(t))
         )
       : rows;
 
+    if (!sortBy) return f;
     const s = [...f].sort((a, b) => {
       const av = (a[sortBy] ?? "").toString().toLowerCase();
       const bv = (b[sortBy] ?? "").toString().toLowerCase();
@@ -83,6 +181,77 @@ export default function FacultyTable() {
 
     return s;
   }, [rows, q, sortBy, sortAsc]);
+
+  // View details
+  const handleView = async (id: number) => {
+    setViewingError(null);
+    setViewingLoading(true);
+    try {
+      const res = await api.get(`/faculties/${id}`);
+      const f = res?.data?.data ?? res?.data;
+      const mapped: Faculty = {
+        id: f.id,
+        code: f.code,
+        name: f.facultyName ?? f.name,
+          shortName: f.shortName,
+          dean: f.degreeTitle ?? f.dean,
+        contactNumber: f.phone ?? f.contactNumber,
+        email: f.email,
+          website: f.website,
+          address: f.website ?? f.address,
+        website: f.website,
+        shortName: f.shortName,
+        universityId: f.universityId,
+        universityCode: f.universityCode,
+        universityName: f.universityName,
+        active: f.active,
+      };
+      setViewing(mapped);
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message
+        || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined)
+        || data?.error
+        || e?.message
+        || 'An unexpected error occurred');
+      setViewingError(String(msg));
+    } finally {
+      setViewingLoading(false);
+    }
+  };
+
+  // Always fetch fresh details before opening Edit
+  const handleOpenEdit = async (id: number) => {
+    try {
+      setEditingError(null);
+      const res = await api.get(`/faculties/${id}`);
+      const f = res?.data?.data ?? res?.data;
+      const mapped: Faculty = {
+        id: f.id,
+        code: f.code,
+        name: f.facultyName ?? f.name,
+        dean: f.degreeTitle ?? f.dean,
+        contactNumber: f.phone ?? f.contactNumber,
+        email: f.email,
+        address: f.website ?? f.address,
+        website: f.website,
+        shortName: f.shortName,
+        universityId: f.universityId,
+        universityCode: f.universityCode,
+        universityName: f.universityName,
+        active: f.active,
+      };
+      setEditing(mapped);
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message
+        || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined)
+        || data?.error
+        || e?.message
+        || 'An unexpected error occurred');
+      setEditingError(String(msg));
+    }
+  };
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const view = filtered.slice((page - 1) * pageSize, page * pageSize);
@@ -111,28 +280,137 @@ export default function FacultyTable() {
 
   const confirmDelete = async () => {
     if (!facultyToDelete) return;
+    setDeleteError(null);
+    setDeleting(true);
     try {
-      await axios.delete(`/api/faculties/${facultyToDelete.id}`);
-    } catch {
-      return; // keep row if API failed; optionally toast an error
+      const res = await api.delete(`/faculties/${facultyToDelete.id}`);
+      if (res && res.status >= 200 && res.status < 300) {
+        setRows((r) => r
+          .filter((x) => x.id !== facultyToDelete.id)
+          .slice()
+          .sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+        );
+        closeDeleteModal();
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message
+        || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined)
+        || data?.error
+        || e?.message
+        || 'An unexpected error occurred');
+      setDeleteError(String(msg));
+    } finally {
+      setDeleting(false);
     }
-    setRows((r) => r.filter((x) => x.id !== facultyToDelete.id));
-    closeDeleteModal();
   };
 
-  const handleCreate = async (payload: Omit<Faculty, "id">) => {
-    const { data } = await axios.post<Faculty>("/api/faculties", payload);
-    setRows((r) => [data, ...r]);
-    setCreating(false);
+  const handleCreate = async (payload: FacultyCreatePayload) => {
+    setCreatingError(null);
+    setSavingCreate(true);
+    // Normalize types
+    const body: FacultyCreatePayload = {
+      code: payload.code.trim(),
+      facultyName: payload.facultyName.trim(),
+      degreeTitle: payload.degreeTitle?.trim() || undefined,
+      shortName: payload.shortName?.trim() || undefined,
+      email: payload.email?.trim() || undefined,
+      phone: payload.phone?.trim() || undefined,
+      website: payload.website?.trim() || undefined,
+      universityId: Number(payload.universityId),
+      active: Boolean(payload.active),
+    };
+
+    try {
+      const res = await api.post(`/faculties`, body);
+      const f = res?.data?.data ?? res?.data;
+      if (f) {
+        const mapped: Faculty = {
+          id: f.id,
+          code: f.code,
+          name: f.facultyName ?? f.name,
+          shortName: f.shortName,
+          dean: f.degreeTitle ?? f.dean,
+          contactNumber: f.phone ?? f.contactNumber,
+          email: f.email,
+          website: f.website,
+          address: f.website ?? f.address,
+          universityId: f.universityId,
+          universityCode: f.universityCode,
+          universityName: f.universityName,
+          active: f.active,
+        };
+        setRows((r) => [...r, mapped].slice().sort((a, b) => (a.id ?? 0) - (b.id ?? 0)));
+        setCreating(false);
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message
+        || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined)
+        || data?.error
+        || e?.message
+        || 'An unexpected error occurred');
+      setCreatingError(String(msg));
+    } finally {
+      setSavingCreate(false);
+    }
   };
 
-  const handleUpdate = async (id: number, payload: Omit<Faculty, "id">) => {
-    const { data } = await axios.put<Faculty>(`/api/faculties/${id}`, payload);
-    setRows((r) => r.map((x) => (x.id === id ? data : x)));
-    setEditing(null);
+  const handleUpdate = async (id: number, payload: FacultyCreatePayload) => {
+    setEditingError(null);
+    setSavingEdit(true);
+    const body: FacultyCreatePayload = {
+      code: payload.code.trim(),
+      facultyName: payload.facultyName.trim(),
+      degreeTitle: payload.degreeTitle?.trim() || undefined,
+      shortName: payload.shortName?.trim() || undefined,
+      email: payload.email?.trim() || undefined,
+      phone: payload.phone?.trim() || undefined,
+      website: payload.website?.trim() || undefined,
+      universityId: Number(payload.universityId),
+      active: Boolean(payload.active),
+    };
+    try {
+      const res = await api.put(`/faculties/${id}`, body);
+      const f = res?.data?.data ?? res?.data;
+      if (f) {
+        const mapped: Faculty = {
+          id: f.id,
+          code: f.code,
+          name: f.facultyName ?? f.name,
+          shortName: f.shortName,
+          dean: f.degreeTitle ?? f.dean,
+          contactNumber: f.phone ?? f.contactNumber,
+          email: f.email,
+          website: f.website,
+          address: f.website ?? f.address,
+          universityId: f.universityId,
+          universityCode: f.universityCode,
+          universityName: f.universityName,
+          active: f.active,
+        };
+        setRows((r) => r
+          .map((x) => (x.id === id ? mapped : x))
+          .slice()
+          .sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+        );
+        setEditing(null);
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message
+        || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined)
+        || data?.error
+        || e?.message
+        || 'An unexpected error occurred');
+      setEditingError(String(msg));
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   useEffect(() => { setPage(1); }, [q]);
+  const viewDrag = useDraggable();
 
   return (
     <div>
@@ -140,12 +418,26 @@ export default function FacultyTable() {
       <div className="user-management-header">
         <div className="custom-searchbar">
           <input
+            ref={searchRef}
             type="text"
-            placeholder="Search…"
+            placeholder="Search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <FaSearch className="search-icon" />
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Search"
+            title="Search"
+            onClick={() => {
+              const val = searchRef.current?.value ?? "";
+              setQ(val.trim());
+              searchRef.current?.focus();
+            }}
+            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+          >
+            <FaSearch className="search-icon" />
+          </button>
         </div>
 
         <div className="filters">
@@ -161,25 +453,14 @@ export default function FacultyTable() {
         <table className="user-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th onClick={() => toggleSort("code")}>
-                Faculty ID {sortIcon("code")}
-              </th>
-              <th onClick={() => toggleSort("name")}>
-                Name {sortIcon("name")}
-              </th>
-              <th onClick={() => toggleSort("dean")}>
-                Dean {sortIcon("dean")}
-              </th>
-              <th onClick={() => toggleSort("contactNumber")}>
-                Contact number {sortIcon("contactNumber")}
-              </th>
-              <th onClick={() => toggleSort("email")}>
-                Email {sortIcon("email")}
-              </th>
-              <th onClick={() => toggleSort("address")}>
-                Address {sortIcon("address")}
-              </th>
+              <th>Id</th>
+              <th onClick={() => toggleSort("code")}>Code {sortIcon("code")}</th>
+              <th onClick={() => toggleSort("name")}>Faculty Name {sortIcon("name")}</th>
+              <th onClick={() => toggleSort("shortName")}>Short Name {sortIcon("shortName")}</th>
+              <th onClick={() => toggleSort("dean")}>Degree Title {sortIcon("dean")}</th>
+              <th onClick={() => toggleSort("email")}>Email {sortIcon("email")}</th>
+              <th onClick={() => toggleSort("contactNumber")}>Phone {sortIcon("contactNumber")}</th>
+              <th onClick={() => toggleSort("website")}>Website {sortIcon("website")}</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -195,15 +476,19 @@ export default function FacultyTable() {
 
             {!loading && view.map((f, i) => (
               <tr key={f.id}>
-                <td>{(page - 1) * pageSize + i + 1}</td>
+                <td>{f.id}</td>
                 <td>{f.code}</td>
                 <td>{f.name}</td>
+                <td>{f.shortName || "-"}</td>
                 <td>{f.dean || "-"}</td>
-                <td>{f.contactNumber || "-"}</td>
                 <td>{f.email || "-"}</td>
-                <td>{f.address || "-"}</td>
+                <td>{f.contactNumber || "-"}</td>
+                <td>{f.website || f.address || "-"}</td>
                 <td className="actions">
-                  <button className="icon-btn" title="Edit" onClick={() => setEditing(f)}>
+                  <button className="icon-btn" title="View" onClick={() => handleView(f.id)}>
+                    <FaEye className="icon view-icon" />
+                  </button>
+                  <button className="icon-btn" title="Edit" onClick={() => handleOpenEdit(f.id)}>
                     <MdEdit className="icon edit-icon" />
                   </button>
                   <button className="icon-btn" title="Delete" onClick={() => askDelete(f)}>
@@ -220,9 +505,14 @@ export default function FacultyTable() {
       {creating && (
         <AppFormModal
           title="Add Faculty"
-          initial={{}}
+          initial={{ active: true }}
+          universities={universities}
           onCancel={() => setCreating(false)}
           onSubmit={(payload) => handleCreate(payload)}
+          error={creatingError ?? undefined}
+          saving={savingCreate}
+          disableBackdropClose
+          disableEscClose
         />
       )}
 
@@ -230,10 +520,80 @@ export default function FacultyTable() {
       {editing && (
         <AppFormModal
           title="Edit Faculty"
-          initial={editing}
+          initial={{
+            code: editing.code,
+            facultyName: editing.name,
+            degreeTitle: editing.dean,
+            shortName: editing.shortName,
+            email: editing.email,
+            phone: editing.contactNumber,
+            website: editing.website ?? editing.address,
+            universityId: editing.universityId,
+            active: editing.active ?? true,
+          }}
+          universities={universities}
           onCancel={() => setEditing(null)}
           onSubmit={(payload) => handleUpdate(editing.id, payload)}
+          error={editingError ?? undefined}
+          saving={savingEdit}
         />
+      )}
+
+      {(viewing || viewingLoading || viewingError) && (
+        <div className="app-modal-backdrop" onClick={() => setViewing(null)} role="dialog" aria-modal="true">
+          <div
+            className="app-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
+          >
+            <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+              <h3 className="app-modal__title">Faculty Details</h3>
+              <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
+                <FaTimes />
+              </button>
+            </div>
+            <div className="app-form" style={{ paddingTop: 0 }}>
+              {viewingLoading ? (
+                <div style={{ padding: '1rem' }}>Loading...</div>
+              ) : (
+                <>
+                  {viewingError && (
+                    <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
+                      {viewingError}
+                    </div>
+                  )}
+                  {viewing && (
+                    <>
+                      <div className="app-grid">
+                        <div className="app-field"><span className="app-label">Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.id}</div></div>
+                        <div className="app-field"><span className="app-label">Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.code}</div></div>
+                        <div className="app-field"><span className="app-label">Faculty Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
+                        <div className="app-field"><span className="app-label">Short Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.shortName || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Degree Title</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.dean || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.email || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.contactNumber || '-'}</div></div>
+                        <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.website || viewing.address || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">University Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.universityCode || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">University Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.universityName || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">University Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.universityId ?? '-'}</div></div>
+                        <label className="app-field">
+                          <span className="app-label">Active</span>
+                          <div className="app-input" style={{ background:'#f8fafc', display:'flex', alignItems:'center', gap:8 }}>
+                            <input type="checkbox" checked={!!viewing.active} readOnly />
+                            <span>{viewing.active ? 'Enabled' : 'Disabled'}</span>
+                          </div>
+                        </label>
+                      </div>
+                      <div className="app-modal__actions">
+                        <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Delete confirmation modal (your class names) */}
@@ -295,36 +655,74 @@ export default function FacultyTable() {
 function AppFormModal({
   title,
   initial,
+  universities,
   onCancel,
   onSubmit,
+  error,
+  saving,
+  disableBackdropClose,
+  disableEscClose,
 }: {
   title: string;
-  initial?: Partial<Omit<Faculty, "id">>;
+  initial?: Partial<FacultyCreatePayload>;
+  universities: Array<{ id: number; name: string; code?: string }>;
   onCancel: () => void;
-  onSubmit: (payload: Omit<Faculty, "id">) => void;
+  onSubmit: (payload: FacultyCreatePayload) => void;
+  error?: string;
+  saving?: boolean;
+  disableBackdropClose?: boolean;
+  disableEscClose?: boolean;
 }) {
+  const drag = useDraggable();
   const [code, setCode] = useState(initial?.code ?? "");
-  const [name, setName] = useState(initial?.name ?? "");
-  const [dean, setDean] = useState(initial?.dean ?? "");
-  const [contactNumber, setContactNumber] = useState(initial?.contactNumber ?? "");
+  const [facultyName, setFacultyName] = useState(initial?.facultyName ?? "");
+  const [degreeTitle, setDegreeTitle] = useState(initial?.degreeTitle ?? "");
+  const [shortName, setShortName] = useState(initial?.shortName ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
-  const [address, setAddress] = useState(initial?.address ?? "");
+  const [phone, setPhone] = useState(initial?.phone ?? "");
+  const [website, setWebsite] = useState(initial?.website ?? "");
+  const [universityId, setUniversityId] = useState<number>(
+    initial?.universityId ?? (universities[0]?.id ?? 0)
+  );
+  const [active, setActive] = useState<boolean>(initial?.active ?? true);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ code, name, dean, contactNumber, email, address });
+    onSubmit({
+      code,
+      facultyName,
+      degreeTitle,
+      shortName,
+      email,
+      phone,
+      website,
+      universityId,
+      active,
+    });
   };
 
+  // If universities load after mount and no value selected, choose first
   useEffect(() => {
+    if (!universityId && universities.length > 0) {
+      setUniversityId(universities[0].id);
+    }
+  }, [universities]);
+
+  useEffect(() => {
+    if (disableEscClose) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onCancel]);
+  }, [onCancel, disableEscClose]);
 
   return (
-    <div className="app-modal-backdrop" onClick={onCancel} role="dialog" aria-modal="true">
-      <div className="app-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="app-modal__header">
+    <div className="app-modal-backdrop" onClick={disableBackdropClose ? undefined : onCancel} role="dialog" aria-modal="true">
+      <div
+        className="app-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
+      >
+        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
           <h3 className="app-modal__title">{title}</h3>
           <button
             type="button"
@@ -338,25 +736,30 @@ function AppFormModal({
         </div>
 
         <form onSubmit={submit} className="app-form">
+          {error && (
+            <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
+              {error}
+            </div>
+          )}
           <div className="app-grid">
             <label className="app-field">
-              <span className="app-label">Faculty ID</span>
+              <span className="app-label">Code</span>
               <input className="app-input" value={code} onChange={(e) => setCode(e.target.value)} required />
             </label>
 
             <label className="app-field">
-              <span className="app-label">Name</span>
-              <input className="app-input" value={name} onChange={(e) => setName(e.target.value)} required />
+              <span className="app-label">Faculty Name</span>
+              <input className="app-input" value={facultyName} onChange={(e) => setFacultyName(e.target.value)} required />
             </label>
 
             <label className="app-field">
-              <span className="app-label">Dean</span>
-              <input className="app-input" value={dean} onChange={(e) => setDean(e.target.value)} />
+              <span className="app-label">Degree Title</span>
+              <input className="app-input" value={degreeTitle} onChange={(e) => setDegreeTitle(e.target.value)} />
             </label>
 
             <label className="app-field">
-              <span className="app-label">Contact number</span>
-              <input className="app-input" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />
+              <span className="app-label">Short Name</span>
+              <input className="app-input" value={shortName} onChange={(e) => setShortName(e.target.value)} />
             </label>
 
             <label className="app-field">
@@ -364,18 +767,48 @@ function AppFormModal({
               <input className="app-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </label>
 
+            <label className="app-field">
+              <span className="app-label">Phone</span>
+              <input className="app-input" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            </label>
+
             <label className="app-field app-grid--2">
-              <span className="app-label">Address</span>
-              <input className="app-input" value={address} onChange={(e) => setAddress(e.target.value)} />
+              <span className="app-label">Website</span>
+              <input className="app-input" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.edu" />
+            </label>
+
+            <label className="app-field">
+              <span className="app-label">University</span>
+              <select
+                className="app-input"
+                value={universityId}
+                onChange={(e) => setUniversityId(Number(e.target.value))}
+                required
+              >
+                <option value={0} disabled>Select university</option>
+                {universities.map((u) => (
+                  <option key={u.id} value={u.id}>{u.code ? `${u.code} — ${u.name}` : u.name}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="app-field">
+              <span className="app-label">Active</span>
+              <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
+                <span>{active ? 'Enabled' : 'Disabled'}</span>
+              </div>
             </label>
           </div>
 
           <div className="app-modal__actions">
-            <button type="submit" className="app-btn app-btn--primary">Save</button>
-            <button type="button" className="app-btn" onClick={onCancel}>Cancel</button>
+            <button type="submit" className="app-btn app-btn--primary" disabled={!!saving}>{saving ? 'Saving...' : 'Save'}</button>
+            <button type="button" className="app-btn" onClick={onCancel} disabled={!!saving}>Cancel</button>
           </div>
         </form>
       </div>
     </div>
   );
 }
+
+

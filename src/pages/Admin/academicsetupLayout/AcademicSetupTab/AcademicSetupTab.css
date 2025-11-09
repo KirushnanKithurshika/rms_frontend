@@ -69,18 +69,7 @@
     font-weight: 600;
 }
 
-.table .actions {
-    display: flex;
-    gap: .5rem;
-    justify-content: center;
-}
 
-.icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-}
 
 .btn-primary {
     background: #332255;

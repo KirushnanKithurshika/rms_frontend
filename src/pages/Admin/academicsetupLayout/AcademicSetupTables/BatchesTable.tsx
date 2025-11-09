@@ -1,5 +1,5 @@
 // BatchesTable.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import {
   FaSearch,
@@ -8,6 +8,7 @@ import {
   FaSort,
   FaSortUp,
   FaSortDown,
+  FaEye,
 } from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
 import "./table.css"; // reuse the same shared classes
@@ -83,6 +84,32 @@ type SortKey = keyof Pick<
   "code" | "name" | "faculty" | "department" | "intakeYear" | "startDate" | "endDate" | "status" | "size"
 >;
 
+function useDraggable() {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const origin = useRef({ x: 0, y: 0 });
+  const start = useRef({ x: 0, y: 0 });
+  const onMouseMove = (e: MouseEvent) => {
+    const dx = e.clientX - origin.current.x;
+    const dy = e.clientY - origin.current.y;
+    setPos({ x: start.current.x + dx, y: start.current.y + dy });
+  };
+  const onMouseUp = () => {
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+  };
+  const onMouseDown = (e: any) => {
+    origin.current = { x: e.clientX, y: e.clientY };
+    start.current = pos;
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+  useEffect(() => () => {
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+  }, []);
+  return { pos, onMouseDown };
+}
+
 export default function BatchesTable() {
   const [rows, setRows] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,6 +122,8 @@ export default function BatchesTable() {
 
   const [editing, setEditing] = useState<Batch | null>(null);
   const [creating, setCreating] = useState(false);
+  const [viewing, setViewing] = useState<Batch | null>(null);
+  const viewDrag = useDraggable();
 
   // Delete confirmation
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -224,7 +253,7 @@ export default function BatchesTable() {
         <table className="user-table">
           <thead>
             <tr>
-              <th>#</th>
+              <th>Id</th>
               <th onClick={() => toggleSort("code")}>
                 Batch ID {sortIcon("code")}
               </th>
@@ -283,18 +312,13 @@ export default function BatchesTable() {
                   <td>{b.status || "-"}</td>
                   <td>{b.size ?? "-"}</td>
                   <td className="actions">
-                    <button
-                      className="icon-btn"
-                      title="Edit"
-                      onClick={() => setEditing(b)}
-                    >
+                    <button className="icon-btn" title="View" onClick={() => setViewing(b)}>
+                      <FaEye className="icon view-icon" />
+                    </button>
+                    <button className="icon-btn" title="Edit" onClick={() => setEditing(b)}>
                       <MdEdit className="icon edit-icon" />
                     </button>
-                    <button
-                      className="icon-btn"
-                      title="Delete"
-                      onClick={() => askDelete(b)}
-                    >
+                    <button className="icon-btn" title="Delete" onClick={() => askDelete(b)}>
                       <MdDelete className="icon delete-icon" />
                     </button>
                   </td>
@@ -322,6 +346,39 @@ export default function BatchesTable() {
           onCancel={() => setEditing(null)}
           onSubmit={(payload) => handleUpdate(editing.id, payload)}
         />
+      )}
+
+      {viewing && (
+        <div className="app-modal-backdrop" onClick={() => setViewing(null)} role="dialog" aria-modal="true">
+          <div
+            className="app-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
+          >
+            <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+              <h3 className="app-modal__title">Batch Details</h3>
+              <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
+                <FaTimes />
+              </button>
+            </div>
+            <div className="app-form" style={{ paddingTop: 0 }}>
+              <div className="app-grid">
+                <div className="app-field"><span className="app-label">Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.code}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
+                <div className="app-field"><span className="app-label">Faculty</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.faculty || '-'}</div></div>
+                <div className="app-field"><span className="app-label">Department</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.department || '-'}</div></div>
+                <div className="app-field"><span className="app-label">Intake Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.intakeYear}</div></div>
+                <div className="app-field"><span className="app-label">Start Date</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.startDate || '-'}</div></div>
+                <div className="app-field"><span className="app-label">End Date</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.endDate || '-'}</div></div>
+                <div className="app-field"><span className="app-label">Status</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.status || '-'}</div></div>
+                <div className="app-field"><span className="app-label">Size</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.size ?? '-'}</div></div>
+              </div>
+              <div className="app-modal__actions">
+                <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Delete confirmation (uses your common modal classes) */}
@@ -391,6 +448,7 @@ function AppFormModal({
   onCancel: () => void;
   onSubmit: (payload: Omit<Batch, "id">) => void;
 }) {
+  const drag = useDraggable();
   const [code, setCode] = useState(initial?.code ?? "");
   const [name, setName] = useState(initial?.name ?? "");
   const [faculty, setFaculty] = useState(initial?.faculty ?? "");
@@ -431,8 +489,12 @@ function AppFormModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="app-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="app-modal__header">
+      <div
+        className="app-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
+      >
+        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
           <h3 className="app-modal__title">{title}</h3>
           <button
             type="button"
