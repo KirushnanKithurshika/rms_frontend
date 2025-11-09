@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import html2pdf from "html2pdf.js";
 import "./resultspreview.css";
 import Logo from "../../assets/ResultsP_Logo.png";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -141,27 +142,56 @@ const ResultsPreview: React.FC = () => {
     const input = document.querySelector(".rp-results-content") as HTMLElement;
     if (!input) return;
 
-    const canvas = await html2canvas(input, { scale: 3, useCORS: true });
-    const imgData = canvas.toDataURL("image/png");
+    // Temporarily expand table to full width so no columns are clipped
+    const wrap = input.querySelector(".rp-table-wrap") as HTMLElement | null;
+    const table = input.querySelector(".rp-table") as HTMLElement | null;
+    const original: any = {};
+    try {
+      if (wrap && table) {
+        original.wrapOverflow = wrap.style.overflow;
+        original.wrapWidth = wrap.style.width;
+        original.tableMinWidth = table.style.minWidth;
+        // Expand wrapper to full table width
+        wrap.style.overflow = "visible";
+        const fullWidth = table.scrollWidth || table.clientWidth;
+        if (fullWidth) {
+          wrap.style.width = `${fullWidth}px`;
+        }
+        table.style.minWidth = "auto";
+      }
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+      const code = (results as any)?.header?.course?.courseCode ?? "Course";
+      const tab = activeTab === "CA" ? "CA" : "EndExam";
 
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+      const fullWidthPx = table?.scrollWidth || input.scrollWidth || 794;
+      const orientation = fullWidthPx > 900 ? "landscape" : "portrait"; // switch if very wide
 
-    let heightLeft = pdfHeight;
-    let position = 0;
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `${code}_Results_${tab}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: fullWidthPx,
+        },
+        jsPDF: { unit: "mm", format: "a4", orientation },
+        pagebreak: { mode: ["css", "legacy"] },
+      } as any;
 
-    while (heightLeft > 0) {
-      pdf.addImage(imgData, "PNG", 0, position, pageWidth, pdfHeight);
-      heightLeft -= pageHeight;
-      position -= pageHeight;
-      if (heightLeft > 0) pdf.addPage();
+      await (html2pdf() as any).set(opt).from(input).save();
+    } catch (e) {
+      console.error("Export PDF failed", e);
+    } finally {
+      if (wrap && table) {
+        wrap.style.overflow = original.wrapOverflow ?? "";
+        wrap.style.width = original.wrapWidth ?? "";
+        table.style.minWidth = original.tableMinWidth ?? "";
+      }
     }
-
-    pdf.save(`${selectedCourse.code}_Results.pdf`);
   };
 
   return (
