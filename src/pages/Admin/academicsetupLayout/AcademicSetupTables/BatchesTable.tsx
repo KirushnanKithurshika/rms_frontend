@@ -1,88 +1,20 @@
-// BatchesTable.tsx
+﻿// BatchesTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
-import {
-  FaSearch,
-  FaPlus,
-  FaTimes,
-  FaSort,
-  FaSortUp,
-  FaSortDown,
-  FaEye,
-} from "react-icons/fa";
+import api from "../../../../services/api";
+import { FaSearch, FaPlus, FaTimes, FaSort, FaSortUp, FaSortDown, FaEye } from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
-import "./table.css"; // reuse the same shared classes
+import "./table.css";
 
-type BatchStatus = "Planned" | "Active" | "Archived";
-
-type Batch = {
+export type Batch = {
   id: number;
-  code: string;             // e.g., "ENG-2025-01"
-  name: string;             // e.g., "Engineering Intake 2025 - Batch 01"
-  faculty?: string;         // display name or code, e.g., "ENG-UOR"
-  department?: string;      // e.g., "MME"
-  intakeYear: number;       // e.g., 2025
-  startDate?: string;       // ISO or display string
-  endDate?: string;         // ISO or display string
-  status?: BatchStatus;     // Planned | Active | Archived
-  size?: number;            // number of students (optional)
+  name: string;
+  startYear: number;
+  durationYears: number;
+  facultyId: number;
+  facultyName: string;
 };
 
-const SAMPLE_BATCHES: Batch[] = [
-  {
-    id: 1,
-    code: "ENG-2025-01",
-    name: "Engineering Intake 2025 - Batch 01",
-    faculty: "ENG-UOR",
-    department: "MME",
-    intakeYear: 2025,
-    startDate: "2025-08-15",
-    endDate: "2029-06-30",
-    status: "Planned",
-    size: 120,
-  },
-  {
-    id: 2,
-    code: "ENG-2024-01",
-    name: "Engineering Intake 2024 - Batch 01",
-    faculty: "ENG-UOR",
-    department: "EEE",
-    intakeYear: 2024,
-    startDate: "2024-08-14",
-    endDate: "2028-06-30",
-    status: "Active",
-    size: 118,
-  },
-  {
-    id: 3,
-    code: "SCI-2023-02",
-    name: "Science Intake 2023 - Batch 02",
-    faculty: "SCI-UOR",
-    department: "Physics",
-    intakeYear: 2023,
-    startDate: "2023-08-10",
-    endDate: "2027-06-30",
-    status: "Active",
-    size: 95,
-  },
-  {
-    id: 4,
-    code: "ENG-2021-01",
-    name: "Engineering Intake 2021 - Batch 01",
-    faculty: "ENG-UOM",
-    department: "CSE",
-    intakeYear: 2021,
-    startDate: "2021-08-12",
-    endDate: "2025-06-30",
-    status: "Archived",
-    size: 130,
-  },
-];
-
-type SortKey = keyof Pick<
-  Batch,
-  "code" | "name" | "faculty" | "department" | "intakeYear" | "startDate" | "endDate" | "status" | "size"
->;
+type SortKey = keyof Pick<Batch, "name" | "startYear" | "durationYears" | "facultyName">;
 
 function useDraggable() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -114,29 +46,46 @@ export default function BatchesTable() {
   const [rows, setRows] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [sortBy, setSortBy] = useState<SortKey>("code");
+  const searchRef = useRef<HTMLInputElement | null>(null);
+
+  const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
 
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-
-  const [editing, setEditing] = useState<Batch | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [viewing, setViewing] = useState<Batch | null>(null);
+  // view/edit/delete state
+  const [viewing, setViewing] = useState<any>(null);
+  const [viewingError, setViewingError] = useState<string | null>(null);
   const viewDrag = useDraggable();
 
-  // Delete confirmation
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [batchToDelete, setBatchToDelete] = useState<Batch | null>(null);
+  const [editing, setEditing] = useState<Batch | null>(null);
+  const [editingError, setEditingError] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const [creating, setCreating] = useState(false);
+  const [creatingError, setCreatingError] = useState<string | null>(null);
+  const [savingCreate, setSavingCreate] = useState(false);
+
+  const [showDelete, setShowDelete] = useState(false);
+  const [toDelete, setToDelete] = useState<Batch | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get<Batch[]>("/api/batches");
-        setRows(Array.isArray(data) && data.length ? data : SAMPLE_BATCHES);
+        const res = await api.get(`/v1/batches/GetAll`);
+        const arr = Array.isArray(res?.data?.data) ? res.data.data : (Array.isArray(res?.data) ? res.data : []);
+        const mapped: Batch[] = (arr as any[]).map((b: any) => ({
+          id: b.id,
+          name: b.name,
+          startYear: b.startYear,
+          durationYears: b.durationYears,
+          facultyId: b.facultyId,
+          facultyName: b.facultyName,
+        }));
+        setRows(mapped.slice().sort((a, b) => a.id - b.id));
       } catch {
-        setRows(SAMPLE_BATCHES);
+        setRows([]);
       } finally {
         setLoading(false);
       }
@@ -146,215 +95,216 @@ export default function BatchesTable() {
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
     const f = t
-      ? rows.filter((r) =>
-          [
-            r.code,
-            r.name,
-            r.faculty,
-            r.department,
-            r.intakeYear?.toString(),
-            r.startDate,
-            r.endDate,
-            r.status,
-            r.size?.toString(),
-          ]
-            .filter(Boolean)
-            .some((v) => String(v).toLowerCase().includes(t))
-        )
+      ? rows.filter((r) => [r.name, r.startYear, r.durationYears, r.facultyName]
+          .filter((v) => v !== undefined && v !== null)
+          .some((v) => String(v).toLowerCase().includes(t)))
       : rows;
 
+    if (!sortBy) return f;
+
     const s = [...f].sort((a, b) => {
-      const av = (a[sortBy] ?? "").toString().toLowerCase();
-      const bv = (b[sortBy] ?? "").toString().toLowerCase();
-      if (av < bv) return sortAsc ? -1 : 1;
-      if (av > bv) return sortAsc ? 1 : -1;
+      const av = a[sortBy] as any;
+      const bv = b[sortBy] as any;
+      if (typeof av === "number" && typeof bv === "number") {
+        return sortAsc ? av - bv : bv - av;
+      }
+      const as = String(av ?? "").toLowerCase();
+      const bs = String(bv ?? "").toLowerCase();
+      if (as < bs) return sortAsc ? -1 : 1;
+      if (as > bs) return sortAsc ? 1 : -1;
       return 0;
     });
-
     return s;
   }, [rows, q, sortBy, sortAsc]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const view = filtered.slice((page - 1) * pageSize, page * pageSize);
-
   const toggleSort = (key: SortKey) => {
     if (key === sortBy) setSortAsc((v) => !v);
-    else {
-      setSortBy(key);
-      setSortAsc(true);
-    }
+    else { setSortBy(key); setSortAsc(true); }
   };
 
-  const sortIcon = (key: SortKey) =>
-    sortBy !== key ? <FaSort /> : sortAsc ? <FaSortUp /> : <FaSortDown />;
+  const sortIcon = (key: SortKey) => (sortBy !== key ? <FaSort /> : sortAsc ? <FaSortUp /> : <FaSortDown />);
 
-  // Delete modal handlers
-  const askDelete = (b: Batch) => {
-    setBatchToDelete(b);
-    setShowDeleteModal(true);
-  };
-
-  const closeDeleteModal = () => {
-    setShowDeleteModal(false);
-    setBatchToDelete(null);
-  };
-
-  const confirmDelete = async () => {
-    if (!batchToDelete) return;
+  // View details
+  const handleView = async (id: number) => {
+    setViewingError(null);
     try {
-      await axios.delete(`/api/batches/${batchToDelete.id}`);
-    } catch {
-      return; // optionally toast error
+      const res = await api.get(`/v1/batches/GetById/${id}`);
+      const data = res?.data?.data ?? res?.data;
+      if (data) { setViewing(data); return; }
+      throw new Error("Empty response");
+    } catch (e: any) {
+      const local = rows.find((x) => x.id === id) || null;
+      if (local) setViewing(local);
+      const d = e?.response?.data;
+      const msg = (d?.message || (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) || d?.error || e?.message || "An unexpected error occurred");
+      setViewingError(String(msg));
     }
-    setRows((r) => r.filter((x) => x.id !== batchToDelete.id));
-    closeDeleteModal();
   };
 
-  const handleCreate = async (payload: Omit<Batch, "id">) => {
-    const { data } = await axios.post<Batch>("/api/batches", payload);
-    setRows((r) => [data, ...r]);
-    setCreating(false);
+  // Edit
+  const handleOpenEdit = async (id: number) => {
+    setEditingError(null);
+    try {
+      const res = await api.get(`/v1/batches/GetById/${id}`);
+      const b = res?.data?.data ?? res?.data;
+      if (b) {
+        setEditing({ id: b.id, name: b.name, startYear: b.startYear, durationYears: b.durationYears, facultyId: b.facultyId, facultyName: b.facultyName });
+        return;
+      }
+      throw new Error("Empty response");
+    } catch (e: any) {
+      const local = rows.find((x) => x.id === id) || null;
+      if (local) setEditing(local);
+      const d = e?.response?.data;
+      const msg = (d?.message || (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) || d?.error || e?.message || "An unexpected error occurred");
+      setEditingError(String(msg));
+    }
   };
 
   const handleUpdate = async (id: number, payload: Omit<Batch, "id">) => {
-    const { data } = await axios.put<Batch>(`/api/batches/${id}`, payload);
-    setRows((r) => r.map((x) => (x.id === id ? data : x)));
-    setEditing(null);
+    setEditingError(null);
+    setSavingEdit(true);
+    const body = { name: payload.name.trim(), startYear: Number(payload.startYear), durationYears: Number(payload.durationYears), facultyId: Number(payload.facultyId) };
+    try {
+      const res = await api.put(`/v1/batches/Update/${id}`, body);
+      const d = res?.data?.data ?? res?.data;
+      if (res && res.status >= 200 && res.status < 300) {
+        if (d) {
+          const mapped: Batch = { id: d.id, name: d.name, startYear: d.startYear, durationYears: d.durationYears, facultyId: d.facultyId, facultyName: d.facultyName };
+          setRows((prev) => prev.map((x) => (x.id === id ? mapped : x)).slice().sort((a, b) => a.id - b.id));
+        }
+        setEditing(null);
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
+      setEditingError(String(msg));
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
-  useEffect(() => {
-    setPage(1);
-  }, [q]);
+  
+  const handleCreate = async (payload: Omit<Batch, 'id' | 'facultyName'>) => {
+    setCreatingError(null);
+    setSavingCreate(true);
+    const body = { name: String(payload.name).trim(), startYear: Number(payload.startYear), durationYears: Number(payload.durationYears), facultyId: Number(payload.facultyId) };
+    try {
+      const res = await api.post(`/v1/batches/Create`, body);
+      const d = res?.data?.data ?? res?.data;
+      if (res && res.status >= 200 && res.status < 300 && d) {
+        const mapped: Batch = { id: d.id, name: d.name, startYear: d.startYear, durationYears: d.durationYears, facultyId: d.facultyId, facultyName: d.facultyName };
+        setRows((prev) => prev.concat(mapped).slice().sort((a, b) => a.id - b.id));
+        setCreating(false);
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined) || data?.error || e?.message || 'An unexpected error occurred');
+      setCreatingError(String(msg));
+    } finally {
+      setSavingCreate(false);
+    }
+  };
+// Delete
+  const askDelete = (b: Batch) => { setToDelete(b); setDeleteError(null); setShowDelete(true); };
+  const closeDelete = () => { setShowDelete(false); setToDelete(null); };
+  const confirmDelete = async () => {
+    if (!toDelete) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await api.delete(`/v1/batches/Delete/${toDelete.id}`);
+      if (res && res.status >= 200 && res.status < 300) {
+        setRows((prev) => prev.filter((x) => x.id !== toDelete.id));
+        closeDelete();
+      }
+    } catch (e: any) {
+      const data = e?.response?.data;
+      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
+      setDeleteError(String(msg));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div>
-      {/* Top toolbar (shared classes) */}
+      {/* Top toolbar (theme-consistent) */}
       <div className="user-management-header">
         <div className="custom-searchbar">
           <input
+            ref={searchRef}
             type="text"
-            placeholder="Search…"
+            placeholder="Search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <FaSearch className="search-icon" />
-        </div>
-
-        <div className="filters">
-          <button className="add-user-btn" onClick={() => setCreating(true)}>
-            <FaPlus style={{ marginRight: 6 }} />
-            Add Batch
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Search"
+            title="Search"
+            onClick={() => {
+              const val = searchRef.current?.value ?? "";
+              setQ(val.trim());
+              searchRef.current?.focus();
+            }}
+            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+          >
+            <FaSearch className="search-icon" />
           </button>
         </div>
+        <div className="filters">         <button className="add-user-btn" onClick={() => setCreating(true)}> <FaPlus style={{ marginRight: 6 }} />Add Batch</button>     </div>
       </div>
 
-      {/* Table (shared classes) */}
+      {/* Table */}
       <div className="table-wrapper">
         <table className="user-table">
           <thead>
             <tr>
               <th>Id</th>
-              <th onClick={() => toggleSort("code")}>
-                Batch ID {sortIcon("code")}
-              </th>
-              <th onClick={() => toggleSort("name")}>
-                Name {sortIcon("name")}
-              </th>
-              <th onClick={() => toggleSort("faculty")}>
-                Faculty {sortIcon("faculty")}
-              </th>
-              <th onClick={() => toggleSort("department")}>
-                Department {sortIcon("department")}
-              </th>
-              <th onClick={() => toggleSort("intakeYear")}>
-                Intake Year {sortIcon("intakeYear")}
-              </th>
-              <th onClick={() => toggleSort("startDate")}>
-                Start Date {sortIcon("startDate")}
-              </th>
-              <th onClick={() => toggleSort("endDate")}>
-                End Date {sortIcon("endDate")}
-              </th>
-              <th onClick={() => toggleSort("status")}>
-                Status {sortIcon("status")}
-              </th>
-              <th onClick={() => toggleSort("size")}>
-                Size {sortIcon("size")}
-              </th>
+              <th onClick={() => toggleSort("name")}>Batch name {sortIcon("name")}</th>
+              <th onClick={() => toggleSort("startYear")}>Start year {sortIcon("startYear" as any)}</th>
+              <th onClick={() => toggleSort("durationYears")}>duration year {sortIcon("durationYears" as any)}</th>
+              <th onClick={() => toggleSort("facultyName")}>faculty name {sortIcon("facultyName" as any)}</th>
               <th>Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {loading && (
-              <tr>
-                <td colSpan={11}>Loading…</td>
-              </tr>
+              <tr><td colSpan={6}>Loading...</td></tr>
             )}
-
-            {!loading && view.length === 0 && (
-              <tr>
-                <td colSpan={11}>No data</td>
-              </tr>
+            {!loading && filtered.length === 0 && (
+              <tr><td colSpan={6}>No data</td></tr>
             )}
-
-            {!loading &&
-              view.map((b, i) => (
-                <tr key={b.id}>
-                  <td>{(page - 1) * pageSize + i + 1}</td>
-                  <td>{b.code}</td>
-                  <td>{b.name}</td>
-                  <td>{b.faculty || "-"}</td>
-                  <td>{b.department || "-"}</td>
-                  <td>{b.intakeYear}</td>
-                  <td>{b.startDate || "-"}</td>
-                  <td>{b.endDate || "-"}</td>
-                  <td>{b.status || "-"}</td>
-                  <td>{b.size ?? "-"}</td>
-                  <td className="actions">
-                    <button className="icon-btn" title="View" onClick={() => setViewing(b)}>
-                      <FaEye className="icon view-icon" />
-                    </button>
-                    <button className="icon-btn" title="Edit" onClick={() => setEditing(b)}>
-                      <MdEdit className="icon edit-icon" />
-                    </button>
-                    <button className="icon-btn" title="Delete" onClick={() => askDelete(b)}>
-                      <MdDelete className="icon delete-icon" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {!loading && filtered.map((b) => (
+              <tr key={b.id}>
+                <td>{b.id}</td>
+                <td>{b.name}</td>
+                <td>{b.startYear}</td>
+                <td>{b.durationYears}</td>
+                <td>{b.facultyName}</td>
+                <td className="actions">
+                  <button className="icon-btn" title="View" onClick={() => handleView(b.id)}>
+                    <FaEye className="icon view-icon" />
+                  </button>
+                  <button className="icon-btn" title="Edit" onClick={() => handleOpenEdit(b.id)}>
+                    <MdEdit className="icon edit-icon" />
+                  </button>
+                  <button className="icon-btn" title="Delete" onClick={() => askDelete(b)}>
+                    <MdDelete className="icon delete-icon" />
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
-      {/* Create modal */}
-      {creating && (
-        <AppFormModal
-          title="Add Batch"
-          initial={{}}
-          onCancel={() => setCreating(false)}
-          onSubmit={(payload) => handleCreate(payload)}
-        />
-      )}
-
-      {/* Edit modal */}
-      {editing && (
-        <AppFormModal
-          title="Edit Batch"
-          initial={editing}
-          onCancel={() => setEditing(null)}
-          onSubmit={(payload) => handleUpdate(editing.id, payload)}
-        />
-      )}
-
+      {/* View modal */}
       {viewing && (
-        <div className="app-modal-backdrop" onClick={() => setViewing(null)} role="dialog" aria-modal="true">
-          <div
-            className="app-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
-          >
+        <div className="app-modal-backdrop" role="dialog" aria-modal="true">
+          <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}>
             <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
               <h3 className="app-modal__title">Batch Details</h3>
               <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
@@ -362,16 +312,15 @@ export default function BatchesTable() {
               </button>
             </div>
             <div className="app-form" style={{ paddingTop: 0 }}>
+              {viewingError && (
+                <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>{viewingError}</div>
+              )}
               <div className="app-grid">
-                <div className="app-field"><span className="app-label">Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.code}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
-                <div className="app-field"><span className="app-label">Faculty</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.faculty || '-'}</div></div>
-                <div className="app-field"><span className="app-label">Department</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.department || '-'}</div></div>
-                <div className="app-field"><span className="app-label">Intake Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.intakeYear}</div></div>
-                <div className="app-field"><span className="app-label">Start Date</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.startDate || '-'}</div></div>
-                <div className="app-field"><span className="app-label">End Date</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.endDate || '-'}</div></div>
-                <div className="app-field"><span className="app-label">Status</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.status || '-'}</div></div>
-                <div className="app-field"><span className="app-label">Size</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.size ?? '-'}</div></div>
+                <div className="app-field"><span className="app-label">Id</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.id)}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">Batch name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
+                <div className="app-field"><span className="app-label">Start year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.startYear}</div></div>
+                <div className="app-field"><span className="app-label">duration year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.durationYears}</div></div>
+                <div className="app-field"><span className="app-label">faculty name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.facultyName}</div></div>
               </div>
               <div className="app-modal__actions">
                 <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>
@@ -381,53 +330,45 @@ export default function BatchesTable() {
         </div>
       )}
 
-      {/* Delete confirmation (uses your common modal classes) */}
-      {showDeleteModal && (
-        <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-title"
-          onClick={closeDeleteModal}
-        >
-          <div
-            className="modal"
-            role="document"
-            onClick={(e) => e.stopPropagation()}
-            tabIndex={-1}
-          >
+      {/* Edit modal */}
+      {editing && (
+        <BatchFormModal
+          title="Edit Batch"
+          initial={{ name: editing.name, startYear: editing.startYear, durationYears: editing.durationYears, facultyId: editing.facultyId }}
+          onCancel={() => setEditing(null)}
+          onSubmit={(payload) => handleUpdate(editing.id, payload as any)}
+          error={editingError ?? undefined}
+          saving={savingEdit}
+        />
+      )}
+
+            {creating && (
+        <BatchFormModal
+          title="Add Batch"
+          onCancel={() => setCreating(false)}
+          onSubmit={(payload) => handleCreate(payload as any)}
+          error={creatingError ?? undefined}
+          saving={savingCreate}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      {showDelete && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
             <div className="modal-header">
               <h4 id="delete-title">Delete Batch</h4>
-              <button
-                className="close-btn"
-                aria-label="Close"
-                onClick={closeDeleteModal}
-              >
-                ×
-              </button>
+              <button className="close-btn" aria-label="Close" onClick={closeDelete}>A-</button>
             </div>
             <div className="modal-body">
               <p className="modal-body">
-                {batchToDelete ? (
-                  <>
-                    Are you sure you want to delete{" "}
-                    <strong>
-                      {batchToDelete.code} — {batchToDelete.name}
-                    </strong>
-                    ?
-                  </>
-                ) : (
-                  "Are you sure you want to delete this batch?"
-                )}
+                {toDelete ? (<>Are you sure you want to delete <strong>{toDelete.name}</strong>?</>) : ("Are you sure you want to delete this batch?")}
               </p>
+              {deleteError && (<div className="app-error" style={{ color: '#b91c1c' }}>{deleteError}</div>)}
             </div>
             <div className="modal-footer">
-              <button className="btn-delete danger" onClick={confirmDelete}>
-                Delete
-              </button>
-              <button className="btn-delete ghost" onClick={closeDeleteModal}>
-                Cancel
-              </button>
+              <button className="btn-delete danger" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete'}</button>
+              <button className="btn-delete ghost" onClick={closeDelete} disabled={deleting}>Cancel</button>
             </div>
           </div>
         </div>
@@ -436,191 +377,66 @@ export default function BatchesTable() {
   );
 }
 
-/** Reusable modal with the same app-* classes */
-function AppFormModal({
-  title,
-  initial,
-  onCancel,
-  onSubmit,
-}: {
+function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving }: {
   title: string;
-  initial?: Partial<Omit<Batch, "id">>;
+  initial?: Partial<Batch>;
   onCancel: () => void;
-  onSubmit: (payload: Omit<Batch, "id">) => void;
+  onSubmit: (payload: Omit<Batch, 'id' | 'facultyName'>) => void;
+  error?: string;
+  saving?: boolean;
 }) {
   const drag = useDraggable();
-  const [code, setCode] = useState(initial?.code ?? "");
   const [name, setName] = useState(initial?.name ?? "");
-  const [faculty, setFaculty] = useState(initial?.faculty ?? "");
-  const [department, setDepartment] = useState(initial?.department ?? "");
-  const [intakeYear, setIntakeYear] = useState<number>(
-    initial?.intakeYear ?? new Date().getFullYear()
-  );
-  const [startDate, setStartDate] = useState(initial?.startDate ?? "");
-  const [endDate, setEndDate] = useState(initial?.endDate ?? "");
-  const [status, setStatus] = useState<BatchStatus>(initial?.status ?? "Planned");
-  const [size, setSize] = useState<number | "">(initial?.size ?? "");
+  const [startYear, setStartYear] = useState<number | "">(initial?.startYear ?? "");
+  const [durationYears, setDurationYears] = useState<number | "">(initial?.durationYears ?? "");
+  const [facultyId, setFacultyId] = useState<number | "">(initial?.facultyId ?? "");
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      code,
-      name,
-      faculty,
-      department,
-      intakeYear: Number(intakeYear),
-      startDate,
-      endDate,
-      status,
-      size: size === "" ? undefined : Number(size),
-    });
+    onSubmit({ name: String(name).trim(), startYear: Number(startYear), durationYears: Number(durationYears), facultyId: Number(facultyId) } as any);
   };
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onCancel]);
-
   return (
-    <div
-      className="app-modal-backdrop"
-      onClick={onCancel}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        className="app-modal"
-        onClick={(e) => e.stopPropagation()}
-        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
-      >
+    <div className="app-modal-backdrop" role="dialog" aria-modal="true">
+      <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}>
         <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
           <h3 className="app-modal__title">{title}</h3>
-          <button
-            type="button"
-            className="app-modal__close"
-            onClick={onCancel}
-            aria-label="Close"
-            title="Close"
-          >
+          <button type="button" className="app-modal__close" onClick={onCancel} aria-label="Close" title="Close">
             <FaTimes />
           </button>
         </div>
 
         <form onSubmit={submit} className="app-form">
+          {error && (<div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>{error}</div>)}
           <div className="app-grid">
             <label className="app-field">
-              <span className="app-label">Batch ID</span>
-              <input
-                className="app-input"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                placeholder="e.g., ENG-2025-01"
-              />
+              <span className="app-label">Batch name</span>
+              <input className="app-input" value={name} onChange={(e) => setName(e.target.value)} required />
             </label>
-
             <label className="app-field">
-              <span className="app-label">Name</span>
-              <input
-                className="app-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="e.g., Engineering Intake 2025 - Batch 01"
-              />
+              <span className="app-label">Start year</span>
+              <input className="app-input" type="number" value={startYear as number | ""} onChange={(e) => setStartYear(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
-
             <label className="app-field">
-              <span className="app-label">Faculty</span>
-              <input
-                className="app-input"
-                value={faculty}
-                onChange={(e) => setFaculty(e.target.value)}
-                placeholder="e.g., ENG-UOR"
-              />
+              <span className="app-label">duration year</span>
+              <input className="app-input" type="number" value={durationYears as number | ""} onChange={(e) => setDurationYears(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
-
             <label className="app-field">
-              <span className="app-label">Department</span>
-              <input
-                className="app-input"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                placeholder="e.g., MME"
-              />
-            </label>
-
-            <label className="app-field">
-              <span className="app-label">Intake Year</span>
-              <input
-                className="app-input"
-                type="number"
-                value={intakeYear}
-                onChange={(e) => setIntakeYear(Number(e.target.value))}
-                min={1980}
-                max={2099}
-              />
-            </label>
-
-            <label className="app-field">
-              <span className="app-label">Start Date</span>
-              <input
-                className="app-input"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </label>
-
-            <label className="app-field">
-              <span className="app-label">End Date</span>
-              <input
-                className="app-input"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </label>
-
-            <label className="app-field">
-              <span className="app-label">Status</span>
-              <select
-                className="app-input"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as BatchStatus)}
-              >
-                <option value="Planned">Planned</option>
-                <option value="Active">Active</option>
-                <option value="Archived">Archived</option>
-              </select>
-            </label>
-
-            <label className="app-field app-grid--2">
-              <span className="app-label">Size</span>
-              <input
-                className="app-input"
-                type="number"
-                min={0}
-                value={size as number | undefined}
-                onChange={(e) =>
-                  setSize(e.target.value === "" ? "" : Number(e.target.value))
-                }
-                placeholder="e.g., 120"
-              />
+              <span className="app-label">faculty Id</span>
+              <input className="app-input" type="number" value={facultyId as number | ""} onChange={(e) => setFacultyId(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
           </div>
-
           <div className="app-modal__actions">
-            <button type="submit" className="app-btn app-btn--primary">
-              Save
-            </button>
-            <button type="button" className="app-btn" onClick={onCancel}>
-              Cancel
-            </button>
+            <button type="submit" className="app-btn app-btn--primary" disabled={!!saving}>{saving ? 'Saving...' : 'Save'}</button>
+            <button type="button" className="app-btn" onClick={onCancel} disabled={!!saving}>Cancel</button>
           </div>
         </form>
       </div>
     </div>
   );
 }
+
+
+
+
+
