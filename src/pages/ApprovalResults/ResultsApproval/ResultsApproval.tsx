@@ -4,7 +4,7 @@ import "./ResultsApproval.css";
 import PendingApprovals from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
 import ResultsSheetAP from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
-import { downloadExactHtmlPdf} from "../../../utils/downloadResultsSheetPdf"; // ✅ correct util
+import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf"; // ✅ correct util
 
 const ResultsApprovalPage = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -19,24 +19,25 @@ const ResultsApprovalPage = () => {
 
   const handleBack = () => setSelectedId(null);
 
- const handleDownloadPdf = async () => {
-  await new Promise<void>((r) => requestAnimationFrame(() => r())); // ensure mounted
-
-  // Option A: by selector (simplest)
-  await downloadExactHtmlPdf("#results-pdf-root", "ResultsSheet.pdf");
+  const handleDownloadPdf = async () => {
+    await new Promise<void>((r) => requestAnimationFrame(() => r())); // ensure render done
+    await downloadExactHtmlPdf("#results-pdf-root", "ResultsSheet.pdf");
   };
 
   return (
     <div className="lec-dashboard-container">
+      {/* Navbar */}
       <div className="nav">
         <Navbarin />
       </div>
 
       <div className="dashboard-content-approval">
+        {/* Sidebar */}
         <div className="sidebar-approval">
           <ResultsApprovalSidebar />
         </div>
 
+        {/* Main Area */}
         <div className="main-area-approval">
           <div className="card-approval">
             <div className="CAA">
@@ -44,16 +45,19 @@ const ResultsApprovalPage = () => {
                 <span className="tAR-heading">Pending Results Approval</span>
               </div>
 
+              {/* Pending Approvals List */}
               {!selectedId && (
                 <PendingApprovals
                   items={[
                     { id: "1", title: "Results Sheet - Batch 2023" },
                     { id: "2", title: "Results Sheet - Batch 2024" },
+                    { id: "3", title: "Results Sheet - Batch 2025" },
                   ]}
                   onApprove={onApprove}
                 />
               )}
 
+              {/* Approval View */}
               {selectedId && (
                 <>
                   <div className="tAR-inline">
@@ -86,9 +90,9 @@ const ResultsApprovalPage = () => {
                     </div>
                   </div>
 
-                  <div className="tAR-inline-body">
-                    <div className="rap" ref={printRootRef}>
-                      {/* Ensure ResultsTable inside ResultsSheetAP renders <table class="rs-table"> */}
+                  {/* Results Table Section */}
+                  <div className="tAR-inline-body-results">
+                    <div className="rap" id="results-pdf-root" ref={printRootRef}>
                       <ResultsSheetAP />
                     </div>
                   </div>

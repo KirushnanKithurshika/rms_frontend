@@ -277,9 +277,3 @@ body {
 /* inside text */
 .lab{ font-weight:600; white-space:nowrap; }
 .val{ font-weight:400; }
-
-.canvas{
-  width:75mm;
-  height:100px;
- 
-}

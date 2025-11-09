@@ -48,12 +48,19 @@
   color: #21406b;
 }
 
-.tAR-inline-body {
-  justify-content: center;
+.tAR-inline-body-results {
+
   padding: 12px;
   background: #fff;
   overflow: auto;
   max-height: 100vh;
+  display: flex;
+  align-items: center;       
+  flex-direction: column;   
+  overflow: auto;
+
+
+
 }
 
 

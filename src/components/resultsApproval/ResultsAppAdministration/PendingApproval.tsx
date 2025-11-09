@@ -5,23 +5,18 @@ import "./PendingApproval.css";
 export type ApprovalItem = { id: string; title: string };
 
 type PendingApprovalsProps = {
+  items: ApprovalItem[];             // ✅ add items prop
   onApprove: (id: string) => void;
 };
 
-const PendingApprovals: React.FC<PendingApprovalsProps> = ({ onApprove }) => {
-  // Define approvals list here (no need to import or pass from parent)
-  const approvals: ApprovalItem[] = [
-    { id: "22-5", title: "22nd Batch - 5th Semester Results" },
-    { id: "22-6", title: "22nd Batch - 6th Semester Results" },
-  ];
-
+const PendingApprovals: React.FC<PendingApprovalsProps> = ({ items, onApprove }) => {
   return (
     <section className="pa-scope pa-wrap">
       <div className="pa-list">
-        {approvals.map((item) => (
+        {items.map((item) => (
           <div key={item.id} className="pa-card" role="group" aria-label={item.title}>
             <div className="pa-card-left">
-              <FaRegFilePdf className="pa-icon" aria-hidden="true" focusable="false" />
+              <FaRegFilePdf className="pa-icon" aria-hidden="true" />
               <div className="pa-title" title={item.title}>
                 {item.title}
               </div>

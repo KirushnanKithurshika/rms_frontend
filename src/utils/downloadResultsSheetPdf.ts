@@ -16,7 +16,7 @@ export async function downloadExactHtmlPdf(
   await document.fonts?.ready?.catch(() => {});
 
   const opt: html2pdf.Options = {
-    margin: [0, 0, 0, 0],                // mm (top, right, bottom, left)
+    margin: [5, 0, 0, 0],                // mm (top, right, bottom, left)
     filename: fileName,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: {

@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaUndoAlt, FaBroom, FaImage } from "react-icons/fa";
-import "./SignatureCanvas.css";
+import "./SignatureCanvasRS.css";
 
 type Point = { x: number; y: number };
 type Stroke = Point[];
 
-export default function SignatureBoard() {
+export default function SignatureBoardRS() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -197,7 +197,7 @@ export default function SignatureBoard() {
   if (finalPngUrl) {
     return (
       <div className="sig-paper sig-paper--final" aria-label="Signature PNG output">
-        <img src={finalPngUrl} alt="Signature" className="sig-final-img" />
+        <img src={finalPngUrl} alt="Signature" className="sig-final-imgAR" />
       </div>
     );
   }

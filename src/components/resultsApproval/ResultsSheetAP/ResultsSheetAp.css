@@ -298,6 +298,85 @@ body {
 
 .canvas{
   width:75mm;
-  height:100px;
+  height: fit-content;
  
 }
+/* --- Section spacing & break behavior --- */
+.rs-sign-exactAP { margin-top: 40px; }
+.avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+.sig-gridAP{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 56px;              /* more air between columns */
+  align-items:start;
+}
+
+.sig-colAP{
+  display:flex;
+  flex-direction:column;
+}
+
+.sig-rightHeaderAP {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sig-rightHeaderAP--below {
+  margin: 6px 0 10px;           
+}
+
+.sig-leaderLabelAP { font-weight: 600; white-space: nowrap; }
+.sig-leaderDotsAP {
+  flex: 1 1 auto;
+  height: 0;
+  border-bottom: 1px dashed #2b2b2b;
+  transform: translateY(-2px);
+}
+
+
+.sig-signboxAP{
+ height:130px;
+  margin: 10px 0 10px;
+  border-bottom: 1px dashed #2b2b2b;
+  position: relative;
+  background: transparent;
+}
+.sig-signboxAP > canvas,
+.sig-signboxAP > img,
+.sig-signboxAP > div,
+.sig-signboxSmallAP > canvas,
+.sig-signboxSmallAP > img,
+.sig-signboxSmallAP > div{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: calc(100% - 2px);
+  object-fit: contain;
+}
+
+/* Captions & helper text */
+.sig-captionAP{
+  font-size:12px;
+  line-height:1.35;
+  color:#111;
+  margin:4px 0 18px;
+}
+.sig-smallAP{
+  font-size:12px;
+  color:#111;
+  margin:2px 0 8px;
+
+}
+
+/* Date pinned near bottom of left column content flow */
+.sig-dateAP{
+  font-size:12px;
+  color:#111;
+  margin-top:8px;
+}
+.sig-dateLabelAP{ font-weight:600; margin-right:6px; }
+.sig-dateValueAP{ font-weight:500; }
+
+

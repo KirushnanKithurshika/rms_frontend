@@ -1,6 +1,7 @@
 import React from "react";
-import './ResultsSheetAp.css'
+import "./ResultsSheetAp.css";
 import ResultsTable from "./ResultsTable/ResultsTable";
+import SignatureBoardRS from "../SignatureCanvasResultsSheet/SignatureCanvasRS";
 
 type Item = { code: string; name: string; credits: number };
 type Student = { name: string; regNo: string; gradesByCode: Record<string, string> };
@@ -18,6 +19,17 @@ type Props = {
     student?: Student;
     modulesCountingForGPA?: Counting;
     note?: string;
+    /** Single date shown on the sheet. If not provided, today's date is used. */
+    finalApprovalDate?: string | Date;
+};
+
+const formatLongDate = (d?: string | Date) => {
+    const date = d ? new Date(d) : new Date();
+    return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "2-digit",
+        year: "numeric",
+    }).format(date);
 };
 
 const ResultsSheetAP: React.FC<Props> = ({
@@ -43,6 +55,7 @@ const ResultsSheetAP: React.FC<Props> = ({
     },
     modulesCountingForGPA = { core: ["EE4250", "IS4305"], electives: ["IS4411", "IS4510"] },
     note = "Note: The results of the module IS4411 were previously released on December 23, 2024 and submitted for Senate Approval.",
+    finalApprovalDate,
 }) => {
     const gradeRow = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "E", "N", "W"];
     const gpRow = ["4.0", "4.0", "3.7", "3.3", "3.0", "2.7", "2.3", "2.0", "1.7", "0.0", "-", "-"];
@@ -60,9 +73,8 @@ const ResultsSheetAP: React.FC<Props> = ({
 
     return (
         <>
-            <section className="sheet a4"  id="results-pdf-root">
+            <section className="sheet a4" id="results-pdf-root">
                 {/* The sheet sits inside the page scroller */}
-
                 <div role="document" aria-label="A4 Results Sheet">
                     <div className="rs-top avoid-break">
                         {/* Header */}
@@ -115,66 +127,81 @@ const ResultsSheetAP: React.FC<Props> = ({
                             <div className="legend-row">
                                 <span className="legend-head">Grade</span>
                                 {gradeRow.map((g) => (
-                                    <span key={g} className="legend-cell">{g}</span>
+                                    <span key={g} className="legend-cell">
+                                        {g}
+                                    </span>
                                 ))}
                             </div>
                             <div className="legend-row">
                                 <span className="legend-head">Grade Point</span>
                                 {gpRow.map((g, i) => (
-                                    <span key={i} className="legend-cell">{g}</span>
+                                    <span key={i} className="legend-cell">
+                                        {g}
+                                    </span>
                                 ))}
                             </div>
                         </div>
 
-
                         <div className="rs-box">
-                           
-<ResultsTable/>
-                            <div className="rs-note avoid-break">{note}</div>
+                            <ResultsTable />
 
 
-                            <section className="rs-sign-exact avoid-break">
-
-                                <div className="sig-row top">
-                                    <div className="cell left">
-                                        <div className="label">Checked By:</div>
-                                    </div>
-                                    <div className="cell right">
-                                        <div className="lineBox">
-                                            <span className="sig-line r-line" />
+                            <section className="rs-sign-exactAP avoid-break">
+                                <div className="sig-gridAP">
+                                    {/* LEFT COLUMN */}
+                                    {/* LEFT COLUMN */}
+                                    <div className="sig-colAP">
+                                        {/* 1) Small signature box (the span-sized one) */}
+                                        <div className="sig-signboxAP">
+                                            <SignatureBoardRS />
                                         </div>
-                                        <div className="caption">Vice Chancellor, University of Ruhuna</div>
-                                    </div>
-                                </div>
 
-
-                                <div className="sig-row two-col">
-                                    <div className="cell left">
-                                        <div className="label strong">Certified Correct:</div>
-                                        <div className="lineBox">
-                                            <span className="sig-line l-line" />
+                              
+                                        <div className="sig-rightHeaderAP sig-rightHeaderAP--below">
+                                          <div className="sig-smallAP">Checked</div>
+                                          
                                         </div>
-                                        <div className="caption">
-                                            Senior Assistant Registrar,<br />
-                                            Faculty of Engineering, University of Ruhuna,<br />
+
+                                        {/* 3) Assistant Registrar full-size signature box */}
+                                        <div className="sig-signboxAP">
+                                            <SignatureBoardRS />
+                                        </div>
+
+                                        <div className="sig-smallAP">Certified Correct.</div>
+                                        <div className="sig-captionAP">
+                                            Assistant Registrar<br />
+                                            Faculty of Engineering, University of Ruhuna<br />
                                             Hapugala, Galle
                                         </div>
+
+                                        <div className="sig-dateAP">
+                                            <span className="sig-dateLabelAP">Final Approval Date :</span>
+                                            <span className="sig-dateValueAP">{formatLongDate(finalApprovalDate)}</span>
+                                        </div>
                                     </div>
 
-                                    <div className="cell right">
-                                        <div className="lineBox">
-                                            <span className="sig-line r-line" />
+
+                                    {/* RIGHT COLUMN */}
+                                    <div className="sig-colAP">
+                                        {/* Dean */}
+                                        <div className="sig-signboxAP">
+                                            <SignatureBoardRS />
                                         </div>
-                                        <div className="caption">Dean, Faculty of Engineering</div>
+                                        <div className="sig-captionAP">Dean, Faculty of Engineering</div>
+
+                                        {/* VC */}
+                                        <div className="sig-signboxAP">
+                                            <SignatureBoardRS />
+                                        </div>
+                                        <div className="sig-captionAP">Vice-chancellor, University of Ruhuna</div>
                                     </div>
                                 </div>
                             </section>
+
                         </div>
                     </div>
                 </div>
-
             </section>
-
 
             <section className="sheet a4"></section>
             <section className="sheet a4"></section>
