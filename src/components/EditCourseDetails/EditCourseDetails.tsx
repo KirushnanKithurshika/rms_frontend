@@ -5,6 +5,7 @@ import { useAppSelector } from "../../app/hooks";
 import { selectUserId } from "../../features/auth/selectors";
 import "./EditCourseDetails.css";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 /* ---------- Reusable dropdown ---------- */
 interface DropdownProps {
@@ -26,7 +27,8 @@ const CustomDropdown: React.FC<DropdownProps> = ({
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -69,7 +71,7 @@ export type CourseView = {
   code: string;
   title: string;
   department?: string; // label "CODE - Name"
-  credits?: number;           // numeric in the view (input uses string)
+  credits?: number; // numeric in the view (input uses string)
 };
 
 type Props = {
@@ -79,7 +81,13 @@ type Props = {
   onCancel?: () => void;
 };
 
-const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, onCancel }) => {
+const EditCourseDetails: React.FC<Props> = ({
+  initial,
+  allocationId,
+  onUpdate,
+  onCancel,
+}) => {
+  const navigate = useNavigate();
   // Dropdown data from backend
   type DepartmentDto = {
     departmentId: number;
@@ -90,21 +98,30 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
     id: number;
     name: string;
   };
-  const COURSE_TYPES = ["CORE", "TECHNICAL_ELECTIVE", "GENERAL_ELECTIVE"] as const;
+  const COURSE_TYPES = [
+    "CORE",
+    "TECHNICAL_ELECTIVE",
+    "GENERAL_ELECTIVE",
+  ] as const;
 
   // Build snapshot compatible with parent
-  const initialSnapshot = useMemo<CourseView>(() => ({
-    id: initial?.id,
-    code: initial?.code ?? "",
-    title: initial?.title ?? "",
-    department: initial?.department ?? "",
-    credits: initial?.credits,
-  }), [initial]);
+  const initialSnapshot = useMemo<CourseView>(
+    () => ({
+      id: initial?.id,
+      code: initial?.code ?? "",
+      title: initial?.title ?? "",
+      department: initial?.department ?? "",
+      credits: initial?.credits,
+    }),
+    [initial]
+  );
 
   // Local form state (credit as string for the input)
   const [code, setCode] = useState(initialSnapshot.code);
   const [title, setTitle] = useState(initialSnapshot.title);
-  const [department, setDepartment] = useState(initialSnapshot.department ?? "");
+  const [department, setDepartment] = useState(
+    initialSnapshot.department ?? ""
+  );
   const [creditValue, setCreditValue] = useState(
     initialSnapshot.credits != null ? String(initialSnapshot.credits) : ""
   );
@@ -122,7 +139,11 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
     courseType: string;
     course: { id: number; courseCode: string; courseName: string };
     semester: { id: number; name: string };
-    pass?: { caPassPercent?: number; endExamPassPercent?: number; overallPassPercent?: number };
+    pass?: {
+      caPassPercent?: number;
+      endExamPassPercent?: number;
+      overallPassPercent?: number;
+    };
     description?: string;
   };
   const [allocations, setAllocations] = useState<AllocationItem[]>([]);
@@ -145,24 +166,7 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
     }
   }, [allocationId]);
 
-  // Seed selected allocation from props
-  useEffect(() => {
-    if (typeof (arguments as any) === 'undefined') {
-      // no-op to keep TS happy in some editors
-    }
-  }, []);
-  useEffect(() => {
-    if (typeof (initial as any) !== 'undefined') {
-      // placeholder to avoid unused warning
-    }
-  }, [initial]);
-  useEffect(() => {
-    // When parent passes allocationId, prefer it and skip listing dropdown
-    const propAllocId = ({} as any); // dummy to avoid hoist issues
-  }, []);
-  // simple set from prop
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (typeof (arguments as any) !== 'undefined') {} }, []);
+  // removed placeholder effects
 
   // Assessments for selected allocation (CA only, edit via Update endpoint)
   type AssessmentRow = {
@@ -185,7 +189,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
     setCode(initialSnapshot.code);
     setTitle(initialSnapshot.title);
     setDepartment(initialSnapshot.department ?? "");
-    setCreditValue(initialSnapshot.credits != null ? String(initialSnapshot.credits) : "");
+    setCreditValue(
+      initialSnapshot.credits != null ? String(initialSnapshot.credits) : ""
+    );
   }, [initialSnapshot]);
 
   // Load dropdown data + lecturer id + allocations for this course
@@ -221,7 +227,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       setDepartmentId(null);
       return;
     }
-    const m = departments.find((x) => `${x.code} - ${x.departmentName}` === department);
+    const m = departments.find(
+      (x) => `${x.code} - ${x.departmentName}` === department
+    );
     setDepartmentId(m?.departmentId ?? null);
   }, [department, departments]);
 
@@ -237,7 +245,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
         setAllocations(all as AllocationItem[]);
         // Try to auto-pick one matching current course code or id, else first
         const byCode = all.find((a: any) => a.course?.courseCode === code);
-        const byId = all.find((a: any) => a.course?.id === Number(initialSnapshot.id));
+        const byId = all.find(
+          (a: any) => a.course?.id === Number(initialSnapshot.id)
+        );
         const pick = byCode ?? byId ?? all[0];
         if (pick) setSelectedAllocId(pick.allocationId);
       } catch {}
@@ -252,7 +262,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
     // Fetch fresh allocation details by id
     (async () => {
       try {
-        const allocRes = await api.get(`/v1/course-allocations/GetById/${sel.allocationId}`);
+        const allocRes = await api.get(
+          `/v1/course-allocations/GetById/${sel.allocationId}`
+        );
         const a = allocRes.data?.data ?? allocRes.data;
         setAllocCourseType(a?.courseType ?? "CORE");
         if (a?.course?.id) setCourseId(Number(a.course.id));
@@ -273,7 +285,13 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       setAssLoading(true);
       try {
         const r = await api.get(`../results/preview`, {
-          params: { allocationId: sel.allocationId, type: "CA", page: 0, size: 1, includeMeta: true },
+          params: {
+            allocationId: sel.allocationId,
+            type: "CA",
+            page: 0,
+            size: 1,
+            includeMeta: true,
+          },
         });
         const header = (r.data?.data ?? r.data)?.header;
         const basic: AssessmentRow[] = Array.isArray(header?.assessments)
@@ -291,7 +309,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
         const detailed = await Promise.all(
           basic.map(async (b) => {
             try {
-              const ad = await api.get(`/v1/assessments/GetById/${b.assessmentId}`);
+              const ad = await api.get(
+                `/v1/assessments/GetById/${b.assessmentId}`
+              );
               const d = ad.data?.data ?? ad.data;
               return {
                 assessmentId: d?.id ?? b.assessmentId,
@@ -322,13 +342,16 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
     const loadCourse = async () => {
       try {
         if (initialSnapshot.code) {
-          const r = await api.get(`/v1/courses/GetByCode/${encodeURIComponent(initialSnapshot.code)}`);
+          const r = await api.get(
+            `/v1/courses/GetByCode/${encodeURIComponent(initialSnapshot.code)}`
+          );
           const d = r.data?.data ?? r.data;
           if (d?.id) setCourseId(Number(d.id));
           if (d?.courseCode) setCode(String(d.courseCode));
           if (d?.courseName) setTitle(String(d.courseName));
           if (d?.credits != null) setCreditValue(String(d.credits));
-          if (d?.departmentCode && d?.departmentName) setDepartment(`${d.departmentCode} - ${d.departmentName}`);
+          if (d?.departmentCode && d?.departmentName)
+            setDepartment(`${d.departmentCode} - ${d.departmentName}`);
           return;
         }
       } catch {}
@@ -341,7 +364,8 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
         if (d?.courseCode) setCode(String(d.courseCode));
         if (d?.courseName) setTitle(String(d.courseName));
         if (d?.credits != null) setCreditValue(String(d.credits));
-        if (d?.departmentCode && d?.departmentName) setDepartment(`${d.departmentCode} - ${d.departmentName}`);
+        if (d?.departmentCode && d?.departmentName)
+          setDepartment(`${d.departmentCode} - ${d.departmentName}`);
       } catch {}
     };
     loadCourse();
@@ -351,11 +375,18 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
   const courseDirty = useMemo(() => {
     const snap = initialSnapshot;
     const snapCredit = snap.credits != null ? String(snap.credits) : "";
-    return !(code === snap.code && title === snap.title && department === (snap.department ?? "") && creditValue === snapCredit);
+    return !(
+      code === snap.code &&
+      title === snap.title &&
+      department === (snap.department ?? "") &&
+      creditValue === snapCredit
+    );
   }, [code, title, department, creditValue, initialSnapshot]);
 
   const updateCourse = async () => {
-    setError(null); setSuccess(null); setSaving(true);
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
     try {
       // Resolve course id: prefer fetched courseId; else initial snapshot; else allocations
       let id = Number(courseId ?? initialSnapshot.id);
@@ -370,15 +401,28 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       if (!Number.isFinite(id) || id <= 0) throw new Error("Missing course id");
       if (!departmentId) throw new Error("Select a department");
       const creditsNum = Number(creditValue);
-      if (!Number.isFinite(creditsNum) || creditsNum <= 0) throw new Error("Credits must be > 0");
-      const body = { courseCode: code.trim(), courseName: title.trim(), credits: creditsNum, departmentId };
+      if (!Number.isFinite(creditsNum) || creditsNum <= 0)
+        throw new Error("Credits must be > 0");
+      const body = {
+        courseCode: code.trim(),
+        courseName: title.trim(),
+        credits: creditsNum,
+        departmentId,
+      };
       const res = await api.put(`/v1/courses/Update/${id}`, body);
       const data = res.data?.data ?? res.data;
       setSuccess("Course updated successfully");
       toast.success("Course updated successfully");
-      onUpdate?.({ id, code: data.courseCode ?? code, title: data.courseName ?? title, department, credits: creditsNum });
+      onUpdate?.({
+        id,
+        code: data.courseCode ?? code,
+        title: data.courseName ?? title,
+        department,
+        credits: creditsNum,
+      });
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "Course update failed";
+      const msg =
+        e?.response?.data?.message || e?.message || "Course update failed";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -387,7 +431,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
   };
 
   const updateAllocation = async () => {
-    setError(null); setSuccess(null); setSaving(true);
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
     try {
       const allocId = selectedAllocId;
       if (!allocId) throw new Error("Select an allocation");
@@ -409,7 +455,8 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       setSuccess("Allocation updated successfully");
       toast.success("Allocation updated successfully");
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "Allocation update failed";
+      const msg =
+        e?.response?.data?.message || e?.message || "Allocation update failed";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -418,7 +465,9 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
   };
 
   const saveAssessment = async (row: AssessmentRow) => {
-    setError(null); setSuccess(null); setSaving(true);
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
     try {
       const id = row.assessmentId;
       const body = {
@@ -433,7 +482,8 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
       setSuccess("Assessment updated");
       toast.success("Assessment updated");
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "Assessment update failed";
+      const msg =
+        e?.response?.data?.message || e?.message || "Assessment update failed";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -469,6 +519,17 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
                   onChange={(e) => setCode(e.target.value)}
                 />
               </div>
+              <div>
+                <div className="form-group">
+                  <label>Credit Value</label>
+                  <input
+                    className="input"
+                    placeholder="Credit Value"
+                    value={creditValue}
+                    onChange={(e) => setCreditValue(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
             <div>
@@ -496,21 +557,16 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
                 onChange={setDepartment}
               />
             </div>
-
-            <div>
-              <div className="form-group">
-                <label>Credit Value</label>
-                <input
-                  className="input"
-                  placeholder="Credit Value"
-                  value={creditValue}
-                  onChange={(e) => setCreditValue(e.target.value)}
-                />
-              </div>
-            </div>
           </div>
-          <div className="form-actions bottom-actions" style={{ justifyContent: 'flex-end' }}>
-            <button type="submit" className="btn primary" disabled={!courseDirty || saving}>
+          <div
+            className="form-actions bottom-actions"
+            style={{ justifyContent: "flex-end" }}
+          >
+            <button
+              type="submit"
+              className="btn primary"
+              disabled={!courseDirty || saving}
+            >
               Save Course
             </button>
           </div>
@@ -525,16 +581,23 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
               <CustomDropdown
                 label="Select Allocation"
                 options={(Array.isArray(allocations) ? allocations : []).map(
-                  (a) => `${a.allocationId} - ${a.course?.courseCode ?? ''} ${a.course?.courseName ?? ''} (${a.semester?.name ?? ''})`
+                  (a) =>
+                    `${a.allocationId} - ${a.course?.courseCode ?? ""} ${
+                      a.course?.courseName ?? ""
+                    } (${a.semester?.name ?? ""})`
                 )}
                 value={
                   selectedAllocId
                     ? (() => {
-                        const a = (Array.isArray(allocations) ? allocations : []).find(
-                          (x) => x.allocationId === selectedAllocId
-                        );
+                        const a = (
+                          Array.isArray(allocations) ? allocations : []
+                        ).find((x) => x.allocationId === selectedAllocId);
                         return a
-                          ? `${a.allocationId} - ${a.course?.courseCode ?? ''} ${a.course?.courseName ?? ''} (${a.semester?.name ?? ''})`
+                          ? `${a.allocationId} - ${
+                              a.course?.courseCode ?? ""
+                            } ${a.course?.courseName ?? ""} (${
+                              a.semester?.name ?? ""
+                            })`
                           : "";
                       })()
                     : ""
@@ -559,13 +622,15 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
             />
             <CustomDropdown
               label="Semester"
-              options={(Array.isArray(semesters) ? semesters : []).map((s) => `${s.id} - ${s.name}`)}
+              options={(Array.isArray(semesters) ? semesters : []).map(
+                (s) => `${s.id} - ${s.name}`
+              )}
               value={
                 allocSemesterId
                   ? (() => {
-                      const s = (Array.isArray(semesters) ? semesters : []).find(
-                        (x) => x.id === allocSemesterId
-                      );
+                      const s = (
+                        Array.isArray(semesters) ? semesters : []
+                      ).find((x) => x.id === allocSemesterId);
                       const nm = s?.name ?? allocSemesterLabel;
                       return `${allocSemesterId} - ${nm ?? ""}`;
                     })()
@@ -583,23 +648,50 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
             />
             <div className="form-group">
               <label>CA Pass %</label>
-              <input className="input" inputMode="numeric" value={allocCaPass} onChange={(e) => setAllocCaPass(e.target.value)} />
+              <input
+                className="input"
+                inputMode="numeric"
+                value={allocCaPass}
+                onChange={(e) => setAllocCaPass(e.target.value)}
+              />
             </div>
             <div className="form-group">
               <label>End Exam Pass %</label>
-              <input className="input" inputMode="numeric" value={allocEndPass} onChange={(e) => setAllocEndPass(e.target.value)} />
+              <input
+                className="input"
+                inputMode="numeric"
+                value={allocEndPass}
+                onChange={(e) => setAllocEndPass(e.target.value)}
+              />
             </div>
             <div className="form-group">
               <label>Overall Pass %</label>
-              <input className="input" inputMode="numeric" value={allocOverallPass} onChange={(e) => setAllocOverallPass(e.target.value)} />
+              <input
+                className="input"
+                inputMode="numeric"
+                value={allocOverallPass}
+                onChange={(e) => setAllocOverallPass(e.target.value)}
+              />
             </div>
             <div className="form-group full-width">
               <label>Description</label>
-              <input className="input" value={allocDescription} onChange={(e) => setAllocDescription(e.target.value)} />
+              <input
+                className="input"
+                value={allocDescription}
+                onChange={(e) => setAllocDescription(e.target.value)}
+              />
             </div>
           </div>
-          <div className="form-actions bottom-actions" style={{ justifyContent: 'flex-end' }}>
-            <button type="button" className="btn primary" onClick={updateAllocation} disabled={saving || !selectedAllocId}>
+          <div
+            className="form-actions bottom-actions"
+            style={{ justifyContent: "flex-end" }}
+          >
+            <button
+              type="button"
+              className="btn primary"
+              onClick={updateAllocation}
+              disabled={saving || !selectedAllocId}
+            >
               Save Allocation
             </button>
           </div>
@@ -613,16 +705,124 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
             <div>No CA assessments found for this allocation.</div>
           ) : (
             <div className="form-grid">
+              {/* Column headings for assessments */}
+              <div className="cd-item" style={{ gridColumn: "1 / -1" }}>
+                <div className="cd-k" style={{ fontWeight: 700 }}>
+                  No.
+                </div>
+                <div
+                  className="cd-v"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(5, minmax(120px, 1fr)) 120px",
+                    gap: "8px",
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    color: "#0b235c",
+                  }}
+                >
+                  <div>Title</div>
+                  <div>Max</div>
+                  <div>Weight %</div>
+                  <div>Date</div>
+                  <div>Description</div>
+                  <div>Actions</div>
+                </div>
+              </div>
               {assessments.map((row, idx) => (
-                <div key={row.assessmentId} className="cd-item" style={{ gridColumn: '1 / -1' }}>
+                <div
+                  key={row.assessmentId}
+                  className="cd-item"
+                  style={{ gridColumn: "1 / -1" }}
+                >
                   <div className="cd-k">{`#${idx + 1}`} </div>
-                  <div className="cd-v" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(120px, 1fr)) 120px', gap: '8px' }}>
-                    <input className="input" value={row.title} onChange={(e) => setAssessments(prev => prev.map(r => r.assessmentId === row.assessmentId ? { ...r, title: e.target.value } : r))} placeholder="Title" />
-                    <input className="input" value={row.maxMarks} onChange={(e) => setAssessments(prev => prev.map(r => r.assessmentId === row.assessmentId ? { ...r, maxMarks: Number(e.target.value) || 0 } : r))} placeholder="Max" inputMode="numeric" />
-                    <input className="input" value={row.weight ?? ''} onChange={(e) => setAssessments(prev => prev.map(r => r.assessmentId === row.assessmentId ? { ...r, weight: Number(e.target.value) || 0 } : r))} placeholder="Weight %" inputMode="numeric" />
-                    <input className="input" type="date" value={row.date ?? ''} onChange={(e) => setAssessments(prev => prev.map(r => r.assessmentId === row.assessmentId ? { ...r, date: e.target.value } : r))} />
-                    <input className="input" value={row.description ?? ''} onChange={(e) => setAssessments(prev => prev.map(r => r.assessmentId === row.assessmentId ? { ...r, description: e.target.value } : r))} placeholder="Description (optional)" />
-                    <button type="button" className="btn" onClick={() => saveAssessment(row)} disabled={saving}>
+                  <div
+                    className="cd-v"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(5, minmax(120px, 1fr)) 120px",
+                      gap: "8px",
+                    }}
+                  >
+                    <input
+                      className="input"
+                      value={row.title}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, title: e.target.value }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Title"
+                    />
+                    <input
+                      className="input"
+                      value={row.maxMarks}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, maxMarks: Number(e.target.value) || 0 }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Max"
+                      inputMode="numeric"
+                    />
+                    <input
+                      className="input"
+                      value={row.weight ?? ""}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, weight: Number(e.target.value) || 0 }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Weight %"
+                      inputMode="numeric"
+                    />
+                    <input
+                      className="input"
+                      type="date"
+                      value={row.date ?? ""}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, date: e.target.value }
+                              : r
+                          )
+                        )
+                      }
+                    />
+                    <input
+                      className="input"
+                      value={row.description ?? ""}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, description: e.target.value }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Description (optional)"
+                    />
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => saveAssessment(row)}
+                      disabled={saving}
+                    >
                       Update
                     </button>
                   </div>
@@ -633,7 +833,16 @@ const EditCourseDetails: React.FC<Props> = ({ initial, allocationId, onUpdate, o
         </div>
 
         <div className="form-actions bottom-actions">
-          <button type="button" className="btn ghost" onClick={onCancel}>
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => {
+              try {
+                onCancel?.();
+              } catch {}
+              navigate("/courses");
+            }}
+          >
             Cancel
           </button>
           {/* {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
