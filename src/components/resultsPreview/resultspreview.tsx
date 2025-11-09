@@ -215,7 +215,9 @@ const ResultsPreview: React.FC = () => {
                         ? (results as any).header?.course?.courseName
                         : ""}
                     </h4>
-                    <p>CA Marks (Total 40%)</p>
+                    <p>
+                      CA Marks (Total {(results as any)?.header?.totals?.caWeightTotal ?? ""}%)
+                    </p>
                   </div>
                   <div className="rp-logo">
                     <img src={Logo} alt="University/Department Logo" />
@@ -303,7 +305,9 @@ const ResultsPreview: React.FC = () => {
                         ? (results as any).header?.course?.courseName
                         : ""}
                     </h4>
-                    <p>Final Exam (Total 60%)</p>
+                    <p>
+                      Final Exam (Total {(results as any)?.header?.endExam?.weight ?? ""}%)
+                    </p>
                   </div>
                   <div className="rp-logo">
                     <img src={Logo} alt="University/Department Logo" />
