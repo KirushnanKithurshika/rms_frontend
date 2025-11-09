@@ -10,6 +10,7 @@ import {
   fetchAllocationsByLecturer,
   fetchResultsPreview,
 } from "../../features/resultsPreview/resultsPreviewSlice";
+import api from "../../services/api";
 
 // No dummy data; wired to backend
 
@@ -101,15 +102,24 @@ const ResultsPreview: React.FC = () => {
   const [selectedAllocationId, setSelectedAllocationId] = useState<
     number | null
   >(null);
+  const [lecturerId, setLecturerId] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Convert userId to lecturerId is done server-side in endpoint; here we have direct lecturer endpoints.
-    // We assume caller provides lecturerId; if not, you can add a prefetch here.
-    // For now, require that lecturerId equals userId mapping on backend, or expose lecturerId in auth if needed.
-    if (!userId) return;
-    // If your backend requires lecturerId (not userId), you can store lecturerId in auth or fetch once and keep in Redux.
-    dispatch(fetchAllocationsByLecturer(userId as number));
-  }, [dispatch, userId]);
+useEffect(() => {
+if (!userId) return;
+(async () => {
+try {
+const r = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
+const d = r.data?.data ?? r.data;
+const lid = Number(d?.id) || null;
+setLecturerId(lid);
+if (lid) {
+dispatch(fetchAllocationsByLecturer(lid));
+}
+} catch {
+// optionally toast or set local error
+}
+})();
+}, [dispatch, userId]);
 
   const courseOptions: Option[] = useMemo(() => {
     return allocations.map((a) => ({
