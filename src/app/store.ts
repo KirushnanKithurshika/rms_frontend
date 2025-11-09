@@ -5,6 +5,7 @@ import studentCourseReducer from "../features/studentCourses/studentCoursesSlice
 import studentCAReducer from "../features/studentCA/studentCASlice";
 import lecturerDashboardReducer from "../features/lecturerDashboard/lecturerDashboardSlice";
 import lecturerCoursesReducer from "../features/lecturerCourses/lecturerCoursesSlice";
+import resultsPreviewReducer from "../features/resultsPreview/resultsPreviewSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     studentCA: studentCAReducer,
     lecturerDashboard: lecturerDashboardReducer,
     lecturerCourses: lecturerCoursesReducer,
+    resultsPreview: resultsPreviewReducer,
   },
   middleware: (getDefault) => getDefault({ serializableCheck: false }),
 });

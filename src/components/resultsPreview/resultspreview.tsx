@@ -3,21 +3,14 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import "./resultspreview.css";
 import Logo from "../../assets/ResultsP_Logo.png";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectUserId } from "../../features/auth/selectors";
+import {
+  fetchAllocationsByLecturer,
+  fetchResultsPreview,
+} from "../../features/resultsPreview/resultsPreviewSlice";
 
-// Dummy Data
-const dummyData = [
-  { id: "1", name: "Student A", project: 18, quiz1: 25, quiz2: 28, total: 71, status: "Pass" },
-  { id: "2", name: "Student B", project: 15, quiz1: 22, quiz2: 27, total: 64, status: "Pass" },
-  { id: "3", name: "Student C", project: 17, quiz1: 26, quiz2: 25, total: 68, status: "Pass" },
-  { id: "4", name: "Student D", project: 19, quiz1: 27, quiz2: 29, total: 75, status: "Pass" },
-  { id: "5", name: "Student E", project: 20, quiz1: 28, quiz2: 28, total: 76, status: "Pass" },
-];
-
-const courses = [
-  { code: "EC7201", name: "Information Security" },
-  { code: "EC7202", name: "Computer Networks" },
-  { code: "EC7203", name: "Web Engineering" },
-];
+// No dummy data; wired to backend
 
 type Option = { value: string; label: string };
 
@@ -31,11 +24,15 @@ const CustomDropdownVL: React.FC<{
 }> = ({ label, options, value, placeholder, onChange }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
-  const selected = useMemo(() => options.find((o) => o.value === value), [options, value]);
+  const selected = useMemo(
+    () => options.find((o) => o.value === value),
+    [options, value]
+  );
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -70,7 +67,9 @@ const CustomDropdownVL: React.FC<{
           {options.map((opt) => (
             <div
               key={opt.value}
-              className={`dropdown-option ${value === opt.value ? "active" : ""}`}
+              className={`dropdown-option ${
+                value === opt.value ? "active" : ""
+              }`}
               role="option"
               aria-selected={value === opt.value}
               onClick={() => {
@@ -89,18 +88,53 @@ const CustomDropdownVL: React.FC<{
 
 /** ------- Main Component ------- */
 const ResultsPreview: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"CA" | "FE">("CA");
-  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
-
-  const courseOptions: Option[] = useMemo(
-    () => courses.map((c) => ({ value: c.code, label: `${c.code} - ${c.name}` })),
-    []
+  const dispatch = useAppDispatch();
+  const userId = useAppSelector(selectUserId);
+  const allocations = useAppSelector((s) => s.resultsPreview.allocations);
+  const allocationsLoading = useAppSelector(
+    (s) => s.resultsPreview.allocationsLoading
   );
+  const results = useAppSelector((s) => s.resultsPreview.results);
+  const resultsLoading = useAppSelector((s) => s.resultsPreview.resultsLoading);
+  const [activeTab, setActiveTab] = useState<"CA" | "FE">("CA");
+  const [selectedAllocationId, setSelectedAllocationId] = useState<
+    number | null
+  >(null);
 
-  const handleCourseChange = (code: string) => {
-    const course = courses.find((c) => c.code === code);
-    if (course) setSelectedCourse(course);
+  useEffect(() => {
+    // Convert userId to lecturerId is done server-side in endpoint; here we have direct lecturer endpoints.
+    // We assume caller provides lecturerId; if not, you can add a prefetch here.
+    // For now, require that lecturerId equals userId mapping on backend, or expose lecturerId in auth if needed.
+    if (!userId) return;
+    // If your backend requires lecturerId (not userId), you can store lecturerId in auth or fetch once and keep in Redux.
+    dispatch(fetchAllocationsByLecturer(userId as number));
+  }, [dispatch, userId]);
+
+  const courseOptions: Option[] = useMemo(() => {
+    return allocations.map((a) => ({
+      value: String(a.allocationId),
+      label: `${a.course.courseCode} - ${a.course.courseName} (${a.semester.name})`,
+    }));
+  }, [allocations]);
+
+  const handleCourseChange = (allocIdString: string) => {
+    const id = Number(allocIdString);
+    setSelectedAllocationId(Number.isFinite(id) ? id : null);
   };
+
+  useEffect(() => {
+    if (!selectedAllocationId) return;
+    const type = activeTab === "CA" ? "CA" : "END_EXAM";
+    dispatch(
+      fetchResultsPreview({
+        allocationId: selectedAllocationId,
+        type,
+        page: 0,
+        size: 50,
+        includeMeta: true,
+      })
+    );
+  }, [dispatch, selectedAllocationId, activeTab]);
 
   // -------- PDF Export (only results content) ----------
   const handleExportPDF = async () => {
@@ -137,10 +171,12 @@ const ResultsPreview: React.FC = () => {
         <h3 className="rp-title">Results Preview</h3>
         <div className="rp-select-row">
           <CustomDropdownVL
-            label="Select Course"
+            label="Select Course Allocation"
             options={courseOptions}
-            value={selectedCourse.code}
-            placeholder="Select Course"
+            value={selectedAllocationId ? String(selectedAllocationId) : ""}
+            placeholder={
+              allocationsLoading ? "Loading..." : "Select Allocation"
+            }
             onChange={handleCourseChange}
           />
         </div>
@@ -174,7 +210,11 @@ const ResultsPreview: React.FC = () => {
               <div className="results-page">
                 <div className="rp-card-header">
                   <div className="rp-section">
-                    <h4>{selectedCourse.name}</h4>
+                    <h4>
+                      {results && "header" in results
+                        ? (results as any).header?.course?.courseName
+                        : ""}
+                    </h4>
                     <p>CA Marks (Total 40%)</p>
                   </div>
                   <div className="rp-logo">
@@ -182,10 +222,11 @@ const ResultsPreview: React.FC = () => {
                   </div>
                   <div className="rp-section rp-right">
                     <p>
-                      2024 <br />
-                      22nd Batch <br />
-                      Department: Computer Engineering <br />
-                      Module Code: {selectedCourse.code}
+                      {(results as any)?.header?.semester?.year ?? ""} <br />
+                      {(results as any)?.header?.semester?.batchName ?? ""}{" "}
+                      <br />
+                      Module Code:{" "}
+                      {(results as any)?.header?.course?.courseCode ?? ""}
                     </p>
                   </div>
                 </div>
@@ -196,30 +237,56 @@ const ResultsPreview: React.FC = () => {
                         <th>#</th>
                         <th>Student ID</th>
                         <th>Name</th>
-                        <th>Project (20)</th>
-                        <th>Quiz 1 (30)</th>
-                        <th>Quiz 2 (30)</th>
-                        <th>Total (80)</th>
+                        {Array.isArray((results as any)?.header?.assessments)
+                          ? (results as any).header.assessments.map(
+                              (a: any) => (
+                                <th
+                                  key={a.assessmentId}
+                                >{`${a.title} (${a.maxMarks})`}</th>
+                              )
+                            )
+                          : null}
+                        <th>Total</th>
                         <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {dummyData.map((s, idx) => (
-                        <tr key={s.id}>
-                          <td>{idx + 1}</td>
-                          <td>{s.id}</td>
-                          <td>{s.name}</td>
-                          <td>{s.project}</td>
-                          <td>{s.quiz1}</td>
-                          <td>{s.quiz2}</td>
-                          <td>{s.total}</td>
-                          <td className={s.status === "Pass" ? "ok" : "bad"}>{s.status}</td>
-                        </tr>
-                      ))}
+                      {Array.isArray((results as any)?.students)
+                        ? (results as any).students.map(
+                            (s: any, idx: number) => (
+                              <tr key={s.studentId}>
+                                <td>{idx + 1}</td>
+                                <td>{s.regNo}</td>
+                                <td>{s.name}</td>
+                                {(
+                                  (results as any).header?.assessments || []
+                                ).map((a: any) => (
+                                  <td key={a.assessmentId}>
+                                    {s.marksByAssessmentId?.[
+                                      String(a.assessmentId)
+                                    ] ?? "-"}
+                                  </td>
+                                ))}
+                                <td>{s.total ?? ""}</td>
+                                <td
+                                  className={
+                                    (s.status ?? "").toUpperCase() === "PASS"
+                                      ? "ok"
+                                      : "bad"
+                                  }
+                                >
+                                  {s.status}
+                                </td>
+                              </tr>
+                            )
+                          )
+                        : null}
                     </tbody>
                   </table>
                 </div>
-                <footer className="rp-print-footer">Printed on: {new Date().toLocaleDateString()}</footer>
+                <footer className="rp-print-footer">
+                  Printed on: {new Date().toLocaleDateString()}
+                </footer>
               </div>
             </div>
           </div>
@@ -231,7 +298,11 @@ const ResultsPreview: React.FC = () => {
               <div className="results-page">
                 <div className="rp-card-header">
                   <div className="rp-section">
-                    <h4>{selectedCourse.name}</h4>
+                    <h4>
+                      {results && "header" in results
+                        ? (results as any).header?.course?.courseName
+                        : ""}
+                    </h4>
                     <p>Final Exam (Total 60%)</p>
                   </div>
                   <div className="rp-logo">
@@ -239,10 +310,11 @@ const ResultsPreview: React.FC = () => {
                   </div>
                   <div className="rp-section rp-right">
                     <p>
-                      2024 <br />
-                      22nd Batch <br />
-                      Department: Computer Engineering <br />
-                      Module Code: {selectedCourse.code}
+                      {(results as any)?.header?.semester?.year ?? ""} <br />
+                      {(results as any)?.header?.semester?.batchName ?? ""}{" "}
+                      <br />
+                      Module Code:{" "}
+                      {(results as any)?.header?.course?.courseCode ?? ""}
                     </p>
                   </div>
                 </div>
@@ -253,27 +325,43 @@ const ResultsPreview: React.FC = () => {
                         <th>#</th>
                         <th>Student ID</th>
                         <th>Name</th>
-                        <th>Final Exam (60)</th>
+                        <th>
+                          Final Exam
+                          {(results as any)?.header?.endExam?.maxMarks
+                            ? ` (${(results as any).header.endExam.maxMarks})`
+                            : ""}
+                        </th>
                         <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {dummyData.map((s, idx) => {
-                        const fe = Math.max(0, (s.total ?? 0) - 40);
-                        return (
-                          <tr key={s.id}>
-                            <td>{idx + 1}</td>
-                            <td>{s.id}</td>
-                            <td>{s.name}</td>
-                            <td>{fe}</td>
-                            <td className={s.status === "Pass" ? "ok" : "bad"}>{s.status}</td>
-                          </tr>
-                        );
-                      })}
+                      {Array.isArray((results as any)?.students)
+                        ? (results as any).students.map(
+                            (s: any, idx: number) => (
+                              <tr key={s.studentId}>
+                                <td>{idx + 1}</td>
+                                <td>{s.regNo}</td>
+                                <td>{s.name}</td>
+                                <td>{s.endExamMarks ?? ""}</td>
+                                <td
+                                  className={
+                                    (s.status ?? "").toUpperCase() === "PASS"
+                                      ? "ok"
+                                      : "bad"
+                                  }
+                                >
+                                  {s.status}
+                                </td>
+                              </tr>
+                            )
+                          )
+                        : null}
                     </tbody>
                   </table>
                 </div>
-                <footer className="rp-print-footer">Printed on: {new Date().toLocaleDateString()}</footer>
+                <footer className="rp-print-footer">
+                  Printed on: {new Date().toLocaleDateString()}
+                </footer>
               </div>
             </div>
           </div>
