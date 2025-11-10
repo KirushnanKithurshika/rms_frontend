@@ -183,6 +183,8 @@ const EditCourseDetails: React.FC<Props> = ({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  // Keep an immutable baseline to detect per-row edits
+  const [assInitial, setAssInitial] = useState<Record<number, AssessmentRow>>({});
 
   // Sync form whenever a different course is passed in
   useEffect(() => {
@@ -328,6 +330,12 @@ const EditCourseDetails: React.FC<Props> = ({
           })
         );
         setAssessments(detailed);
+        // snapshot initial values for dirty detection
+        const base: Record<number, AssessmentRow> = {};
+        detailed.forEach((a) => {
+          base[a.assessmentId] = { ...a };
+        });
+        setAssInitial(base);
       } catch {
         setAssessments([]);
       } finally {
@@ -480,6 +488,8 @@ const EditCourseDetails: React.FC<Props> = ({
       };
       await api.put(`/v1/assessments/Update/${id}`, body);
       setSuccess("Assessment updated");
+      // refresh baseline for this row so button returns to normal color
+      setAssInitial((prev) => ({ ...prev, [row.assessmentId]: { ...row } }));
       toast.success("Assessment updated");
     } catch (e: any) {
       const msg =
@@ -492,6 +502,19 @@ const EditCourseDetails: React.FC<Props> = ({
   };
 
   // removed legacy actions (academic year / coordinator fields)
+
+  const isAssessmentDirty = (row: AssessmentRow) => {
+    const base = assInitial[row.assessmentId];
+    if (!base) return false;
+    const norm = (s?: string) => (s ?? "").trim();
+    return (
+      norm(row.title) !== norm(base.title) ||
+      (row.maxMarks ?? 0) !== (base.maxMarks ?? 0) ||
+      (row.weight ?? 0) !== (base.weight ?? 0) ||
+      norm(row.date) !== norm(base.date) ||
+      norm(row.description) !== norm(base.description)
+    );
+  };
 
   return (
     <div className="form-wrapper">
@@ -819,7 +842,7 @@ const EditCourseDetails: React.FC<Props> = ({
                     />
                     <button
                       type="button"
-                      className="btn"
+                      className={`btn ${isAssessmentDirty(row) ? 'primary' : ''}`}
                       onClick={() => saveAssessment(row)}
                       disabled={saving}
                     >
