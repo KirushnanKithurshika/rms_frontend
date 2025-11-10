@@ -1,7 +1,19 @@
 ﻿// SemesterTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../../../../services/api";
-import { FaSearch, FaPlus, FaSort, FaSortUp, FaSortDown, FaEye, FaTimes, FaAngleLeft, FaAngleRight, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
+import {
+  FaSearch,
+  FaPlus,
+  FaSort,
+  FaSortUp,
+  FaSortDown,
+  FaEye,
+  FaTimes,
+  FaAngleLeft,
+  FaAngleRight,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
+} from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
 import "./table.css";
 
@@ -42,10 +54,13 @@ function useDraggable() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
   };
-  useEffect(() => () => {
-    window.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("mouseup", onMouseUp);
-  }, []);
+  useEffect(
+    () => () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    },
+    []
+  );
   return { pos, onMouseDown };
 }
 
@@ -56,8 +71,12 @@ export default function SemesterTable() {
   const searchRef = useRef<HTMLInputElement | null>(null);
 
   // reference data for rendering Batch as "Batch Name Faculty-Code"
-  const [batches, setBatches] = useState<Array<{ id: number; name: string; facultyId?: number }>>([]);
-  const [faculties, setFaculties] = useState<Array<{ id: number; code?: string; shortName?: string; name?: string }>>([]);
+  const [batches, setBatches] = useState<
+    Array<{ id: number; name: string; facultyId?: number }>
+  >([]);
+  const [faculties, setFaculties] = useState<
+    Array<{ id: number; code?: string; shortName?: string; name?: string }>
+  >([]);
 
   // server paging (0-based)
   const [page, setPage] = useState(0);
@@ -89,7 +108,9 @@ export default function SemesterTable() {
     (async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/v1/semesters/GetAll?page=${page}&size=${pageSize}`);
+        const res = await api.get(
+          `/v1/semesters/GetAll?page=${page}&size=${pageSize}`
+        );
         const payload: any = res?.data?.data;
         const content = Array.isArray(payload?.content) ? payload.content : [];
         const mapped: Semester[] = content.map((s: any) => ({
@@ -101,7 +122,9 @@ export default function SemesterTable() {
         }));
         setRows(mapped.slice().sort((a, b) => a.id - b.id));
         setTotalPages(Number(payload?.totalPages ?? 1));
-        const total = Number(payload?.totalElements ?? payload?.totalItems ?? payload?.total ?? 0);
+        const total = Number(
+          payload?.totalElements ?? payload?.totalItems ?? payload?.total ?? 0
+        );
         setTotalItems(Number.isFinite(total) ? total : 0);
       } catch {
         setRows([]);
@@ -117,17 +140,42 @@ export default function SemesterTable() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get(`/v1/batches/GetAll`).catch(() => null as any);
-        const arr = Array.isArray(res?.data?.data) ? res!.data.data : (Array.isArray(res?.data) ? res!.data : []);
-        const mapped = (arr as any[]).map((b: any) => ({ id: b.id ?? b.batchId, name: b.name ?? b.batchName, facultyId: b.facultyId ?? b.faculty?.id }));
+        const res = await api
+          .get(`/v1/batches/GetAll`)
+          .catch(() => null as any);
+        const arr = Array.isArray(res?.data?.data)
+          ? res!.data.data
+          : Array.isArray(res?.data)
+          ? res!.data
+          : [];
+        const mapped = (arr as any[]).map((b: any) => ({
+          id: b.id ?? b.batchId,
+          name: b.name ?? b.batchName,
+          facultyId: b.facultyId ?? b.faculty?.id,
+        }));
         setBatches(mapped);
-      } catch { setBatches([]); }
+      } catch {
+        setBatches([]);
+      }
 
       try {
         const fres = await api.get(`/faculties`).catch(() => null as any);
-        const flist = Array.isArray(fres?.data?.data) ? fres!.data.data : (Array.isArray(fres?.data) ? fres!.data : []);
-        setFaculties((flist as any[]).map((f: any) => ({ id: f.id ?? f.facultyId, code: f.code ?? f.shortName, shortName: f.shortName, name: f.name ?? f.facultyName })));
-      } catch { setFaculties([]); }
+        const flist = Array.isArray(fres?.data?.data)
+          ? fres!.data.data
+          : Array.isArray(fres?.data)
+          ? fres!.data
+          : [];
+        setFaculties(
+          (flist as any[]).map((f: any) => ({
+            id: f.id ?? f.facultyId,
+            code: f.code ?? f.shortName,
+            shortName: f.shortName,
+            name: f.name ?? f.facultyName,
+          }))
+        );
+      } catch {
+        setFaculties([]);
+      }
     })();
   }, []);
 
@@ -164,10 +212,14 @@ export default function SemesterTable() {
 
   const toggleSort = (key: SortKey) => {
     if (key === sortBy) setSortAsc((v) => !v);
-    else { setSortBy(key); setSortAsc(true); }
+    else {
+      setSortBy(key);
+      setSortAsc(true);
+    }
   };
 
-  const sortIcon = (key: SortKey) => (sortBy !== key ? <FaSort /> : sortAsc ? <FaSortUp /> : <FaSortDown />);
+  const sortIcon = (key: SortKey) =>
+    sortBy !== key ? <FaSort /> : sortAsc ? <FaSortUp /> : <FaSortDown />;
 
   // view details
   const handleView = async (id: number) => {
@@ -184,14 +236,26 @@ export default function SemesterTable() {
       const local = rows.find((x) => x.id === id) || null;
       if (local) setViewing(local);
       const d = e?.response?.data;
-      const msg = (d?.message || (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) || d?.error || e?.message || "An unexpected error occurred");
+      const msg =
+        d?.message ||
+        (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) ||
+        d?.error ||
+        e?.message ||
+        "An unexpected error occurred";
       setViewingError(String(msg));
     }
   };
 
   // delete
-  const askDelete = (s: Semester) => { setToDelete(s); setDeleteError(null); setShowDelete(true); };
-  const closeDelete = () => { setShowDelete(false); setToDelete(null); };
+  const askDelete = (s: Semester) => {
+    setToDelete(s);
+    setDeleteError(null);
+    setShowDelete(true);
+  };
+  const closeDelete = () => {
+    setShowDelete(false);
+    setToDelete(null);
+  };
   const confirmDelete = async () => {
     if (!toDelete) return;
     setDeleting(true);
@@ -204,7 +268,12 @@ export default function SemesterTable() {
       }
     } catch (e: any) {
       const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
+      const msg =
+        data?.message ||
+        (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) ||
+        data?.error ||
+        e?.message ||
+        "An unexpected error occurred";
       setDeleteError(String(msg));
     } finally {
       setDeleting(false);
@@ -219,16 +288,27 @@ export default function SemesterTable() {
       const res = await api.get(`/v1/semesters/GetById/${id}`);
       const d = res?.data?.data ?? res?.data;
       if (d) {
-        const mapped: Semester = { id: d.id, name: d.name, year: d.year, number: d.number, batchId: d.batchId ?? (d.batch?.id ?? 0) };
+        const mapped: Semester = {
+          id: d.id,
+          name: d.name,
+          year: d.year,
+          number: d.number,
+          batchId: d.batchId ?? d.batch?.id ?? 0,
+        };
         setEditing(mapped);
         return;
       }
-      throw new Error('Empty response');
+      throw new Error("Empty response");
     } catch (e: any) {
       const local = rows.find((x) => x.id === id) || null;
       if (local) setEditing(local);
       const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined) || data?.error || e?.message || 'An unexpected error occurred');
+      const msg =
+        data?.message ||
+        (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) ||
+        data?.error ||
+        e?.message ||
+        "An unexpected error occurred";
       setEditingError(String(msg));
     }
   };
@@ -253,24 +333,30 @@ export default function SemesterTable() {
             name: d.name,
             year: d.year,
             number: d.number,
-            batchId: d.batchId ?? (d.batch?.id ?? body.batchId),
+            batchId: d.batchId ?? d.batch?.id ?? body.batchId,
           };
-          setRows((prev) => prev
-            .map((x) => (x.id === id ? mapped : x))
-            .slice()
-            .sort((a, b) => a.id - b.id)
+          setRows((prev) =>
+            prev
+              .map((x) => (x.id === id ? mapped : x))
+              .slice()
+              .sort((a, b) => a.id - b.id)
           );
         }
         setEditing(null);
       }
     } catch (e: any) {
       const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined) || data?.error || e?.message || 'An unexpected error occurred');
+      const msg =
+        data?.message ||
+        (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) ||
+        data?.error ||
+        e?.message ||
+        "An unexpected error occurred";
       setEditingError(String(msg));
     } finally {
       setSavingEdit(false);
     }
-  }; 
+  };
   const handleCreate = async (payload: SemesterCreatePayload) => {
     setCreatingError(null);
     setSavingCreate(true);
@@ -288,7 +374,12 @@ export default function SemesterTable() {
       }
     } catch (e: any) {
       const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
+      const msg =
+        data?.message ||
+        (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) ||
+        data?.error ||
+        e?.message ||
+        "An unexpected error occurred";
       setCreatingError(String(msg));
     } finally {
       setSavingCreate(false);
@@ -317,14 +408,26 @@ export default function SemesterTable() {
               setQ(val.trim());
               searchRef.current?.focus();
             }}
-            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+            style={{
+              position: "absolute",
+              right: 8,
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "transparent",
+              border: 0,
+              padding: 0,
+              cursor: "pointer",
+            }}
           >
             <FaSearch className="search-icon" />
           </button>
         </div>
 
         <div className="filters">
-          <label className="app-field" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <label
+            className="app-field"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+          >
             <span className="app-label">Page</span>
             <input
               className="app-input"
@@ -339,12 +442,23 @@ export default function SemesterTable() {
             />
           </label>
 
-          <label className="app-field" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
+          <label
+            className="app-field"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              marginLeft: 8,
+            }}
+          >
             <span className="app-label">Size</span>
             <select
               className="app-input"
               value={pageSize}
-              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(0);
+              }}
               style={{ width: 110 }}
             >
               <option value={5}>5</option>
@@ -354,7 +468,11 @@ export default function SemesterTable() {
             </select>
           </label>
 
-          <button className="add-user-btn" onClick={() => setCreating(true)} style={{ marginLeft: 8 }}>
+          <button
+            className="add-user-btn"
+            onClick={() => setCreating(true)}
+            style={{ marginLeft: 8 }}
+          >
             <FaPlus style={{ marginRight: 6 }} />
             Add Semester
           </button>
@@ -367,10 +485,18 @@ export default function SemesterTable() {
           <thead>
             <tr>
               <th>Id</th>
-              <th onClick={() => toggleSort("name")}>Name {sortIcon("name")}</th>
-              <th onClick={() => toggleSort("year")}>Year {sortIcon("year")}</th>
-              <th onClick={() => toggleSort("number")}>Number {sortIcon("number")}</th>
-              <th onClick={() => toggleSort("batchId")}>Batch Id {sortIcon("batchId")}</th>
+              <th onClick={() => toggleSort("name")}>
+                Name {sortIcon("name")}
+              </th>
+              <th onClick={() => toggleSort("year")}>
+                Year {sortIcon("year")}
+              </th>
+              <th onClick={() => toggleSort("number")}>
+                Number {sortIcon("number")}
+              </th>
+              <th onClick={() => toggleSort("batchId")}>
+                Batch Id {sortIcon("batchId")}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -396,19 +522,38 @@ export default function SemesterTable() {
                   <td>{s.number}</td>
                   <td>
                     {(() => {
-                      const b = batches.find(x => x.id === (s.batchId ?? 0));
-                      const f = faculties.find(ff => ff.id === (b?.facultyId ?? 0));
+                      const b = batches.find((x) => x.id === (s.batchId ?? 0));
+                      const f = faculties.find(
+                        (ff) => ff.id === (b?.facultyId ?? 0)
+                      );
                       const facCode = f?.code ?? f?.shortName ?? "";
-                      const label = [b?.name ?? "", facCode].filter(Boolean).join(" ").trim();
+                      const label = [b?.name ?? "", facCode]
+                        .filter(Boolean)
+                        .join(" ")
+                        .trim();
                       return label || String(s.batchId);
                     })()}
                   </td>
                   <td className="actions">
-                    <button className="icon-btn" title="View" onClick={() => handleView(s.id)}>
+                    <button
+                      className="icon-btn"
+                      title="View"
+                      onClick={() => handleView(s.id)}
+                    >
                       <FaEye className="icon view-icon" />
                     </button>
-                    <button className="icon-btn" title="Edit" onClick={() => handleOpenEdit(s.id)}><MdEdit className="icon edit-icon" /></button>
-                    <button className="icon-btn" title="Delete" onClick={() => askDelete(s)}>
+                    <button
+                      className="icon-btn"
+                      title="Edit"
+                      onClick={() => handleOpenEdit(s.id)}
+                    >
+                      <MdEdit className="icon edit-icon" />
+                    </button>
+                    <button
+                      className="icon-btn"
+                      title="Delete"
+                      onClick={() => askDelete(s)}
+                    >
                       <MdDelete className="icon delete-icon" />
                     </button>
                   </td>
@@ -419,30 +564,44 @@ export default function SemesterTable() {
 
         {/* Pager (match user-management style, styled via table.css) */}
         <div className="custom-pagination">
-          <div className="pagination-left">
-            <span className="pagination-label">Rows per page</span>
-            <select
-              className="pagination-select"
-              value={pageSize}
-              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>
-            <span className="pagination-count">
-              {totalItems === 0
-                ? `0-0 of 0`
-                : `${page * pageSize + 1}-${Math.min(totalItems, (page + 1) * pageSize)} of ${totalItems}`}
-            </span>
-          </div>
+          <div className="pagination-left"></div>
           <div className="pagination-right">
-            <button className="page-btn" onClick={() => setPage(0)} disabled={page <= 0} aria-label="First page"><FaAngleDoubleLeft /></button>
-            <button className="page-btn" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page <= 0} aria-label="Previous page"><FaAngleLeft /></button>
-            <button className="page-number active" aria-current="page">{page + 1}</button>
+            <button
+              className="page-btn"
+              onClick={() => setPage(0)}
+              disabled={page <= 0}
+              aria-label="First page"
+            >
+              <FaAngleDoubleLeft />
+            </button>
+            <button
+              className="page-btn"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page <= 0}
+              aria-label="Previous page"
+            >
+              <FaAngleLeft />
+            </button>
+            <button className="page-number active" aria-current="page">
+              {page + 1}
+            </button>
             <span className="page-ellipsis">/ {totalPages}</span>
-            <button className="page-btn" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page + 1 >= totalPages} aria-label="Next page"><FaAngleRight /></button>
-            <button className="page-btn" onClick={() => setPage(Math.max(0, totalPages - 1))} disabled={page + 1 >= totalPages} aria-label="Last page"><FaAngleDoubleRight /></button>
+            <button
+              className="page-btn"
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={page + 1 >= totalPages}
+              aria-label="Next page"
+            >
+              <FaAngleRight />
+            </button>
+            <button
+              className="page-btn"
+              onClick={() => setPage(Math.max(0, totalPages - 1))}
+              disabled={page + 1 >= totalPages}
+              aria-label="Last page"
+            >
+              <FaAngleDoubleRight />
+            </button>
           </div>
         </div>
       </div>
@@ -450,72 +609,357 @@ export default function SemesterTable() {
       {/* View modal */}
       {viewing && (
         <div className="app-modal-backdrop" role="dialog" aria-modal="true">
-          <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}>
-            <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+          <div
+            className="app-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)`,
+            }}
+          >
+            <div
+              className="app-modal__header"
+              onMouseDown={viewDrag.onMouseDown}
+              style={{ cursor: "move" }}
+            >
               <h3 className="app-modal__title">Semester Details</h3>
-              <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
+              <button
+                type="button"
+                className="app-modal__close"
+                onClick={() => setViewing(null)}
+                aria-label="Close"
+                title="Close"
+              >
                 <FaTimes />
               </button>
             </div>
             <div className="app-form" style={{ paddingTop: 0 }}>
               {viewingError && (
-                <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
+                <div
+                  className="app-error"
+                  style={{ color: "#b91c1c", marginBottom: 8 }}
+                >
                   {viewingError}
                 </div>
               )}
               <div className="app-grid">
-                <div className="app-field"><span className="app-label">Id</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.id)}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
-                <div className="app-field"><span className="app-label">Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.year}</div></div>
-                <div className="app-field"><span className="app-label">Number</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.number}</div></div>
-                <div className="app-field"><span className="app-label">Batch Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batchId ?? viewing.batch?.id ?? '-'}</div></div>
+                <div className="app-field">
+                  <span className="app-label">Id</span>
+                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                    {String(viewing.id)}
+                  </div>
+                </div>
+                <div className="app-field app-grid--2">
+                  <span className="app-label">Name</span>
+                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                    {viewing.name}
+                  </div>
+                </div>
+                <div className="app-field">
+                  <span className="app-label">Year</span>
+                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                    {viewing.year}
+                  </div>
+                </div>
+                <div className="app-field">
+                  <span className="app-label">Number</span>
+                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                    {viewing.number}
+                  </div>
+                </div>
+                <div className="app-field">
+                  <span className="app-label">Batch Id</span>
+                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                    {viewing.batchId ?? viewing.batch?.id ?? "-"}
+                  </div>
+                </div>
 
                 {viewing.batch && (
                   <>
-                    <div className="app-field app-grid--2"><span className="app-label">Batch Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.name}</div></div>
-                    <div className="app-field"><span className="app-label">Batch Start Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.startYear}</div></div>
-                    <div className="app-field"><span className="app-label">Batch Duration Years</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.durationYears}</div></div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Batch Name</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.name}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Batch Start Year</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.startYear}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Batch Duration Years</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.durationYears}
+                      </div>
+                    </div>
                   </>
                 )}
 
                 {viewing.batch?.faculty && (
                   <>
-                    <div className="app-field"><span className="app-label">Faculty Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.id}</div></div>
-                    <div className="app-field"><span className="app-label">Faculty Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.code}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">Faculty Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.facultyName}</div></div>
-                    <div className="app-field"><span className="app-label">Degree Title</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.degreeTitle || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Short Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.shortName || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.email || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.phone || '-'}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.website || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Faculty Active</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.batch.faculty.active ?? true)}</div></div>
+                    <div className="app-field">
+                      <span className="app-label">Faculty Id</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.id}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Faculty Code</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.code}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Faculty Name</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.facultyName}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Degree Title</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.degreeTitle || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Short Name</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.shortName || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Email</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.email || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Phone</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.phone || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Website</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.website || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Faculty Active</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {String(viewing.batch.faculty.active ?? true)}
+                      </div>
+                    </div>
                   </>
                 )}
 
                 {viewing.batch?.faculty?.university && (
                   <>
-                    <div className="app-field"><span className="app-label">University Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.id}</div></div>
-                    <div className="app-field"><span className="app-label">University Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.code}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">University Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.name}</div></div>
-                    <div className="app-field"><span className="app-label">Short Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.shortName || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.email || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.phone || '-'}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.website || '-'}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">Address Line 1</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.addressLine1 || '-'}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">Address Line 2</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.addressLine2 || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">City</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.city || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">State</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.state || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Country</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.country || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Postal Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.postalCode || '-'}</div></div>
-                    <div className="app-field"><span className="app-label">Established Year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.establishedYear ?? '-'}</div></div>
-                    <div className="app-field app-grid--2"><span className="app-label">Logo</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.batch.faculty.university.logoUrl ? <img src={viewing.batch.faculty.university.logoUrl} alt="logo" style={{maxHeight:50}} /> : '-'}</div></div>
-                    <div className="app-field"><span className="app-label">University Active</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.batch.faculty.university.active ?? true)}</div></div>
+                    <div className="app-field">
+                      <span className="app-label">University Id</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.id}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">University Code</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.code}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">University Name</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.name}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Short Name</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.shortName || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Email</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.email || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Phone</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.phone || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Website</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.website || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Address Line 1</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.addressLine1 || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Address Line 2</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.addressLine2 || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">City</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.city || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">State</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.state || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Country</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.country || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Postal Code</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.postalCode || "-"}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">Established Year</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.establishedYear ??
+                          "-"}
+                      </div>
+                    </div>
+                    <div className="app-field app-grid--2">
+                      <span className="app-label">Logo</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {viewing.batch.faculty.university.logoUrl ? (
+                          <img
+                            src={viewing.batch.faculty.university.logoUrl}
+                            alt="logo"
+                            style={{ maxHeight: 50 }}
+                          />
+                        ) : (
+                          "-"
+                        )}
+                      </div>
+                    </div>
+                    <div className="app-field">
+                      <span className="app-label">University Active</span>
+                      <div
+                        className="app-input"
+                        style={{ background: "#f8fafc" }}
+                      >
+                        {String(
+                          viewing.batch.faculty.university.active ?? true
+                        )}
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
 
               <div className="app-modal__actions">
-                <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>
+                <button
+                  type="button"
+                  className="app-btn app-btn--primary"
+                  onClick={() => setViewing(null)}
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
@@ -527,7 +971,12 @@ export default function SemesterTable() {
       {editing && (
         <SemesterFormModal
           title="Edit Semester"
-          initial={{ name: editing.name, year: editing.year, number: editing.number, batchId: editing.batchId }}
+          initial={{
+            name: editing.name,
+            year: editing.year,
+            number: editing.number,
+            batchId: editing.batchId,
+          }}
           onCancel={() => setEditing(null)}
           onSubmit={(payload) => handleUpdate(editing.id, payload)}
           error={editingError ?? undefined}
@@ -550,27 +999,60 @@ export default function SemesterTable() {
 
       {/* Delete confirmation modal */}
       {showDelete && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title">
-          <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-title"
+        >
+          <div
+            className="modal"
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+            tabIndex={-1}
+          >
             <div className="modal-header">
               <h4 id="delete-title">Delete Semester</h4>
-              <button className="close-btn" aria-label="Close" onClick={closeDelete}>A-</button>
+              <button
+                className="close-btn"
+                aria-label="Close"
+                onClick={closeDelete}
+              >
+                A-
+              </button>
             </div>
             <div className="modal-body">
               <p className="modal-body">
                 {toDelete ? (
-                  <>Are you sure you want to delete <strong>{toDelete.name}</strong>?</>
+                  <>
+                    Are you sure you want to delete{" "}
+                    <strong>{toDelete.name}</strong>?
+                  </>
                 ) : (
                   "Are you sure you want to delete this semester?"
                 )}
               </p>
               {deleteError && (
-                <div className="app-error" style={{ color: '#b91c1c' }}>{deleteError}</div>
+                <div className="app-error" style={{ color: "#b91c1c" }}>
+                  {deleteError}
+                </div>
               )}
             </div>
             <div className="modal-footer">
-              <button className="btn-delete danger" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete'}</button>
-              <button className="btn-delete ghost" onClick={closeDelete} disabled={deleting}>Cancel</button>
+              <button
+                className="btn-delete danger"
+                onClick={confirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+              <button
+                className="btn-delete ghost"
+                onClick={closeDelete}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -596,19 +1078,29 @@ function SemesterFormModal({
   error?: string;
   saving?: boolean;
   batches: Array<{ id: number; name: string; facultyId?: number }>;
-  faculties: Array<{ id: number; code?: string; shortName?: string; name?: string }>;
+  faculties: Array<{
+    id: number;
+    code?: string;
+    shortName?: string;
+    name?: string;
+  }>;
 }) {
   const drag = useDraggable();
   const [name, setName] = useState(initial?.name ?? "");
   const [year, setYear] = useState<number | "">(initial?.year ?? "");
   const [number, setNumber] = useState<number | "">(initial?.number ?? "");
   const [batchId, setBatchId] = useState<number | "">(
-    (initial?.batchId as number | undefined) ?? (batches.length ? batches[0].id : ("" as any))
+    (initial?.batchId as number | undefined) ??
+      (batches.length ? batches[0].id : ("" as any))
   );
 
   // default first batch if none provided and list is available
   useEffect(() => {
-    if ((initial?.batchId == null || initial?.batchId === undefined) && batches.length && (batchId === "" || batchId == null)) {
+    if (
+      (initial?.batchId == null || initial?.batchId === undefined) &&
+      batches.length &&
+      (batchId === "" || batchId == null)
+    ) {
       setBatchId(batches[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -631,7 +1123,11 @@ function SemesterFormModal({
         onClick={(e) => e.stopPropagation()}
         style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
       >
-        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
+        <div
+          className="app-modal__header"
+          onMouseDown={drag.onMouseDown}
+          style={{ cursor: "move" }}
+        >
           <h3 className="app-modal__title">{title}</h3>
           <button
             type="button"
@@ -646,24 +1142,48 @@ function SemesterFormModal({
 
         <form onSubmit={submit} className="app-form">
           {error && (
-            <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
+            <div
+              className="app-error"
+              style={{ color: "#b91c1c", marginBottom: 8 }}
+            >
               {error}
             </div>
           )}
           <div className="app-grid">
             <label className="app-field">
               <span className="app-label">Name</span>
-              <input className="app-input" value={name} onChange={(e) => setName(e.target.value)} required />
+              <input
+                className="app-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </label>
 
             <label className="app-field">
               <span className="app-label">Year</span>
-              <input className="app-input" type="number" value={year as number | ""} onChange={(e) => setYear(e.target.value === "" ? "" : Number(e.target.value))} required />
+              <input
+                className="app-input"
+                type="number"
+                value={year as number | ""}
+                onChange={(e) =>
+                  setYear(e.target.value === "" ? "" : Number(e.target.value))
+                }
+                required
+              />
             </label>
 
             <label className="app-field">
               <span className="app-label">Number</span>
-              <input className="app-input" type="number" value={number as number | ""} onChange={(e) => setNumber(e.target.value === "" ? "" : Number(e.target.value))} required />
+              <input
+                className="app-input"
+                type="number"
+                value={number as number | ""}
+                onChange={(e) =>
+                  setNumber(e.target.value === "" ? "" : Number(e.target.value))
+                }
+                required
+              />
             </label>
 
             <label className="app-field">
@@ -671,13 +1191,23 @@ function SemesterFormModal({
               <select
                 className="app-input"
                 value={batchId as number | ""}
-                onChange={(e) => setBatchId(e.target.value === "" ? "" : Number(e.target.value))}
+                onChange={(e) =>
+                  setBatchId(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
                 required
               >
                 {batches.map((b) => {
-                  const f = faculties.find((ff) => ff.id === (b.facultyId ?? 0));
+                  const f = faculties.find(
+                    (ff) => ff.id === (b.facultyId ?? 0)
+                  );
                   const facCode = f?.code ?? f?.shortName ?? "";
-                  const label = `${(b.name ?? "").toString().trim()} ${(facCode ?? "").toString().trim()}`.trim();
+                  const label = `${(b.name ?? "").toString().trim()} ${(
+                    facCode ?? ""
+                  )
+                    .toString()
+                    .trim()}`.trim();
                   return (
                     <option key={b.id} value={b.id}>
                       {label || `Batch #${b.id}`}
@@ -689,20 +1219,24 @@ function SemesterFormModal({
           </div>
 
           <div className="app-modal__actions">
-            <button type="submit" className="app-btn app-btn--primary" disabled={!!saving}>{saving ? 'Saving...' : 'Save'}</button>
-            <button type="button" className="app-btn" onClick={onCancel} disabled={!!saving}>Cancel</button>
+            <button
+              type="submit"
+              className="app-btn app-btn--primary"
+              disabled={!!saving}
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
+            <button
+              type="button"
+              className="app-btn"
+              onClick={onCancel}
+              disabled={!!saving}
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
