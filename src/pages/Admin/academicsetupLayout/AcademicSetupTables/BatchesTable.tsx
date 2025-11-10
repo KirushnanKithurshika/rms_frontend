@@ -265,7 +265,7 @@ export default function BatchesTable() {
           />
           <button
             type="button"
-            className="icon-btn"
+            className="icon-btn search-btn-floating"
             aria-label="Search"
             title="Search"
             onClick={() => {
@@ -273,7 +273,6 @@ export default function BatchesTable() {
               setQ(val.trim());
               searchRef.current?.focus();
             }}
-            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
           >
             <FaSearch className="search-icon" />
           </button>
@@ -337,22 +336,22 @@ export default function BatchesTable() {
       {viewing && (
         <div className="app-modal-backdrop" role="dialog" aria-modal="true">
           <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}>
-            <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+            <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
               <h3 className="app-modal__title">Batch Details</h3>
               <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
                 <FaTimes />
               </button>
             </div>
-            <div className="app-form" style={{ paddingTop: 0 }}>
+            <div className="app-form app-form--tight">
               {viewingError && (
-                <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>{viewingError}</div>
+                <div className="app-error">{viewingError}</div>
               )}
               <div className="app-grid">
-                <div className="app-field"><span className="app-label">Id</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.id)}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">Batch name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
-                <div className="app-field"><span className="app-label">Start year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.startYear}</div></div>
-                <div className="app-field"><span className="app-label">duration year</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.durationYears}</div></div>
-                <div className="app-field"><span className="app-label">faculty name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.facultyName}</div></div>
+                <div className="app-field"><span className="app-label">Id</span><div className="app-input app-input--readonly">{String(viewing.id)}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">Batch name</span><div className="app-input app-input--readonly">{viewing.name}</div></div>
+                <div className="app-field"><span className="app-label">Start year</span><div className="app-input app-input--readonly">{viewing.startYear}</div></div>
+                <div className="app-field"><span className="app-label">duration year</span><div className="app-input app-input--readonly">{viewing.durationYears}</div></div>
+                <div className="app-field"><span className="app-label">faculty name</span><div className="app-input app-input--readonly">{viewing.facultyName}</div></div>
               </div>
               <div className="app-modal__actions">
                 <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>
@@ -398,7 +397,7 @@ export default function BatchesTable() {
               <p className="modal-body">
                 {toDelete ? (<>Are you sure you want to delete <strong>{toDelete.name}</strong>?</>) : ("Are you sure you want to delete this batch?")}
               </p>
-              {deleteError && (<div className="app-error" style={{ color: '#b91c1c' }}>{deleteError}</div>)}
+              {deleteError && (<div className="app-error">{deleteError}</div>)}
             </div>
             <div className="modal-footer">
               <button className="btn-delete danger" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete'}</button>
@@ -444,7 +443,7 @@ function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving, fac
   return (
     <div className="app-modal-backdrop" role="dialog" aria-modal="true">
       <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}>
-        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
+        <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>
           <button type="button" className="app-modal__close" onClick={onCancel} aria-label="Close" title="Close">
             <FaTimes />
@@ -452,7 +451,7 @@ function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving, fac
         </div>
 
         <form onSubmit={submit} className="app-form">
-          {error && (<div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>{error}</div>)}
+          {error && (<div className="app-error">{error}</div>)}
           <div className="app-grid">
             <label className="app-field">
               <span className="app-label">Batch name</span>

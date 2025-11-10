@@ -35,6 +35,18 @@
   pointer-events: none;
 }
 
+/* Clickable search icon button inside searchbar */
+.search-btn-floating {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
 /* When the search icon is wrapped in a clickable button, allow hover + pointer cursor */
 .custom-searchbar .icon-btn .search-icon {
   pointer-events: auto;
@@ -232,6 +244,7 @@
   padding: .9rem 1rem .5rem 1rem;
   border-bottom: 1px solid #eef1f5;
 }
+.is-draggable { cursor: move; }
 .app-modal__title {
   margin: 0;
   font-size: 16px;
@@ -252,6 +265,7 @@
 .app-form { padding: 1rem;
 max-height: 700px; 
 overflow-y: auto;}
+.app-form--tight { padding-top: 0; }
 
 .app-grid {
   display: grid;
@@ -271,6 +285,8 @@ overflow-y: auto;}
   text-align: left;
   outline: none;
 }
+.app-input--readonly { background: #f8fafc; }
+.app-input--inline { display: flex; align-items: center; gap: 8px; }
 .app-input:focus {
   border-color: #1f9eff;
   box-shadow: 0 0 0 3px rgba(31,158,255,.15);
@@ -304,6 +320,17 @@ overflow-y: auto;}
   font-weight: 600;
 }
 .app-btn--primary:hover { background: #dadada; color: #0a2558; border-color: #0a2558; }
+
+/* Error helpers */
+.app-error { color: #b91c1c; }
+.app-error-box {
+  background: #fff1f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 8px 12px;
+}
 
 /* Animations */
 @keyframes app-pop {

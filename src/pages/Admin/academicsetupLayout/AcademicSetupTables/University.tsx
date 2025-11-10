@@ -427,7 +427,7 @@ export default function UniversitiesTable() {
           />
           <button
             type="button"
-            className="icon-btn"
+            className="icon-btn search-btn-floating"
             aria-label="Search"
             title="Search"
             onClick={() => {
@@ -435,7 +435,6 @@ export default function UniversitiesTable() {
               setQ(val.trim());
               searchRef.current?.focus();
             }}
-            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
           >
             <FaSearch className="search-icon" />
           </button>
@@ -554,11 +553,11 @@ export default function UniversitiesTable() {
           role="dialog"
           aria-modal="true"
         >
-            <div
-              className="app-modal"
-              style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
-            >
-              <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+          <div
+            className="app-modal"
+            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
+          >
+            <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
                 <h3 className="app-modal__title">University Details</h3>
                 <button
                   type="button"
@@ -570,30 +569,30 @@ export default function UniversitiesTable() {
                   <FaTimes />
                 </button>
               </div>
-              <div className="app-form" style={{ paddingTop: 0 }}>
+            <div className="app-form app-form--tight">
                 {viewingLoading && (
                   <div style={{ padding: '8px 4px', color: '#6b7280' }}>Loading...</div>
                 )}
                 {viewingError && (
-                  <div style={{ padding: '8px 4px', color: '#b91c1c' }}>{viewingError}</div>
+                  <div className="app-error" style={{ padding: '8px 4px' }}>{viewingError}</div>
                 )}
                 <div className="app-grid">
-                <div className="app-field"><span className="app-label">id</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.id)}</div></div>
-                <div className="app-field"><span className="app-label">code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.code}</div></div>
-                <div className="app-field"><span className="app-label">name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
-                <div className="app-field"><span className="app-label">shortName</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.shortName || '-'}</div></div>
-                <div className="app-field"><span className="app-label">email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.email || '-'}</div></div>
-                <div className="app-field"><span className="app-label">phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.phone || viewing.contactNumber || '-'}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.website || '-'}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">addressLine1</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.addressLine1 || '-'}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">addressLine2</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.addressLine2 || '-'}</div></div>
-                <div className="app-field"><span className="app-label">city</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.city || '-'}</div></div>
-                <div className="app-field"><span className="app-label">state</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.state || '-'}</div></div>
-                <div className="app-field"><span className="app-label">country</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.country || '-'}</div></div>
-                <div className="app-field"><span className="app-label">postalCode</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.postalCode || '-'}</div></div>
-                <div className="app-field"><span className="app-label">establishedYear</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.establishedYear ?? '-'}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">logoUrl</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.logoUrl ? <img src={viewing.logoUrl} alt="logo" style={{maxHeight:50}} /> : '-'}</div></div>
-                <div className="app-field"><span className="app-label">active</span><div className="app-input" style={{background:'#f8fafc'}}>{String(viewing.active ?? true)}</div></div>
+                <div className="app-field"><span className="app-label">id</span><div className="app-input app-input--readonly">{String(viewing.id)}</div></div>
+                <div className="app-field"><span className="app-label">code</span><div className="app-input app-input--readonly">{viewing.code}</div></div>
+                <div className="app-field"><span className="app-label">name</span><div className="app-input app-input--readonly">{viewing.name}</div></div>
+                <div className="app-field"><span className="app-label">shortName</span><div className="app-input app-input--readonly">{viewing.shortName || '-'}</div></div>
+                <div className="app-field"><span className="app-label">email</span><div className="app-input app-input--readonly">{viewing.email || '-'}</div></div>
+                <div className="app-field"><span className="app-label">phone</span><div className="app-input app-input--readonly">{viewing.phone || viewing.contactNumber || '-'}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">website</span><div className="app-input app-input--readonly">{viewing.website || '-'}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">addressLine1</span><div className="app-input app-input--readonly">{viewing.addressLine1 || '-'}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">addressLine2</span><div className="app-input app-input--readonly">{viewing.addressLine2 || '-'}</div></div>
+                <div className="app-field"><span className="app-label">city</span><div className="app-input app-input--readonly">{viewing.city || '-'}</div></div>
+                <div className="app-field"><span className="app-label">state</span><div className="app-input app-input--readonly">{viewing.state || '-'}</div></div>
+                <div className="app-field"><span className="app-label">country</span><div className="app-input app-input--readonly">{viewing.country || '-'}</div></div>
+                <div className="app-field"><span className="app-label">postalCode</span><div className="app-input app-input--readonly">{viewing.postalCode || '-'}</div></div>
+                <div className="app-field"><span className="app-label">establishedYear</span><div className="app-input app-input--readonly">{viewing.establishedYear ?? '-'}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">logoUrl</span><div className="app-input app-input--readonly">{viewing.logoUrl ? <img src={viewing.logoUrl} alt="logo" style={{maxHeight:50}} /> : '-'}</div></div>
+                <div className="app-field"><span className="app-label">active</span><div className="app-input app-input--readonly">{String(viewing.active ?? true)}</div></div>
               </div>
               <div className="app-modal__actions">
                 <button type="button" className="app-btn app-btn--primary" onClick={() => setViewing(null)}>Close</button>

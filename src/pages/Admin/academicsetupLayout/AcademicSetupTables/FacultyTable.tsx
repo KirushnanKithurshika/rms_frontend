@@ -426,7 +426,6 @@ export default function FacultyTable() {
           />
           <button
             type="button"
-            className="icon-btn"
             aria-label="Search"
             title="Search"
             onClick={() => {
@@ -434,7 +433,7 @@ export default function FacultyTable() {
               setQ(val.trim());
               searchRef.current?.focus();
             }}
-            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+            className="icon-btn search-btn-floating"
           >
             <FaSearch className="search-icon" />
           </button>
@@ -546,39 +545,37 @@ export default function FacultyTable() {
             onClick={(e) => e.stopPropagation()}
             style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
           >
-            <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+            <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
               <h3 className="app-modal__title">Faculty Details</h3>
               <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
                 <FaTimes />
               </button>
             </div>
-            <div className="app-form" style={{ paddingTop: 0 }}>
+            <div className="app-form app-form--tight">
               {viewingLoading ? (
                 <div style={{ padding: '1rem' }}>Loading...</div>
               ) : (
                 <>
                   {viewingError && (
-                    <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
-                      {viewingError}
-                    </div>
+                    <div className="app-error">{viewingError}</div>
                   )}
                   {viewing && (
                     <>
                       <div className="app-grid">
-                        <div className="app-field"><span className="app-label">Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.id}</div></div>
-                        <div className="app-field"><span className="app-label">Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.code}</div></div>
-                        <div className="app-field"><span className="app-label">Faculty Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.name}</div></div>
-                        <div className="app-field"><span className="app-label">Short Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.shortName || '-'}</div></div>
-                        <div className="app-field"><span className="app-label">Degree Title</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.dean || '-'}</div></div>
-                        <div className="app-field"><span className="app-label">Email</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.email || '-'}</div></div>
-                        <div className="app-field"><span className="app-label">Phone</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.contactNumber || '-'}</div></div>
-                        <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.website || viewing.address || '-'}</div></div>
-                        <div className="app-field"><span className="app-label">University Code</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.universityCode || '-'}</div></div>
-                        <div className="app-field"><span className="app-label">University Name</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.universityName || '-'}</div></div>
-                        <div className="app-field"><span className="app-label">University Id</span><div className="app-input" style={{background:'#f8fafc'}}>{viewing.universityId ?? '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Id</span><div className="app-input app-input--readonly">{viewing.id}</div></div>
+                        <div className="app-field"><span className="app-label">Code</span><div className="app-input app-input--readonly">{viewing.code}</div></div>
+                        <div className="app-field"><span className="app-label">Faculty Name</span><div className="app-input app-input--readonly">{viewing.name}</div></div>
+                        <div className="app-field"><span className="app-label">Short Name</span><div className="app-input app-input--readonly">{viewing.shortName || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Degree Title</span><div className="app-input app-input--readonly">{viewing.dean || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Email</span><div className="app-input app-input--readonly">{viewing.email || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">Phone</span><div className="app-input app-input--readonly">{viewing.contactNumber || '-'}</div></div>
+                        <div className="app-field app-grid--2"><span className="app-label">Website</span><div className="app-input app-input--readonly">{viewing.website || viewing.address || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">University Code</span><div className="app-input app-input--readonly">{viewing.universityCode || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">University Name</span><div className="app-input app-input--readonly">{viewing.universityName || '-'}</div></div>
+                        <div className="app-field"><span className="app-label">University Id</span><div className="app-input app-input--readonly">{viewing.universityId ?? '-'}</div></div>
                         <label className="app-field">
                           <span className="app-label">Active</span>
-                          <div className="app-input" style={{ background:'#f8fafc', display:'flex', alignItems:'center', gap:8 }}>
+                          <div className="app-input app-input--readonly app-input--inline">
                             <input type="checkbox" checked={!!viewing.active} readOnly />
                             <span>{viewing.active ? 'Enabled' : 'Disabled'}</span>
                           </div>
@@ -722,7 +719,7 @@ function AppFormModal({
         onClick={(e) => e.stopPropagation()}
         style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
       >
-        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
+        <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>
           <button
             type="button"
@@ -737,9 +734,7 @@ function AppFormModal({
 
         <form onSubmit={submit} className="app-form">
           {error && (
-            <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
-              {error}
-            </div>
+            <div className="app-error">{error}</div>
           )}
           <div className="app-grid">
             <label className="app-field">

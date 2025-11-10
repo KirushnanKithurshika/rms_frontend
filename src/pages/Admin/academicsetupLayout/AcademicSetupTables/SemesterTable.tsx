@@ -617,9 +617,8 @@ export default function SemesterTable() {
             }}
           >
             <div
-              className="app-modal__header"
+              className="app-modal__header is-draggable"
               onMouseDown={viewDrag.onMouseDown}
-              style={{ cursor: "move" }}
             >
               <h3 className="app-modal__title">Semester Details</h3>
               <button
@@ -632,43 +631,40 @@ export default function SemesterTable() {
                 <FaTimes />
               </button>
             </div>
-            <div className="app-form" style={{ paddingTop: 0 }}>
+            <div className="app-form app-form--tight">
               {viewingError && (
-                <div
-                  className="app-error"
-                  style={{ color: "#b91c1c", marginBottom: 8 }}
-                >
+                <div className="app-error">
                   {viewingError}
                 </div>
               )}
               <div className="app-grid">
                 <div className="app-field">
                   <span className="app-label">Id</span>
-                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                  <div className="app-input app-input--readonly">
                     {String(viewing.id)}
                   </div>
                 </div>
                 <div className="app-field app-grid--2">
                   <span className="app-label">Name</span>
-                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                  <div className="app-input app-input--readonly">
                     {viewing.name}
                   </div>
                 </div>
                 <div className="app-field">
                   <span className="app-label">Year</span>
-                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                  <div className="app-input app-input--readonly">
                     {viewing.year}
                   </div>
                 </div>
                 <div className="app-field">
                   <span className="app-label">Number</span>
-                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                  <div className="app-input app-input--readonly">
                     {viewing.number}
                   </div>
                 </div>
                 <div className="app-field">
                   <span className="app-label">Batch Id</span>
-                  <div className="app-input" style={{ background: "#f8fafc" }}>
+                  <div className="app-input app-input--readonly">
                     {viewing.batchId ?? viewing.batch?.id ?? "-"}
                   </div>
                 </div>
@@ -677,28 +673,19 @@ export default function SemesterTable() {
                   <>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Batch Name</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.name}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Batch Start Year</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.startYear}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Batch Duration Years</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.durationYears}
                       </div>
                     </div>
@@ -709,55 +696,37 @@ export default function SemesterTable() {
                   <>
                     <div className="app-field">
                       <span className="app-label">Faculty Id</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.id}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Faculty Code</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.code}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Faculty Name</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.facultyName}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Degree Title</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.degreeTitle || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Short Name</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.shortName || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Email</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.email || "-"}
                       </div>
                     </div>
@@ -795,137 +764,92 @@ export default function SemesterTable() {
                   <>
                     <div className="app-field">
                       <span className="app-label">University Id</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.id}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">University Code</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.code}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">University Name</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.name}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Short Name</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.shortName || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Email</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.email || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Phone</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.phone || "-"}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Website</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.website || "-"}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Address Line 1</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.addressLine1 || "-"}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Address Line 2</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.addressLine2 || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">City</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.city || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">State</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.state || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Country</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.country || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Postal Code</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.postalCode || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Established Year</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.establishedYear ??
                           "-"}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Logo</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.university.logoUrl ? (
                           <img
                             src={viewing.batch.faculty.university.logoUrl}
@@ -939,10 +863,7 @@ export default function SemesterTable() {
                     </div>
                     <div className="app-field">
                       <span className="app-label">University Active</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {String(
                           viewing.batch.faculty.university.active ?? true
                         )}
@@ -1033,9 +954,7 @@ export default function SemesterTable() {
                 )}
               </p>
               {deleteError && (
-                <div className="app-error" style={{ color: "#b91c1c" }}>
-                  {deleteError}
-                </div>
+                <div className="app-error">{deleteError}</div>
               )}
             </div>
             <div className="modal-footer">
@@ -1124,9 +1043,8 @@ function SemesterFormModal({
         style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
       >
         <div
-          className="app-modal__header"
+          className="app-modal__header is-draggable"
           onMouseDown={drag.onMouseDown}
-          style={{ cursor: "move" }}
         >
           <h3 className="app-modal__title">{title}</h3>
           <button

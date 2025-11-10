@@ -471,23 +471,23 @@ export default function DepartmentTable() {
             className="app-modal"
             style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
           >
-            <div className="app-modal__header" onMouseDown={viewDrag.onMouseDown} style={{ cursor: 'move' }}>
+            <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
               <h3 className="app-modal__title">Department Details</h3>
               <button type="button" className="app-modal__close" onClick={closeView} aria-label="Close" title="Close">
                 <FaTimes />
               </button>
             </div>
-            <div className="app-form" style={{ paddingTop: 0 }}>
+            <div className="app-form app-form--tight">
               {viewError && (
-                <div style={{ color: '#b91c1c', marginBottom: 8 }}>{viewError}</div>
+                <div className="app-error">{viewError}</div>
               )}
               <div className="app-grid">
-                <div className="app-field"><span className="app-label">departmentId</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.id ?? viewing.id) || '-'}</div></div>
-                <div className="app-field"><span className="app-label">code</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.code ?? viewing.code) || '-'}</div></div>
-                <div className="app-field"><span className="app-label">departmentName</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.departmentName ?? viewData?.name ?? viewing.departmentName ?? viewing.name) || '-'}</div></div>
-                <div className="app-field"><span className="app-label">specializationTitle</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.specializationTitle ?? viewing.specializationTitle) || '-'}</div></div>
-                <div className="app-field"><span className="app-label">facultyId</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.facultyId ?? viewing.facultyId) ?? '-'}</div></div>
-                <div className="app-field"><span className="app-label">facultyName</span><div className="app-input" style={{background:'#f8fafc'}}>{(() => {
+                <div className="app-field"><span className="app-label">departmentId</span><div className="app-input app-input--readonly">{(viewData?.id ?? viewing.id) || '-'}</div></div>
+                <div className="app-field"><span className="app-label">code</span><div className="app-input app-input--readonly">{(viewData?.code ?? viewing.code) || '-'}</div></div>
+                <div className="app-field"><span className="app-label">departmentName</span><div className="app-input app-input--readonly">{(viewData?.departmentName ?? viewData?.name ?? viewing.departmentName ?? viewing.name) || '-'}</div></div>
+                <div className="app-field"><span className="app-label">specializationTitle</span><div className="app-input app-input--readonly">{(viewData?.specializationTitle ?? viewing.specializationTitle) || '-'}</div></div>
+                <div className="app-field"><span className="app-label">facultyId</span><div className="app-input app-input--readonly">{(viewData?.facultyId ?? viewing.facultyId) ?? '-'}</div></div>
+                <div className="app-field"><span className="app-label">facultyName</span><div className="app-input app-input--readonly">{(() => {
                   const fid = (viewData?.facultyId ?? viewing.facultyId) as number | undefined;
                   const f = faculties.find(x => x.id === (fid ?? 0));
                   if (f) {
@@ -616,7 +616,7 @@ function AppFormModal({
         onClick={(e) => e.stopPropagation()}
         style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
       >
-        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
+        <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>
           <button
             type="button"
@@ -630,17 +630,8 @@ function AppFormModal({
         </div>
 
         {error && (
-          <div className="app-form" style={{ paddingTop: 0 }}>
-            <div style={{
-              background: '#fff1f2',
-              color: '#991b1b',
-              border: '1px solid #fecaca',
-              borderRadius: 8,
-              padding: '10px 12px',
-              margin: '8px 12px',
-            }}>
-              {error}
-            </div>
+          <div className="app-form app-form--tight">
+            <div className="app-error-box">{error}</div>
           </div>
         )}
 
