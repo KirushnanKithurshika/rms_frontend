@@ -87,7 +87,7 @@ export default function DepartmentTable() {
   const [savingCreate, setSavingCreate] = useState(false);
   const [editingError, setEditingError] = useState<string | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
-  const [faculties, setFaculties] = useState<Array<{ id: number; name: string; code?: string }>>([]);
+  const [faculties, setFaculties] = useState<Array<{ id: number; name: string; code?: string; universityCode?: string }>>([]);
   const [deletingDept, setDeletingDept] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -99,7 +99,7 @@ export default function DepartmentTable() {
         const list = Array.isArray(res?.data?.data)
           ? res!.data.data
           : (Array.isArray(res?.data) ? res!.data : []);
-        setFaculties(list.map((f: any) => ({ id: f.id ?? f.facultyId, name: f.name ?? f.facultyName, code: f.code ?? f.shortName })));
+        setFaculties(list.map((f: any) => ({ id: f.id ?? f.facultyId, name: f.name ?? f.facultyName, code: f.code ?? f.shortName, universityCode: f.universityCode })));
       } catch {
         setFaculties([]);
       }
@@ -398,8 +398,25 @@ export default function DepartmentTable() {
                 <td>{d.code}</td>
                 <td>{d.departmentName ?? d.name}</td>
                 <td>{d.specializationTitle || "-"}</td>
-                <td>{d.facultyId ?? "-"}</td>
-                <td>{d.facultyName || "-"}</td>
+                <td>{d.facultyId ?? "-"}</td>                
+
+                <td>
+                  {(() => {
+                    const f = faculties.find(x => x.id === (d.facultyId ?? 0));
+                    const uniCode =
+                      (f as any)?.universityCode ??
+                      (f as any)?.university?.code ??
+                      (d as any)?.universityCode ??
+                      (d as any)?.university?.code ??
+                      "";
+                    const facName = f?.name ?? d.facultyName ?? "";
+
+                    // first: universityCode, then faculty name
+                    const out = [uniCode, facName].filter(Boolean).join(" ");
+                    return out || "-";
+                  })()}
+                </td>
+
                 <td className="actions">
                   <button className="icon-btn" title="View" onClick={() => openView(d)}>
                     <FaEye className="icon view-icon" />
@@ -470,7 +487,17 @@ export default function DepartmentTable() {
                 <div className="app-field"><span className="app-label">departmentName</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.departmentName ?? viewData?.name ?? viewing.departmentName ?? viewing.name) || '-'}</div></div>
                 <div className="app-field"><span className="app-label">specializationTitle</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.specializationTitle ?? viewing.specializationTitle) || '-'}</div></div>
                 <div className="app-field"><span className="app-label">facultyId</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.facultyId ?? viewing.facultyId) ?? '-'}</div></div>
-                <div className="app-field"><span className="app-label">facultyName</span><div className="app-input" style={{background:'#f8fafc'}}>{(viewData?.facultyName ?? viewing.facultyName) || '-'}</div></div>
+                <div className="app-field"><span className="app-label">facultyName</span><div className="app-input" style={{background:'#f8fafc'}}>{(() => {
+                  const fid = (viewData?.facultyId ?? viewing.facultyId) as number | undefined;
+                  const f = faculties.find(x => x.id === (fid ?? 0));
+                  if (f) {
+                    const uni = (f as any).universityCode || '';
+                    const name = f.name || '';
+                    const label = [uni, name].filter(Boolean).join(' ').trim();
+                    return label || '-';
+                  }
+                  return (viewData?.facultyName ?? viewing.facultyName) || '-';
+                })()}</div></div>
               </div>
               <div className="app-modal__actions">
                 <button type="button" className="app-btn app-btn--primary" onClick={closeView}>Close</button>
@@ -550,7 +577,7 @@ function AppFormModal({
 }: {
   title: string;
   initial?: Partial<{ departmentCode: string; departmentName: string; specializationTitle?: string; facultyId: number }>;
-  faculties: Array<{ id: number; name: string; code?: string }>;
+  faculties: Array<{ id: number; name: string; code?: string; universityCode?: string }>;
   error?: string;
   saving?: boolean;
   onCancel: () => void;
@@ -658,7 +685,7 @@ function AppFormModal({
               >
                 {faculties.map((f) => (
                   <option key={f.id} value={f.id}>
-                    {f.name || f.code || `Faculty #${f.id}`}
+                    {`${(f.universityCode ?? '').toString().trim()} ${((f.name ?? '') || '').toString().trim()}`.trim() || (f.name || f.code || `Faculty #${f.id}`)}
                   </option>
                 ))}
               </select>

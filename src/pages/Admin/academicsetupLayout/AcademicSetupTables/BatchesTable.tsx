@@ -69,6 +69,30 @@ export default function BatchesTable() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // Faculties for dropdowns (match Department page behavior)
+  const [faculties, setFaculties] = useState<Array<{ id: number; name: string; code?: string; universityCode?: string }>>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get(`/faculties`).catch(() => null as any);
+        const list = Array.isArray(res?.data?.data)
+          ? res!.data.data
+          : (Array.isArray(res?.data) ? res!.data : []);
+        setFaculties(
+          list.map((f: any) => ({
+            id: f.id ?? f.facultyId,
+            name: f.name ?? f.facultyName,
+            code: f.code ?? f.shortName,
+            universityCode: f.universityCode,
+          }))
+        );
+      } catch {
+        setFaculties([]);
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
@@ -283,7 +307,15 @@ export default function BatchesTable() {
                 <td>{b.name}</td>
                 <td>{b.startYear}</td>
                 <td>{b.durationYears}</td>
-                <td>{b.facultyName}</td>
+                <td>
+                  {(() => {
+                    const f = faculties.find(x => x.id === (b.facultyId ?? 0));
+                    const uni = (f as any)?.universityCode ?? '';
+                    const name = f?.name ?? b.facultyName ?? '';
+                    const out = [uni, name].filter(Boolean).join(' ').trim();
+                    return out || '-';
+                  })()}
+                </td>
                 <td className="actions">
                   <button className="icon-btn" title="View" onClick={() => handleView(b.id)}>
                     <FaEye className="icon view-icon" />
@@ -339,6 +371,7 @@ export default function BatchesTable() {
           onSubmit={(payload) => handleUpdate(editing.id, payload as any)}
           error={editingError ?? undefined}
           saving={savingEdit}
+          faculties={faculties}
         />
       )}
 
@@ -349,6 +382,7 @@ export default function BatchesTable() {
           onSubmit={(payload) => handleCreate(payload as any)}
           error={creatingError ?? undefined}
           saving={savingCreate}
+          faculties={faculties}
         />
       )}
 
@@ -377,19 +411,30 @@ export default function BatchesTable() {
   );
 }
 
-function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving }: {
+function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving, faculties }: {
   title: string;
   initial?: Partial<Batch>;
   onCancel: () => void;
   onSubmit: (payload: Omit<Batch, 'id' | 'facultyName'>) => void;
   error?: string;
   saving?: boolean;
+  faculties: Array<{ id: number; name: string; code?: string; universityCode?: string }>;
 }) {
   const drag = useDraggable();
   const [name, setName] = useState(initial?.name ?? "");
   const [startYear, setStartYear] = useState<number | "">(initial?.startYear ?? "");
   const [durationYears, setDurationYears] = useState<number | "">(initial?.durationYears ?? "");
-  const [facultyId, setFacultyId] = useState<number | "">(initial?.facultyId ?? "");
+  const [facultyId, setFacultyId] = useState<number | "">(
+    (initial?.facultyId as number | undefined) ?? (faculties.length ? faculties[0].id : ("" as any))
+  );
+
+  // When faculties load and no initial provided, pick first by default
+  useEffect(() => {
+    if ((initial?.facultyId == null || initial?.facultyId === undefined) && faculties.length && (facultyId === "" || facultyId == null)) {
+      setFacultyId(faculties[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [faculties]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -422,8 +467,19 @@ function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving }: {
               <input className="app-input" type="number" value={durationYears as number | ""} onChange={(e) => setDurationYears(e.target.value === "" ? "" : Number(e.target.value))} required />
             </label>
             <label className="app-field">
-              <span className="app-label">faculty Id</span>
-              <input className="app-input" type="number" value={facultyId as number | ""} onChange={(e) => setFacultyId(e.target.value === "" ? "" : Number(e.target.value))} required />
+              <span className="app-label">Faculty</span>
+              <select
+                className="app-input"
+                value={facultyId as number | ""}
+                onChange={(e) => setFacultyId(e.target.value === "" ? "" : Number(e.target.value))}
+                required
+              >
+                {faculties.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {`${(f.universityCode ?? '').toString().trim()} ${((f.name ?? '') || '').toString().trim()}`.trim() || (f.name || f.code || `Faculty #${f.id}`)}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           <div className="app-modal__actions">

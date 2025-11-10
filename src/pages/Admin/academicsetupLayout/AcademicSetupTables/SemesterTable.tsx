@@ -1,7 +1,7 @@
 ﻿// SemesterTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../../../../services/api";
-import { FaSearch, FaPlus, FaSort, FaSortUp, FaSortDown, FaEye, FaTimes } from "react-icons/fa";
+import { FaSearch, FaPlus, FaSort, FaSortUp, FaSortDown, FaEye, FaTimes, FaAngleLeft, FaAngleRight, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
 import "./table.css";
 
@@ -55,10 +55,15 @@ export default function SemesterTable() {
   const [q, setQ] = useState("");
   const searchRef = useRef<HTMLInputElement | null>(null);
 
+  // reference data for rendering Batch as "Batch Name Faculty-Code"
+  const [batches, setBatches] = useState<Array<{ id: number; name: string; facultyId?: number }>>([]);
+  const [faculties, setFaculties] = useState<Array<{ id: number; code?: string; shortName?: string; name?: string }>>([]);
+
   // server paging (0-based)
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
 
   const [sortBy, setSortBy] = useState<SortKey | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
@@ -96,14 +101,35 @@ export default function SemesterTable() {
         }));
         setRows(mapped.slice().sort((a, b) => a.id - b.id));
         setTotalPages(Number(payload?.totalPages ?? 1));
+        const total = Number(payload?.totalElements ?? payload?.totalItems ?? payload?.total ?? 0);
+        setTotalItems(Number.isFinite(total) ? total : 0);
       } catch {
         setRows([]);
         setTotalPages(1);
+        setTotalItems(0);
       } finally {
         setLoading(false);
       }
     })();
   }, [page, pageSize, reloadKey]);
+
+  // Load reference lists (batches and faculties) once for label composition
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get(`/v1/batches/GetAll`).catch(() => null as any);
+        const arr = Array.isArray(res?.data?.data) ? res!.data.data : (Array.isArray(res?.data) ? res!.data : []);
+        const mapped = (arr as any[]).map((b: any) => ({ id: b.id ?? b.batchId, name: b.name ?? b.batchName, facultyId: b.facultyId ?? b.faculty?.id }));
+        setBatches(mapped);
+      } catch { setBatches([]); }
+
+      try {
+        const fres = await api.get(`/faculties`).catch(() => null as any);
+        const flist = Array.isArray(fres?.data?.data) ? fres!.data.data : (Array.isArray(fres?.data) ? fres!.data : []);
+        setFaculties((flist as any[]).map((f: any) => ({ id: f.id ?? f.facultyId, code: f.code ?? f.shortName, shortName: f.shortName, name: f.name ?? f.facultyName })));
+      } catch { setFaculties([]); }
+    })();
+  }, []);
 
   // client filter + sort within current page
   const filtered = useMemo(() => {
@@ -368,7 +394,15 @@ export default function SemesterTable() {
                   <td>{s.name}</td>
                   <td>{s.year}</td>
                   <td>{s.number}</td>
-                  <td>{s.batchId}</td>
+                  <td>
+                    {(() => {
+                      const b = batches.find(x => x.id === (s.batchId ?? 0));
+                      const f = faculties.find(ff => ff.id === (b?.facultyId ?? 0));
+                      const facCode = f?.code ?? f?.shortName ?? "";
+                      const label = [b?.name ?? "", facCode].filter(Boolean).join(" ").trim();
+                      return label || String(s.batchId);
+                    })()}
+                  </td>
                   <td className="actions">
                     <button className="icon-btn" title="View" onClick={() => handleView(s.id)}>
                       <FaEye className="icon view-icon" />
@@ -383,13 +417,32 @@ export default function SemesterTable() {
           </tbody>
         </table>
 
-        {/* Pager */}
-        <div className="table-footer">
-          <div />
-          <div className="pager">
-            <button disabled={page <= 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>Prev</button>
-            <span style={{ margin: "0 8px" }}>Page {page + 1} of {totalPages} | Size {pageSize}</span>
-            <button disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</button>
+        {/* Pager (match user-management style, styled via table.css) */}
+        <div className="custom-pagination">
+          <div className="pagination-left">
+            <span className="pagination-label">Rows per page</span>
+            <select
+              className="pagination-select"
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <span className="pagination-count">
+              {totalItems === 0
+                ? `0-0 of 0`
+                : `${page * pageSize + 1}-${Math.min(totalItems, (page + 1) * pageSize)} of ${totalItems}`}
+            </span>
+          </div>
+          <div className="pagination-right">
+            <button className="page-btn" onClick={() => setPage(0)} disabled={page <= 0} aria-label="First page"><FaAngleDoubleLeft /></button>
+            <button className="page-btn" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page <= 0} aria-label="Previous page"><FaAngleLeft /></button>
+            <button className="page-number active" aria-current="page">{page + 1}</button>
+            <span className="page-ellipsis">/ {totalPages}</span>
+            <button className="page-btn" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page + 1 >= totalPages} aria-label="Next page"><FaAngleRight /></button>
+            <button className="page-btn" onClick={() => setPage(Math.max(0, totalPages - 1))} disabled={page + 1 >= totalPages} aria-label="Last page"><FaAngleDoubleRight /></button>
           </div>
         </div>
       </div>
@@ -479,6 +532,8 @@ export default function SemesterTable() {
           onSubmit={(payload) => handleUpdate(editing.id, payload)}
           error={editingError ?? undefined}
           saving={savingEdit}
+          batches={batches}
+          faculties={faculties}
         />
       )}
       {creating && (
@@ -488,6 +543,8 @@ export default function SemesterTable() {
           onSubmit={(payload) => handleCreate(payload)}
           error={creatingError ?? undefined}
           saving={savingCreate}
+          batches={batches}
+          faculties={faculties}
         />
       )}
 
@@ -529,6 +586,8 @@ function SemesterFormModal({
   onSubmit,
   error,
   saving,
+  batches,
+  faculties,
 }: {
   title: string;
   initial?: Partial<SemesterCreatePayload>;
@@ -536,12 +595,24 @@ function SemesterFormModal({
   onSubmit: (payload: SemesterCreatePayload) => void;
   error?: string;
   saving?: boolean;
+  batches: Array<{ id: number; name: string; facultyId?: number }>;
+  faculties: Array<{ id: number; code?: string; shortName?: string; name?: string }>;
 }) {
   const drag = useDraggable();
   const [name, setName] = useState(initial?.name ?? "");
   const [year, setYear] = useState<number | "">(initial?.year ?? "");
   const [number, setNumber] = useState<number | "">(initial?.number ?? "");
-  const [batchId, setBatchId] = useState<number | "">(initial?.batchId ?? "");
+  const [batchId, setBatchId] = useState<number | "">(
+    (initial?.batchId as number | undefined) ?? (batches.length ? batches[0].id : ("" as any))
+  );
+
+  // default first batch if none provided and list is available
+  useEffect(() => {
+    if ((initial?.batchId == null || initial?.batchId === undefined) && batches.length && (batchId === "" || batchId == null)) {
+      setBatchId(batches[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [batches]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -597,7 +668,23 @@ function SemesterFormModal({
 
             <label className="app-field">
               <span className="app-label">Batch Id</span>
-              <input className="app-input" type="number" value={batchId as number | ""} onChange={(e) => setBatchId(e.target.value === "" ? "" : Number(e.target.value))} required />
+              <select
+                className="app-input"
+                value={batchId as number | ""}
+                onChange={(e) => setBatchId(e.target.value === "" ? "" : Number(e.target.value))}
+                required
+              >
+                {batches.map((b) => {
+                  const f = faculties.find((ff) => ff.id === (b.facultyId ?? 0));
+                  const facCode = f?.code ?? f?.shortName ?? "";
+                  const label = `${(b.name ?? "").toString().trim()} ${(facCode ?? "").toString().trim()}`.trim();
+                  return (
+                    <option key={b.id} value={b.id}>
+                      {label || `Batch #${b.id}`}
+                    </option>
+                  );
+                })}
+              </select>
             </label>
           </div>
 
