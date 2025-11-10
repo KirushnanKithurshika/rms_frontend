@@ -55,6 +55,13 @@ export default function BatchesTable() {
   const [viewing, setViewing] = useState<any>(null);
   const [viewingError, setViewingError] = useState<string | null>(null);
   const viewDrag = useDraggable();
+  const viewModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = viewModalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${viewDrag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${viewDrag.pos.y}px`);
+  }, [viewDrag.pos.x, viewDrag.pos.y]);
 
   const [editing, setEditing] = useState<Batch | null>(null);
   const [editingError, setEditingError] = useState<string | null>(null);
@@ -277,7 +284,7 @@ export default function BatchesTable() {
             <FaSearch className="search-icon" />
           </button>
         </div>
-        <div className="filters">         <button className="add-user-btn" onClick={() => setCreating(true)}> <FaPlus style={{ marginRight: 6 }} />Add Batch</button>     </div>
+        <div className="filters">         <button className="add-user-btn" onClick={() => setCreating(true)}> <FaPlus className="icon-left-gap" />Add Batch</button>     </div>
       </div>
 
       {/* Table */}
@@ -335,7 +342,7 @@ export default function BatchesTable() {
       {/* View modal */}
       {viewing && (
         <div className="app-modal-backdrop" role="dialog" aria-modal="true">
-          <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}>
+          <div className="app-modal app-modal--draggable" onClick={(e) => e.stopPropagation()} ref={viewModalRef}>
             <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
               <h3 className="app-modal__title">Batch Details</h3>
               <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">
@@ -420,6 +427,13 @@ function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving, fac
   faculties: Array<{ id: number; name: string; code?: string; universityCode?: string }>;
 }) {
   const drag = useDraggable();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${drag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${drag.pos.y}px`);
+  }, [drag.pos.x, drag.pos.y]);
   const [name, setName] = useState(initial?.name ?? "");
   const [startYear, setStartYear] = useState<number | "">(initial?.startYear ?? "");
   const [durationYears, setDurationYears] = useState<number | "">(initial?.durationYears ?? "");
@@ -442,7 +456,7 @@ function BatchFormModal({ title, initial, onCancel, onSubmit, error, saving, fac
 
   return (
     <div className="app-modal-backdrop" role="dialog" aria-modal="true">
-      <div className="app-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}>
+      <div className="app-modal app-modal--draggable" onClick={(e) => e.stopPropagation()} ref={modalRef}>
         <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>
           <button type="button" className="app-modal__close" onClick={onCancel} aria-label="Close" title="Close">

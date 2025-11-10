@@ -83,6 +83,13 @@ export default function DepartmentTable() {
   const [viewLoading, setViewLoading] = useState(false);
   const [viewError, setViewError] = useState<string | null>(null);
   const viewDrag = useDraggable();
+  const viewModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = viewModalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${viewDrag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${viewDrag.pos.y}px`);
+  }, [viewDrag.pos.x, viewDrag.pos.y]);
   const [creatingError, setCreatingError] = useState<string | null>(null);
   const [savingCreate, setSavingCreate] = useState(false);
   const [editingError, setEditingError] = useState<string | null>(null);
@@ -352,7 +359,7 @@ export default function DepartmentTable() {
 
         <div className="filters">
           <button className="add-user-btn" onClick={() => setCreating(true)}>
-            <FaPlus style={{ marginRight: 6 }} />
+            <FaPlus className="icon-left-gap" />
             Add Department
           </button>
         </div>
@@ -468,8 +475,8 @@ export default function DepartmentTable() {
       {viewing && (
         <div className="app-modal-backdrop" role="dialog" aria-modal="true">
           <div
-            className="app-modal"
-            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
+            className="app-modal app-modal--draggable"
+            ref={viewModalRef}
           >
             <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
               <h3 className="app-modal__title">Department Details</h3>
@@ -547,7 +554,7 @@ export default function DepartmentTable() {
                 )}
             </p>
             {deleteError && (
-              <div style={{ color: '#b91c1c' }}>{deleteError}</div>
+              <div className="app-error">{deleteError}</div>
             )}
             </div>
             <div className="modal-footer">
@@ -584,6 +591,13 @@ function AppFormModal({
   onSubmit: (payload: { departmentCode: string; departmentName: string; specializationTitle?: string; facultyId: number }) => void;
 }) {
   const drag = useDraggable();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${drag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${drag.pos.y}px`);
+  }, [drag.pos.x, drag.pos.y]);
   const [departmentCode, setDepartmentCode] = useState(initial?.departmentCode ?? "");
   const [departmentName, setDepartmentName] = useState(initial?.departmentName ?? "");
   const [specializationTitle, setSpecializationTitle] = useState(initial?.specializationTitle ?? "");
@@ -612,9 +626,9 @@ function AppFormModal({
   return (
     <div className="app-modal-backdrop" role="dialog" aria-modal="true">
       <div
-        className="app-modal"
+        className="app-modal app-modal--draggable"
         onClick={(e) => e.stopPropagation()}
-        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
+        ref={modalRef}
       >
         <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>

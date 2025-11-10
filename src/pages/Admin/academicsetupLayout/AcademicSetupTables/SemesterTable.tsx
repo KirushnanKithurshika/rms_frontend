@@ -1,4 +1,4 @@
-﻿// SemesterTable.tsx
+// SemesterTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../../../../services/api";
 import {
@@ -91,6 +91,8 @@ export default function SemesterTable() {
   const [viewing, setViewing] = useState<any>(null);
   const [viewingError, setViewingError] = useState<string | null>(null);
   const viewDrag = useDraggable();
+  const viewModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => { const el=viewModalRef.current; if(!el) return; el.style.setProperty("--drag-x", `${viewDrag.pos.x}px`); el.style.setProperty("--drag-y", `${viewDrag.pos.y}px`); }, [viewDrag.pos.x, viewDrag.pos.y]);
   const [showDelete, setShowDelete] = useState(false);
   const [toDelete, setToDelete] = useState<Semester | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -400,7 +402,7 @@ export default function SemesterTable() {
           />
           <button
             type="button"
-            className="icon-btn"
+            className="icon-btn search-btn-floating"
             aria-label="Search"
             title="Search"
             onClick={() => {
@@ -408,29 +410,16 @@ export default function SemesterTable() {
               setQ(val.trim());
               searchRef.current?.focus();
             }}
-            style={{
-              position: "absolute",
-              right: 8,
-              top: "50%",
-              transform: "translateY(-50%)",
-              background: "transparent",
-              border: 0,
-              padding: 0,
-              cursor: "pointer",
-            }}
           >
             <FaSearch className="search-icon" />
           </button>
         </div>
 
         <div className="filters">
-          <label
-            className="app-field"
-            style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
-          >
+          <label className="app-field field-inline">
             <span className="app-label">Page</span>
             <input
-              className="app-input"
+              className="app-input w-90px"
               type="number"
               min={0}
               value={page}
@@ -438,28 +427,18 @@ export default function SemesterTable() {
                 const v = Number(e.target.value);
                 setPage(Number.isFinite(v) && v >= 0 ? v : 0);
               }}
-              style={{ width: 90 }}
             />
           </label>
 
-          <label
-            className="app-field"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              marginLeft: 8,
-            }}
-          >
+          <label className="app-field field-inline ml-8">
             <span className="app-label">Size</span>
             <select
-              className="app-input"
+              className="app-input w-110px"
               value={pageSize}
               onChange={(e) => {
                 setPageSize(Number(e.target.value));
                 setPage(0);
               }}
-              style={{ width: 110 }}
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -468,12 +447,8 @@ export default function SemesterTable() {
             </select>
           </label>
 
-          <button
-            className="add-user-btn"
-            onClick={() => setCreating(true)}
-            style={{ marginLeft: 8 }}
-          >
-            <FaPlus style={{ marginRight: 6 }} />
+          <button className="add-user-btn ml-8" onClick={() => setCreating(true)}>
+            <FaPlus className="icon-left-gap" />
             Add Semester
           </button>
         </div>
@@ -610,11 +585,9 @@ export default function SemesterTable() {
       {viewing && (
         <div className="app-modal-backdrop" role="dialog" aria-modal="true">
           <div
-            className="app-modal"
+            className="app-modal app-modal--draggable"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)`,
-            }}
+            ref={viewModalRef}
           >
             <div
               className="app-modal__header is-draggable"
@@ -732,28 +705,19 @@ export default function SemesterTable() {
                     </div>
                     <div className="app-field">
                       <span className="app-label">Phone</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.phone || "-"}
                       </div>
                     </div>
                     <div className="app-field app-grid--2">
                       <span className="app-label">Website</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {viewing.batch.faculty.website || "-"}
                       </div>
                     </div>
                     <div className="app-field">
                       <span className="app-label">Faculty Active</span>
-                      <div
-                        className="app-input"
-                        style={{ background: "#f8fafc" }}
-                      >
+                      <div className="app-input app-input--readonly">
                         {String(viewing.batch.faculty.active ?? true)}
                       </div>
                     </div>
@@ -854,7 +818,7 @@ export default function SemesterTable() {
                           <img
                             src={viewing.batch.faculty.university.logoUrl}
                             alt="logo"
-                            style={{ maxHeight: 50 }}
+                            className="img-thumb-50"
                           />
                         ) : (
                           "-"
@@ -1005,6 +969,13 @@ function SemesterFormModal({
   }>;
 }) {
   const drag = useDraggable();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${drag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${drag.pos.y}px`);
+  }, [drag.pos.x, drag.pos.y]);
   const [name, setName] = useState(initial?.name ?? "");
   const [year, setYear] = useState<number | "">(initial?.year ?? "");
   const [number, setNumber] = useState<number | "">(initial?.number ?? "");
@@ -1038,9 +1009,9 @@ function SemesterFormModal({
   return (
     <div className="app-modal-backdrop" role="dialog" aria-modal="true">
       <div
-        className="app-modal"
+        className="app-modal app-modal--draggable"
         onClick={(e) => e.stopPropagation()}
-        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
+        ref={modalRef}
       >
         <div
           className="app-modal__header is-draggable"
@@ -1060,12 +1031,7 @@ function SemesterFormModal({
 
         <form onSubmit={submit} className="app-form">
           {error && (
-            <div
-              className="app-error"
-              style={{ color: "#b91c1c", marginBottom: 8 }}
-            >
-              {error}
-            </div>
+            <div className="app-error">{error}</div>
           )}
           <div className="app-grid">
             <label className="app-field">

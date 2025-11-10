@@ -96,6 +96,13 @@ export default function UniversitiesTable() {
   const [viewingLoading, setViewingLoading] = useState(false);
   const [viewingError, setViewingError] = useState<string | null>(null);
   const viewDrag = useDraggable();
+  const viewModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = viewModalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${viewDrag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${viewDrag.pos.y}px`);
+  }, [viewDrag.pos.x, viewDrag.pos.y]);
 
   const mapUni = (u: any): University => ({
     id: u.id,
@@ -442,7 +449,7 @@ export default function UniversitiesTable() {
 
         <div className="filters">
           <button className="add-user-btn" onClick={() => setCreating(true)}>
-            <FaPlus style={{ marginRight: 6 }} />
+            <FaPlus className="icon-left-gap" />
             Add University
           </button>
         </div>
@@ -453,7 +460,7 @@ export default function UniversitiesTable() {
           <thead>
             <tr>
               <th>Id</th>
-              <th style={{ width: 60 }}>Logo</th>
+              <th className="w-60px">Logo</th>
               <th onClick={() => toggleSort("code")}>
                 code {sortIcon("code")}
               </th>
@@ -490,7 +497,7 @@ export default function UniversitiesTable() {
                     <img
                       src={u.logoUrl}
                       alt={`${u.name || u.code} logo`}
-                      style={{ height: 28, width: 28, objectFit: 'contain' }}
+                      className="img-28-contain"
                     />
                   ) : (
                     '-'
@@ -554,8 +561,8 @@ export default function UniversitiesTable() {
           aria-modal="true"
         >
           <div
-            className="app-modal"
-            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
+            className="app-modal app-modal--draggable"
+            ref={viewModalRef}
           >
             <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
                 <h3 className="app-modal__title">University Details</h3>
@@ -571,10 +578,10 @@ export default function UniversitiesTable() {
               </div>
             <div className="app-form app-form--tight">
                 {viewingLoading && (
-                  <div style={{ padding: '8px 4px', color: '#6b7280' }}>Loading...</div>
+                  <div>Loading...</div>
                 )}
                 {viewingError && (
-                  <div className="app-error" style={{ padding: '8px 4px' }}>{viewingError}</div>
+                  <div className="app-error">{viewingError}</div>
                 )}
                 <div className="app-grid">
                 <div className="app-field"><span className="app-label">id</span><div className="app-input app-input--readonly">{String(viewing.id)}</div></div>
@@ -591,7 +598,7 @@ export default function UniversitiesTable() {
                 <div className="app-field"><span className="app-label">country</span><div className="app-input app-input--readonly">{viewing.country || '-'}</div></div>
                 <div className="app-field"><span className="app-label">postalCode</span><div className="app-input app-input--readonly">{viewing.postalCode || '-'}</div></div>
                 <div className="app-field"><span className="app-label">establishedYear</span><div className="app-input app-input--readonly">{viewing.establishedYear ?? '-'}</div></div>
-                <div className="app-field app-grid--2"><span className="app-label">logoUrl</span><div className="app-input app-input--readonly">{viewing.logoUrl ? <img src={viewing.logoUrl} alt="logo" style={{maxHeight:50}} /> : '-'}</div></div>
+                <div className="app-field app-grid--2"><span className="app-label">logoUrl</span><div className="app-input app-input--readonly">{viewing.logoUrl ? <img src={viewing.logoUrl} alt="logo" className="img-thumb-50" /> : '-'}</div></div>
                 <div className="app-field"><span className="app-label">active</span><div className="app-input app-input--readonly">{String(viewing.active ?? true)}</div></div>
               </div>
               <div className="app-modal__actions">
@@ -639,7 +646,7 @@ export default function UniversitiesTable() {
             </div>
             <div className="modal-footer">
               {deleteError && (
-                <div className="app-error" style={{ color: '#b91c1c', marginRight: 'auto' }}>{deleteError}</div>
+                <div className="app-error">{deleteError}</div>
               )}
               <button className="btn-delete danger" onClick={confirmDelete} disabled={deleting}>
                 {deleting ? 'Deleting…' : 'Delete'}
@@ -743,6 +750,13 @@ function AppFormModal({
   }, [onCancel, disableEscClose]);
 
   const drag = useDraggable();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${drag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${drag.pos.y}px`);
+  }, [drag.pos.x, drag.pos.y]);
 
   return (
     <div
@@ -752,10 +766,10 @@ function AppFormModal({
       aria-modal="true"
     >
       <div
-        className="app-modal"
-        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
+        className="app-modal app-modal--draggable"
+        ref={modalRef}
       >
-        <div className="app-modal__header" onMouseDown={drag.onMouseDown} style={{ cursor: 'move' }}>
+        <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>
           <button
             type="button"
@@ -770,9 +784,7 @@ function AppFormModal({
 
         <form onSubmit={submit} className="app-form">
           {error && (
-            <div className="app-error" style={{ color: '#b91c1c', marginBottom: 8 }}>
-              {error}
-            </div>
+            <div className="app-error">{error}</div>
           )}
           <div className="app-grid">
             {!isEdit && (
@@ -849,7 +861,7 @@ function AppFormModal({
 
             <label className="app-field">
               <span className="app-label">Active</span>
-              <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="app-input app-input--inline">
                 <input
                   type="checkbox"
                   checked={active}

@@ -193,14 +193,12 @@ export default function FacultyTable() {
         id: f.id,
         code: f.code,
         name: f.facultyName ?? f.name,
-          shortName: f.shortName,
-          dean: f.degreeTitle ?? f.dean,
+        shortName: f.shortName,
+        dean: f.degreeTitle ?? f.dean,
         contactNumber: f.phone ?? f.contactNumber,
         email: f.email,
-          website: f.website,
-          address: f.website ?? f.address,
         website: f.website,
-        shortName: f.shortName,
+        address: f.website ?? f.address,
         universityId: f.universityId,
         universityCode: f.universityCode,
         universityName: f.universityName,
@@ -411,6 +409,13 @@ export default function FacultyTable() {
 
   useEffect(() => { setPage(1); }, [q]);
   const viewDrag = useDraggable();
+  const viewModalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = viewModalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${viewDrag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${viewDrag.pos.y}px`);
+  }, [viewDrag.pos.x, viewDrag.pos.y]);
 
   return (
     <div>
@@ -441,7 +446,7 @@ export default function FacultyTable() {
 
         <div className="filters">
           <button className="add-user-btn" onClick={() => setCreating(true)}>
-            <FaPlus style={{ marginRight: 6 }} />
+            <FaPlus className="icon-left-gap" />
             Add Faculty
           </button>
         </div>
@@ -541,9 +546,9 @@ export default function FacultyTable() {
       {(viewing || viewingLoading || viewingError) && (
         <div className="app-modal-backdrop" onClick={() => setViewing(null)} role="dialog" aria-modal="true">
           <div
-            className="app-modal"
+            className="app-modal app-modal--draggable"
             onClick={(e) => e.stopPropagation()}
-            style={{ transform: `translate(${viewDrag.pos.x}px, ${viewDrag.pos.y}px)` }}
+            ref={viewModalRef}
           >
             <div className="app-modal__header is-draggable" onMouseDown={viewDrag.onMouseDown}>
               <h3 className="app-modal__title">Faculty Details</h3>
@@ -553,7 +558,7 @@ export default function FacultyTable() {
             </div>
             <div className="app-form app-form--tight">
               {viewingLoading ? (
-                <div style={{ padding: '1rem' }}>Loading...</div>
+                <div>Loading...</div>
               ) : (
                 <>
                   {viewingError && (
@@ -712,12 +717,20 @@ function AppFormModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onCancel, disableEscClose]);
 
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+    el.style.setProperty('--drag-x', `${drag.pos.x}px`);
+    el.style.setProperty('--drag-y', `${drag.pos.y}px`);
+  }, [drag.pos.x, drag.pos.y]);
+
   return (
     <div className="app-modal-backdrop" onClick={disableBackdropClose ? undefined : onCancel} role="dialog" aria-modal="true">
       <div
-        className="app-modal"
+        className="app-modal app-modal--draggable"
         onClick={(e) => e.stopPropagation()}
-        style={{ transform: `translate(${drag.pos.x}px, ${drag.pos.y}px)` }}
+        ref={modalRef}
       >
         <div className="app-modal__header is-draggable" onMouseDown={drag.onMouseDown}>
           <h3 className="app-modal__title">{title}</h3>
@@ -789,7 +802,7 @@ function AppFormModal({
 
             <label className="app-field">
               <span className="app-label">Active</span>
-              <div className="app-input" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="app-input app-input--inline">
                 <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
                 <span>{active ? 'Enabled' : 'Disabled'}</span>
               </div>
