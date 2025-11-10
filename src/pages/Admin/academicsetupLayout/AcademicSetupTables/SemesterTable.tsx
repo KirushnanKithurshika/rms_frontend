@@ -909,7 +909,7 @@ export default function SemesterTable() {
                 aria-label="Close"
                 onClick={closeDelete}
               >
-                A-
+                <FaTimes />
               </button>
             </div>
             <div className="modal-body">

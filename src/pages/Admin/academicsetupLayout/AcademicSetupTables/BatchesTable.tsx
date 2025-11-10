@@ -398,7 +398,9 @@ export default function BatchesTable() {
           <div className="modal" role="document" onClick={(e) => e.stopPropagation()} tabIndex={-1}>
             <div className="modal-header">
               <h4 id="delete-title">Delete Batch</h4>
-              <button className="close-btn" aria-label="Close" onClick={closeDelete}>A-</button>
+              <button className="close-btn" aria-label="Close" onClick={closeDelete}>
+                <FaTimes />
+              </button>
             </div>
             <div className="modal-body">
               <p className="modal-body">
