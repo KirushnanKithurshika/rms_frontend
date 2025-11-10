@@ -638,7 +638,13 @@ export default function SemesterTable() {
                 <div className="app-field">
                   <span className="app-label">Batch Id</span>
                   <div className="app-input app-input--readonly">
-                    {viewing.batchId ?? viewing.batch?.id ?? "-"}
+                    {(() => {
+                      const bid = (viewing as any)?.batchId ?? (viewing as any)?.batch?.id;
+                      const b = batches.find((x) => x.id === (bid ?? 0));
+                      const f = faculties.find((ff) => ff.id === (b?.facultyId ?? 0));
+                      const label = [b?.name, f?.code].filter(Boolean).join(" ");
+                      return label || (bid != null ? String(bid) : "-");
+                    })()}
                   </div>
                 </div>
 
