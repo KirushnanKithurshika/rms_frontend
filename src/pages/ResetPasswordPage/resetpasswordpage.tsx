@@ -96,7 +96,7 @@ const handleReset = async () => {
           <h2>Reset Password</h2>
 
           {!token && (
-            <p style={{ color: "crimson", marginBottom: 8 }}>
+            <p className="rp-error rp-mb-8">
               Missing reset token. Please open the link from your email.
             </p>
           )}
@@ -131,8 +131,8 @@ const handleReset = async () => {
             </span>
           </div>
 
-          {msg && <p style={{ color: "#065f46", marginTop: 8 }}>{msg}</p>}
-          {error && <p style={{ color: "crimson", marginTop: 8 }}>{error}</p>}
+          {msg && <p className="rp-success rp-mt-8">{msg}</p>}
+          {error && <p className="rp-error rp-mt-8">{error}</p>}
 
           <div className="button-wrapper">
             <button
