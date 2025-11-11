@@ -1,5 +1,5 @@
 // src/pages/ResetPasswordPage/resetpasswordpage.tsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./resetpassword.css";
@@ -14,6 +14,7 @@ const ResetPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [tokenValid, setTokenValid] = useState<boolean | null>(null);
 
   const [search] = useSearchParams();
   const navigate = useNavigate();
@@ -28,6 +29,32 @@ const ResetPassword: React.FC = () => {
     if (newPassword !== confirm) return "Passwords do not match.";
     return null;
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    const validateToken = async () => {
+      setError(null);
+      setTokenValid(null);
+      if (!token) return;
+      try {
+        const res = await api.get("/auth/validate-reset-token", { params: { token } });
+        const payload: any = res?.data || {};
+        // Backend always 200; check JSON status/data values per spec
+        const ok = String(payload?.status || "").toUpperCase() === "SUCCESS" || payload?.data === 200;
+        if (!cancelled) setTokenValid(ok);
+        if (!ok && !cancelled) {
+          setError(payload?.message || "Token is invalid or expired.");
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setTokenValid(false);
+          setError(e?.response?.data?.message || "Token is invalid or expired.");
+        }
+      }
+    };
+    validateToken();
+    return () => { cancelled = true; };
+  }, [token]);
 
 const handleReset = async () => {
   const newPassword = (document.getElementById("newPassword") as HTMLInputElement)?.value || "";
@@ -111,7 +138,7 @@ const handleReset = async () => {
             <button
               className="login-button"
               onClick={handleReset}
-              disabled={loading || !token}
+              disabled={loading || !token || tokenValid === false}
             >
               {loading ? "Resetting..." : "Reset Password"}
             </button>

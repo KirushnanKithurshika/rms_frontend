@@ -159,7 +159,7 @@
 .user-table td {
     padding: 5px 10px;
     text-align: left;
-    border-bottom: 1px solid #e5e5e5;
+    /* border-bottom: 1px solid #e5e5e5; */
 }
 
 
@@ -200,10 +200,18 @@
     background: #f39c12;
 }
 
-.actions svg {
-    margin-right: 8px;
-    cursor: pointer;
+.actions svg { margin-right: 0; }
+.actions .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    line-height: 0;          /* prevent baseline offset */
+    vertical-align: middle;  /* align inside table cell */
 }
+.actions .icon-btn .icon { display: block; } /* remove inline svg baseline gap */
 
 .edit-icon {
     color: #3498db;

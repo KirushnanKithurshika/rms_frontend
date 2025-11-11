@@ -3,6 +3,7 @@ import Navbarin from '../../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 import AdminSidebar from '../../../components/Admin/adminsidebar/adminsidebar.tsx';
 import './usermanagement.css';
+import '../academicsetupLayout/AcademicSetupTables/table.css';
 import {
     FaUser,
     FaChevronDown,
@@ -11,12 +12,14 @@ import {
 } from 'react-icons/fa';
 
 import { MdEdit, MdDelete } from "react-icons/md";
+import { FaEye } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
 import Pagination from '../../../components/Admin/pagination/pagination.tsx';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import AddUserForm from '../../../components/Admin/adduserform/adduserform.tsx';
 
-const roles = ['All Roles', 'Admin', 'Moderator', 'User', 'Guest'];
+// UI roles list: rename "Moderator" to "Lecturer"
+const roles = ['All Roles', 'Admin', 'Lecturer', 'User', 'Guest'];
 const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Suspended'];
 const dateOptions = ['Newest', 'Oldest', 'Joined This Month', 'Joined Last 30 Days'];
 
@@ -77,6 +80,10 @@ const UserManagement: React.FC = () => {
     const [page, setPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [total, setTotal] = useState<number>(0);
+    // View modal state
+    const [viewing, setViewing] = useState<any | null>(null);
+    const [viewingLoading, setViewingLoading] = useState(false);
+    const [viewingError, setViewingError] = useState<string | null>(null);
 
     const handleBackdropClick = () => setSidebarOpen(false);
 
@@ -135,18 +142,57 @@ const UserManagement: React.FC = () => {
                 const json = await res.json().catch(() => ({}));
                 const payload: any = json?.data;
                 let list = Array.isArray(payload?.content) ? payload.content : Array.isArray(payload) ? payload : [];
+                // Helpers to normalize role names from various backend shapes
+                const normalizeToken = (s: any) => String(s || '')
+                    .trim()
+                    .toUpperCase()
+                    .replace(/^ROLE_/, '');
+                const extractRoleTokens = (u: any): string[] => {
+                    const tokens: string[] = [];
+                    // roles: [{name:"ADMIN"}|"ADMIN"]
+                    if (Array.isArray(u?.roles)) {
+                        for (const r of u.roles) {
+                            if (r && typeof r === 'object' && (r.name || r.roleName || r.code)) {
+                                tokens.push(normalizeToken(r.name || r.roleName || r.code));
+                            } else if (typeof r === 'string') {
+                                tokens.push(normalizeToken(r));
+                            }
+                        }
+                    }
+                    // authorities: [{authority:"ROLE_ADMIN"}|"ROLE_ADMIN"]
+                    if (Array.isArray(u?.authorities)) {
+                        for (const a of u.authorities) {
+                            if (a && typeof a === 'object' && (a.authority || a.name)) {
+                                tokens.push(normalizeToken(a.authority || a.name));
+                            } else if (typeof a === 'string') {
+                                tokens.push(normalizeToken(a));
+                            }
+                        }
+                    }
+                    // Single role fields
+                    if (u?.role) tokens.push(normalizeToken(u.role));
+                    if (u?.userRole) tokens.push(normalizeToken(u.userRole));
+                    return Array.from(new Set(tokens));
+                };
+                const hasStudentRole = (u: any) => extractRoleTokens(u).includes('STUDENT');
                 // Exclude STUDENT users; show other roles only
-                list = list.filter(
-                    (u: any) =>
-                        Array.isArray(u.roles) && !u.roles.some((r: any) => (r?.name || '').toUpperCase() === 'STUDENT')
-                );
+                list = list.filter((u: any) => !hasStudentRole(u));
                 // client-side filters: role, status, date, search
                 const term = searchTerm.trim().toLowerCase();
                 if (term || selectedRole !== 'Roles' || (selectedStatus !== 'Status' && selectedStatus !== 'All Statuses') || selectedDate !== 'Date') {
                     const roleFilter = (u: any) => {
                         if (selectedRole === 'Roles' || selectedRole === 'All Roles') return true;
-                        const rolesArr = Array.isArray(u.roles) ? u.roles : [];
-                        return rolesArr.some((r: any) => (r?.name || '').toLowerCase() === selectedRole.toLowerCase());
+                        const tokens = extractRoleTokens(u); // normalized
+                        const sel = normalizeToken(selectedRole);
+                        // Map UI selection to acceptable backend tokens (synonyms)
+                        const map: Record<string, string[]> = {
+                            ADMIN: ['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'SYSTEM_ADMIN'],
+                            LECTURER: ['LECTURER', 'LECTURE', 'TEACHER', 'INSTRUCTOR', 'MODERATOR'],
+                            USER: ['USER', 'NORMAL', 'BASIC'],
+                            GUEST: ['GUEST', 'ANONYMOUS', 'PUBLIC', 'VIEWER'],
+                        };
+                        const accepted = map[sel] || [sel];
+                        return tokens.some(t => accepted.includes(t));
                     };
                     const statusFromUser = (u: any) => (u.online ? 'Active' : (u.enabled === false ? 'Inactive' : 'Active'));
                     const statusFilter = (u: any) => {
@@ -209,6 +255,66 @@ const UserManagement: React.FC = () => {
             setTotal(prev => Math.max(0, prev - 1));
         } catch (e: any) {
             alert(e?.message || 'Failed to delete user');
+        }
+    };
+
+    const handleView = async (userId: number | undefined) => {
+        if (!userId) return;
+        const token = localStorage.getItem('token');
+        setViewingError(null);
+        setViewingLoading(true);
+        try {
+            // Backend expects both path and query param id
+            const res = await fetch(`${API_BASE_URL}/users/${userId}?id=${userId}`, {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : '',
+                    'Content-Type': 'application/json',
+                },
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                const msg = json?.message || 'Failed to load user';
+                setViewingError(String(msg));
+                setViewing(null);
+                return;
+            }
+            const d: any = json?.data ?? json;
+            const norm = (s: any) => String(s || '').trim();
+            const roles: string[] = [];
+            if (Array.isArray(d?.roles)) {
+                for (const r of d.roles) {
+                    if (r && typeof r === 'object') roles.push(norm(r.name || r.roleName || r.code));
+                    else if (typeof r === 'string') roles.push(norm(r));
+                }
+            }
+            if (Array.isArray(d?.authorities)) {
+                for (const a of d.authorities) {
+                    if (a && typeof a === 'object') roles.push(norm(a.authority || a.name));
+                    else if (typeof a === 'string') roles.push(norm(a));
+                }
+            }
+            const fullName = d.name || d.fullName || (d.firstName || d.lastName ? `${d.firstName ?? ''} ${d.lastName ?? ''}`.trim() : undefined);
+            setViewing({
+                id: d.id ?? d.userId,
+                username: d.username ?? d.userName,
+                fullName,
+                email: d.email ?? d.mail,
+                phone: d.phone ?? d.phoneNumber,
+                roles: Array.from(new Set(roles)).filter(Boolean),
+                enabled: d.enabled ?? d.active ?? true,
+                online: d.online ?? false,
+                status: d.status,
+                accountNonLocked: d.accountNonLocked,
+                accountNonExpired: d.accountNonExpired,
+                credentialsNonExpired: d.credentialsNonExpired,
+                lastActive: d.lastActive ?? d.lastLoginAt,
+                createdAt: d.createdAt ?? d.joinedAt ?? d.registeredAt,
+            });
+        } catch (e: any) {
+            setViewingError(String(e?.message || 'Failed to load user'));
+            setViewing(null);
+        } finally {
+            setViewingLoading(false);
         }
     };
 
@@ -348,18 +454,27 @@ const UserManagement: React.FC = () => {
                                                         <td>{joined}</td>
                                                         <td>{active}</td>
                                                         <td className="actions">
-                                                            <MdEdit
-                                                              className="icon edit-icon"
+                                                            <button
+                                                              className="icon-btn"
+                                                              title="View user"
+                                                              onClick={() => handleView(u.id)}
+                                                            >
+                                                              <FaEye className="icon view-icon" />
+                                                            </button>
+                                                            <button
+                                                              className="icon-btn"
                                                               title="Edit user"
                                                               onClick={() => { setSelectedUser(u); setShowAddUserForm(true); }}
-                                                              style={{ cursor: 'pointer' }}
-                                                            />
-                                                            <MdDelete
-                                                              className="icon delete-icon"
+                                                            >
+                                                              <MdEdit className="icon edit-icon" />
+                                                            </button>
+                                                            <button
+                                                              className="icon-btn"
                                                               title="Delete user"
                                                               onClick={() => handleDelete(u.id)}
-                                                              style={{ cursor: 'pointer' }}
-                                                            />
+                                                            >
+                                                              <MdDelete className="icon delete-icon" />
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 );
@@ -441,6 +556,44 @@ const UserManagement: React.FC = () => {
                             }}
                         />
                     )}
+
+                {(viewing || viewingLoading || viewingError) && (
+                    <div className="app-modal-backdrop" onClick={() => setViewing(null)} role="dialog" aria-modal="true">
+                        <div className="app-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="app-modal__header">
+                                <h3 className="app-modal__title">User Details</h3>
+                                <button type="button" className="app-modal__close" onClick={() => setViewing(null)} aria-label="Close" title="Close">×</button>
+                            </div>
+                            <div className="app-form app-form--tight">
+                                {viewingLoading ? (
+                                    <div>Loading...</div>
+                                ) : (
+                                    <>
+                                        {viewingError && <div className="app-error">{viewingError}</div>}
+                                        {viewing && (
+                                            <div className="app-grid">
+                                                <div className="app-field"><span className="app-label">Id</span><div className="app-input app-input--readonly">{viewing.id ?? '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Username</span><div className="app-input app-input--readonly">{viewing.username ?? '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Status Code</span><div className="app-input app-input--readonly">{(viewing.status ?? '') === '' ? '-' : viewing.status}</div></div>
+                                                <div className="app-field"><span className="app-label">Online</span><div className="app-input app-input--readonly app-input--inline"><input type="checkbox" checked={!!viewing.online} readOnly /><span>{viewing.online ? 'Online' : 'Offline'}</span></div></div>
+                                                <div className="app-field"><span className="app-label">Enabled</span><div className="app-input app-input--readonly app-input--inline"><input type="checkbox" checked={!!viewing.enabled} readOnly /><span>{viewing.enabled ? 'Enabled' : 'Disabled'}</span></div></div>
+                                                <div className="app-field"><span className="app-label">Account Non Locked</span><div className="app-input app-input--readonly app-input--inline"><input type="checkbox" checked={!!viewing.accountNonLocked} readOnly /><span>{viewing.accountNonLocked ? 'Yes' : 'No'}</span></div></div>
+                                                <div className="app-field"><span className="app-label">Account Non Expired</span><div className="app-input app-input--readonly app-input--inline"><input type="checkbox" checked={!!viewing.accountNonExpired} readOnly /><span>{viewing.accountNonExpired ? 'Yes' : 'No'}</span></div></div>
+                                                <div className="app-field"><span className="app-label">Credentials Non Expired</span><div className="app-input app-input--readonly app-input--inline"><input type="checkbox" checked={!!viewing.credentialsNonExpired} readOnly /><span>{viewing.credentialsNonExpired ? 'Yes' : 'No'}</span></div></div>
+                                                <div className="app-field app-grid--2"><span className="app-label">Roles</span><div className="app-input app-input--readonly">{(viewing.roles || []).join(', ') || '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Full Name</span><div className="app-input app-input--readonly">{viewing.fullName ?? '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Email</span><div className="app-input app-input--readonly">{viewing.email ?? '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Phone</span><div className="app-input app-input--readonly">{viewing.phone ?? '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Last Active</span><div className="app-input app-input--readonly">{viewing.lastActive ?? '-'}</div></div>
+                                                <div className="app-field"><span className="app-label">Created At</span><div className="app-input app-input--readonly">{viewing.createdAt ?? '-'}</div></div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 </div>
                 

@@ -1,15 +1,15 @@
-// src/services/api.ts
+﻿// src/services/api.ts
 import axios, { AxiosHeaders } from "axios";
 
 /**
  * Base URL setup
- * Priority: .env → fallback localhost:8087/api
+ * Priority: env VITE_API_BASE_URL, else fallback localhost:8080/api
  */
 const BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
     /\/+$/,
     ""
-  ) ?? "http://localhost:8087/api"; // 👈 match your Spring Boot backend port
+  ) ?? "http://localhost:8080/api"; // ðŸ‘ˆ match your Spring Boot backend port
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -40,6 +40,17 @@ api.interceptors.request.use((config) => {
     headers.delete("Authorization");
   }
 
+  // For GETs, force fresh data (avoid browser/proxy caches)
+  const method = String(config.method || 'get').toLowerCase();
+  if (method === 'get') {
+    headers.set('Cache-Control', 'no-cache, no-store');
+    headers.set('Pragma', 'no-cache');
+    headers.set('Expires', '0');
+    const ts = Date.now();
+    const existing = (config.params as Record<string, any>) || {};
+    config.params = { ...existing, _: ts };
+  }
+
   config.headers = headers;
   return config;
 });
@@ -67,3 +78,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

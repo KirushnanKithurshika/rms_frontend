@@ -226,6 +226,7 @@ dispatch(fetchAllocationsByLecturer(lid));
       <div className="rp-header no-print">
         <h3 className="rp-title">Results Preview</h3>
         <div className="rp-select-row">
+          <div className="rp-select">
           <CustomDropdownVL
             label="Select Course Allocation"
             options={courseOptions}
@@ -235,6 +236,7 @@ dispatch(fetchAllocationsByLecturer(lid));
             }
             onChange={handleCourseChange}
           />
+        </div>
         </div>
         <hr className="rp-divider" />
       </div>

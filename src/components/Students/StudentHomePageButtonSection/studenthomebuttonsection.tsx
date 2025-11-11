@@ -36,7 +36,7 @@ const ResultsTabsButtomSection: React.FC = () => {
     <div className="results-wrap">
       <h3 className="results-title">Results</h3>
 
-      {/* Tabs + Search */}
+
       <div className="results-toolbar">
         <div className="tabs-SH">
           <button
