@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FaFileExcel, FaFile, FaFolder, FaDownload } from "react-icons/fa";
 import "./ResultUploadInterface.css";
+import api from "../../services/api";
+import { toast } from "react-toastify";
 
 interface ResultUploadInterfaceProps {
   course: { code: string; title: string };
@@ -26,6 +28,7 @@ const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<"ca" | "final">("ca"); // Track active tab
+  const [uploading, setUploading] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -33,6 +36,64 @@ const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({
       setSelectedFile(file);
       onFileUpload(file.name);
     }
+  };
+
+  const canUpload = useMemo(
+    () => Boolean(selectedFile && assessment && assessment.id),
+    [selectedFile, assessment]
+  );
+
+  const handleUpload = async () => {
+    if (!assessment?.id) {
+      toast.error("Please select an assessment from the previous page.");
+      return;
+    }
+    if (!selectedFile) {
+      toast.error("Please choose a file to upload.");
+      return;
+    }
+    try {
+      setUploading(true);
+      const form = new FormData();
+      form.append("assessmentId", String(assessment.id));
+      form.append("file", selectedFile);
+      const res = await api.post("/v1/assessment-results/Upload", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const msg = res.data?.message || "Assessment results uploaded successfully";
+      toast.success(msg);
+      onBack();
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || "Upload failed";
+      toast.error(msg);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const lines: string[] = [];
+    lines.push(`Assessment Name,${assessment?.title ?? ""}`);
+    lines.push(`Batch,`);
+    lines.push(`Semester,`);
+    lines.push(`Module Code,${course.code}`);
+    lines.push(`Module Name,${course.title}`);
+    lines.push(`Assessment Date (YYYY-MM-DD),`);
+    lines.push(
+      `Notes,Enter marks for each student below. Do not rename headers.`
+    );
+    lines.push("");
+    lines.push(["StudentRegNumber", "MarksObtained", "Remarks"].join(","));
+    const csv = lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${course.code}_${assessment?.title ?? "Assessment"}_template.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -80,13 +141,13 @@ const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({
 
         <div className="upload-box">
           <div className="upload-box-icons">
-            <button className="icon-btn">
+            <button className="icon-btn" title="Sample">
               <FaFile />
             </button>
-            <button className="icon-btn">
+            <button className="icon-btn" title="Choose from folder">
               <FaFolder />
             </button>
-            <button className="icon-btn">
+            <button className="icon-btn" title="Download template" onClick={downloadTemplate}>
               <FaDownload />
             </button>
           </div>
@@ -124,8 +185,8 @@ const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({
         </div>
 
         <div className="action-buttons">
-          <button className="save-btn" onClick={onBack}>
-            Save Changes
+          <button className="save-btn" disabled={!canUpload || uploading} onClick={handleUpload}>
+            {uploading ? "Uploading..." : "Upload Results"}
           </button>
           <button className="cancel-btn" onClick={onBack}>
             Cancel
