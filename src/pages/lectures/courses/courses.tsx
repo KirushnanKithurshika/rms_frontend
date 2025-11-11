@@ -65,7 +65,7 @@ const Courses: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // --- Dropdown & Modal Handlers ---
+
   const handleDropdownToggle = (idx: number) =>
     setActiveMenuIndex((prev) => (prev === idx ? null : idx));
   const openDeleteModal = (course: Course) => {
@@ -102,7 +102,6 @@ const Courses: React.FC = () => {
       course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // --- Navigation & View Handlers ---
   const handleCourseClick = (course: Course) => {
     setDetailsCourse(course);
     setView("details");
@@ -123,7 +122,7 @@ const Courses: React.FC = () => {
   };
   const handleCreateCourse = () => navigate("/createcourseui");
 
-  // --- Close dropdown on click outside ---
+ 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -136,7 +135,7 @@ const Courses: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- Close modal on Escape ---
+  
   useEffect(() => {
     if (!showDeleteModal) return;
     const onKey = (e: KeyboardEvent) =>

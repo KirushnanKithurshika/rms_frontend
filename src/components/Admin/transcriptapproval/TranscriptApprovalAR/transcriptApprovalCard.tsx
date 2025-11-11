@@ -3,9 +3,9 @@ import { FaRegFilePdf } from "react-icons/fa6";
 import "./transcriptApprovalCard.css";
 
 type Props = {
-  studentName: string;   // e.g. "R.P Silva"
-  batch: string;         // e.g. "22nd batch"
-  subtitle?: string;     // e.g. "Transcript"
+  studentName: string;  
+  batch: string;         
+  subtitle?: string;     
   onClick: () => void;
 };
 
