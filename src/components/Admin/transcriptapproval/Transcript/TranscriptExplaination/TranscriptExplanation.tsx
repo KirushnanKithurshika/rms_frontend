@@ -94,7 +94,6 @@ const TranscriptExplanation: React.FC = () => {
             </div>
 
 
-            {/* --- Graduation Requirements box (place under the existing explanation content) --- */}
 <div className="txp-req">
   <h3 className="txp-req-head">Graduation Requirements</h3>
 

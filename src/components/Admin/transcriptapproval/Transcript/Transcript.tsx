@@ -4,7 +4,16 @@ import unilogo from "../../../../assets/logoT.png";
 import SemesterTables, { SAMPLE_SEMESTERS } from "./SemResTable/SemResTable";
 import type { SemesterData } from "./SemResTable/SemResTable";
 import TranscriptExplanation from "./TranscriptExplaination/TranscriptExplanation";
+import SignatureBoard from "../../../SignatureCanvas/SignatureCanvas";
 
+
+export type TranscriptApproval = {
+  approverName: string;
+  approverTitle: string;
+  signedAt?: string;
+  signatureUrl?: string;
+  sealUrl?: string;
+};
 export type ContactInfo = {
   telephone?: string;
   fax?: string;
@@ -47,6 +56,7 @@ export type TranscriptData = {
   issueDate?: string;
   registrarTitle?: string;
   footerNotes?: string[];
+  approval?: TranscriptApproval;
 };
 
 const DEFAULT_UNI: UniversityInfo = {
@@ -102,18 +112,11 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
   const serial = data?.serialNo ?? s?.serialNo;
   const ogpa = p?.overallGPA ?? p?.overallGradePointAverage;
 
-  /* ======= CHOOSE HOW TO SPLIT SEMESTERS =======
-     We’ll split after index 4 (zero-based, exclusive end), i.e.
-     Page 2 -> items [0..4)  (first 4 blocks)
-     Page 3 -> items [4..end) (remaining blocks)
-     Adjust SPLIT_AFTER to what fits your layout best.
-  */
   const SPLIT_AFTER = 4; // change to 5 etc. if you need more/less on page 2
   const semesters: SemesterData[] = SAMPLE_SEMESTERS; // or pass your real data here
 
   return (
     <>
-      {/* ===== Page 1: Cover & profile ===== */}
       <section className="sheet a4">
         <header className="uni-header">
           <div className="seal">
@@ -164,8 +167,10 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
         </div>
 
         <section className="footer-block">
+          <div className="canvas"><SignatureBoard /></div>
           <div className="cols">
             <div className="left">
+
               <div className="sig-line" />
               <div className="sig-text">
                 <div className="sig-name"></div>
@@ -177,8 +182,8 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
             </div>
 
             <div className="right">
-              <div className="date-stamp">{data?.issueDate || ""}</div>
-              <div className="date-line"></div>
+             <div className="date"> <div className="date-stamp">{data?.issueDate || ""}</div>
+              </div> <div className="date-line"></div>
               <div className="mutedTD">Date of Issue</div>
             </div>
           </div>
@@ -229,6 +234,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
         <SemesterTables semesters={semesters} startIndex={0} endIndex={SPLIT_AFTER} />
 
         <section className="footer-block">
+          <div className="canvas"><SignatureBoard /></div>
           <div className="cols">
             <div className="left">
               <div className="sig-line" />
@@ -242,8 +248,8 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
             </div>
 
             <div className="right">
-              <div className="date-stamp">{data?.issueDate || ""}</div>
-              <div className="date-line"></div>
+              <div className="date"> <div className="date-stamp">{data?.issueDate || ""}</div>
+              </div> <div className="date-line"></div>
               <div className="mutedTD">Date of Issue</div>
             </div>
           </div>
@@ -294,6 +300,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
         <SemesterTables semesters={semesters} startIndex={SPLIT_AFTER} />
 
         <section className="footer-block">
+          <div className="canvas"><SignatureBoard /></div>
           <div className="cols">
             <div className="left">
               <div className="sig-line" />
@@ -307,7 +314,8 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
             </div>
 
             <div className="right">
-              <div className="date-stamp">{data?.issueDate || ""}</div>
+              <div className="date"> <div className="date-stamp">{data?.issueDate || ""}</div>
+              </div>
               <div className="date-line"></div>
               <div className="mutedTD">Date of Issue</div>
             </div>

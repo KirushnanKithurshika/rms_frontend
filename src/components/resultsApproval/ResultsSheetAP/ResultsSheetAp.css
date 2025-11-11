@@ -1,11 +1,40 @@
-/* ===== A4 canvas ===== */
-@page {
-    size: A4;
-    margin: 5mm 5mm 5mm 5mm;
+
+/* A4 live preview sizing (optional) */
+.sheet.a4 {
+  width: 210mm;
+  min-height: 297mm;
+  box-sizing: border-box;
+  background: #fff;
+ 
 }
 
+/* Don’t let these split across pages */
+.results-table,
+.results-table tr,
+.results-table td,
+.results-table th,
+.list,
+.list tr,
+.list td,
+.list th,
+.legend,
+.rs-sign-exact,
+.rs-top {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
 
+/* helpers you can add on any block you want to keep intact */
+.avoid-break { break-inside: avoid; page-break-inside: avoid; }
 
+/* Optional: force a manual break with a divider element */
+.page-break { page-break-before: always; break-before: page; }
+
+/* Print media fallback (if user presses Ctrl+P) */
+@media print {
+  @page { size: A4;  }
+  .sheet.a4 { padding: 0; box-shadow: none; }
+}
 
 
 * {
@@ -16,18 +45,7 @@ body {
     background: #f4f6f8;
 }
 
-.sheet.a4 {
-    width: 210mm;
-    min-height: 297mm;
-    margin: 6mm auto;
-    background: #fff;
-    color: var(--ink);
-    padding: 8mm 10mm 12mm 10mm;
-    font-family: "Times New Roman", Georgia, serif;
-    font-size: var(--base);
-    line-height: 1.25;
-    box-shadow: 0 2mm 8mm rgba(0, 0, 0, .08);
-}
+
 
 
 .uni-header {
@@ -277,3 +295,88 @@ body {
 /* inside text */
 .lab{ font-weight:600; white-space:nowrap; }
 .val{ font-weight:400; }
+
+.canvas{
+  width:75mm;
+  height: fit-content;
+ 
+}
+/* --- Section spacing & break behavior --- */
+.rs-sign-exactAP { margin-top: 40px; }
+.avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+.sig-gridAP{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 56px;              /* more air between columns */
+  align-items:start;
+}
+
+.sig-colAP{
+  display:flex;
+  flex-direction:column;
+}
+
+.sig-rightHeaderAP {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sig-rightHeaderAP--below {
+  margin: 6px 0 10px;           
+}
+
+.sig-leaderLabelAP { font-weight: 600; white-space: nowrap; }
+.sig-leaderDotsAP {
+  flex: 1 1 auto;
+  height: 0;
+  border-bottom: 1px dashed #2b2b2b;
+  transform: translateY(-2px);
+}
+
+
+.sig-signboxAP{
+ height:130px;
+  margin: 10px 0 10px;
+  border-bottom: 1px dashed #2b2b2b;
+  position: relative;
+  background: transparent;
+}
+.sig-signboxAP > canvas,
+.sig-signboxAP > img,
+.sig-signboxAP > div,
+.sig-signboxSmallAP > canvas,
+.sig-signboxSmallAP > img,
+.sig-signboxSmallAP > div{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: calc(100% - 2px);
+  object-fit: contain;
+}
+
+/* Captions & helper text */
+.sig-captionAP{
+  font-size:12px;
+  line-height:1.35;
+  color:#111;
+  margin:4px 0 18px;
+}
+.sig-smallAP{
+  font-size:12px;
+  color:#111;
+  margin:2px 0 8px;
+
+}
+
+/* Date pinned near bottom of left column content flow */
+.sig-dateAP{
+  font-size:12px;
+  color:#111;
+  margin-top:8px;
+}
+.sig-dateLabelAP{ font-weight:600; margin-right:6px; }
+.sig-dateValueAP{ font-weight:500; }
+
+

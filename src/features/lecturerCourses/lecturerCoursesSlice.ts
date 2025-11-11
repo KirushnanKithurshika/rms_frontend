@@ -17,10 +17,10 @@ const initialState: LecturerCoursesState = {
 
 export const fetchLecturerCourses = createAsyncThunk(
   "lecturerCourses/fetchLecturerCourses",
-  async (lecturerId: number, { rejectWithValue }) => {
+  async (userId: number, { rejectWithValue }) => {
     try {
       const res = await api.get(
-        `/v1/course-allocations/GetCoursesForLecturer/${lecturerId}`
+        `/v1/course-allocations/GetCoursesForLecturer/${userId}`
       );
       return res.data.data;
     } catch (err: any) {

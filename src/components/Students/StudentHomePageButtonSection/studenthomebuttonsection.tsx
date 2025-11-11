@@ -14,6 +14,7 @@ const ResultsTabsButtomSection: React.FC = () => {
   const resultsSheet = useSelector(
     (state: RootState) => state.studentResults.resultsSheet
   );
+  const caSheet = useSelector((state: RootState) => state.studentCA.sheet);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +25,12 @@ const ResultsTabsButtomSection: React.FC = () => {
     setOpenSemester((cur) => (cur === n ? null : n));
 
   // Build a simple numeric list of semesters for the accordion
-  const semestersCount = resultsSheet?.semesters?.length ?? 0;
-  const semesters = Array.from({ length: semestersCount }, (_, i) => i + 1);
+  const examSemCount = resultsSheet?.semesters?.length ?? 0;
+  const examSemesters = Array.from({ length: examSemCount }, (_, i) => i + 1);
+  const caSemesters = (caSheet?.semesters ?? []).map((s) => s.semesterNumber);
+  const semesters = Array.from(
+    new Set<number>([...examSemesters, ...caSemesters])
+  ).sort((a, b) => a - b);
 
   return (
     <div className="results-wrap">
@@ -81,7 +86,7 @@ const ResultsTabsButtomSection: React.FC = () => {
                 type="button"
                 className="sem-head"
                 onClick={() => toggleSemester(n)}
-                aria-expanded={open ? 'true' : 'false'}
+                aria-expanded={open ? "true" : "false"}
                 aria-controls={`sem-panel-${n}`}
               >
                 <span className="sem-title">
@@ -100,7 +105,24 @@ const ResultsTabsButtomSection: React.FC = () => {
                 {/* The panel is exactly the same width as the band, but the sheet is centered inside */}
                 <div className="results-sheet-host">
                   {activeTab === "CA" ? (
-                    <StudentsConAss />
+                    (() => {
+                      const semNumber = n;
+                      const semCA = caSheet?.semesters?.find(
+                        (s) => s.semesterNumber === semNumber
+                      );
+                      return (
+                        <StudentsConAss
+                          universityTitle={caSheet?.university}
+                          department={caSheet?.departmentLine}
+                          batchText={caSheet?.batchText}
+                          sheetSubtitle={caSheet?.sheetTitle ?? "CA Marks"}
+                          studentName={caSheet?.student?.name}
+                          regNo={caSheet?.student?.regNo}
+                          semester={semNumber}
+                          caDynamic={semCA?.ca}
+                        />
+                      );
+                    })()
                   ) : (
                     <StudentResultsSheet />
                   )}

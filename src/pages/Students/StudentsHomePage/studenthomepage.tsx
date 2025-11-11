@@ -7,9 +7,10 @@ import ResultsTabsButtomSection from "../../../components/Students/StudentHomePa
 import { useAppDispatch, useAppSelector } from "../../../app/hooks.ts";
 import { selectUserId } from "../../../features/auth/selectors.ts";
 import { fetchStudentResultsSheet } from "../../../features/studentResults/studentResultsSlice.ts";
+import { fetchStudentCAByUser } from "../../../features/studentCA/studentCASlice.ts";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../../app/store.ts";import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
-
+import type { RootState } from "../../../app/store.ts";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 
 const StudentDashboard = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +20,10 @@ const StudentDashboard = () => {
   );
 
   useEffect(() => {
-    if (userId) dispatch(fetchStudentResultsSheet(userId));
+    if (userId) {
+      dispatch(fetchStudentResultsSheet(userId));
+      dispatch(fetchStudentCAByUser(userId));
+    }
   }, [dispatch, userId]);
 
   // useEffect(() => {
@@ -28,35 +32,29 @@ const StudentDashboard = () => {
 
   return (
     <div className="lec-dashboard-container">
-   
       <div className="nav">
         <Navbarin />
       </div>
 
-
-       <div className="breadcrumb">
+      <div className="breadcrumb">
         <BreadcrumbNav />
       </div>
-
 
       <div className="dashboard-content">
         <StudentSubNav />
 
         <div className="subnav-divider"></div>
         <div className="dashboard-cards-students">
-          
           <div className="card-students">
             <StudentMetrics />
           </div>
-          <div className='SHP'><ResultsTabsButtomSection /></div>
-          <div>
-
+          <div className="SHP">
+            <ResultsTabsButtomSection />
           </div>
-
+          <div></div>
         </div>
       </div>
     </div>
-
   );
 };
 

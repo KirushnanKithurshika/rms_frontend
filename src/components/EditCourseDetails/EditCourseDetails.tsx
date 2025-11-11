@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import api from "../../services/api";
+import { useAppSelector } from "../../app/hooks";
+import { selectUserId } from "../../features/auth/selectors";
 import "./EditCourseDetails.css";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 /* ---------- Reusable dropdown ---------- */
 interface DropdownProps {
@@ -22,7 +27,8 @@ const CustomDropdown: React.FC<DropdownProps> = ({
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -64,156 +70,450 @@ export type CourseView = {
   id?: number | string;
   code: string;
   title: string;
-  academicYear?: string;
-  department?: string;
-  semester?: string;
-  degreeProgram?: string;
-  credits?: number;           // numeric in the view (input uses string)
-  coordinator?: string;
-  coordinatorId?: string;
-  email?: string;
-  assessments?: string[];
+  department?: string; // label "CODE - Name"
+  credits?: number; // numeric in the view (input uses string)
 };
 
 type Props = {
-  
   initial?: Partial<CourseView>;
-
+  allocationId?: number; // pass selected allocation id from parent
   onUpdate?: (payload: CourseView) => void;
   onCancel?: () => void;
 };
 
-const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => {
-  // Static options
-  const academicYears = ["2020/2021","2021/2022","2022/2023","2023/2024","2024/2025"];
-  const departments = ["Computer Engineering","Electrical Engineering","Mechanical Engineering","Marine Engineering","Civil Engineering"];
-  const semesters = ["Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7","Semester 8"];
+const EditCourseDetails: React.FC<Props> = ({
+  initial,
+  allocationId,
+  onUpdate,
+  onCancel,
+}) => {
+  const navigate = useNavigate();
+  // Dropdown data from backend
+  type DepartmentDto = {
+    departmentId: number;
+    code: string;
+    departmentName: string;
+  };
+  type SemesterDto = {
+    id: number;
+    name: string;
+  };
+  const COURSE_TYPES = [
+    "CORE",
+    "TECHNICAL_ELECTIVE",
+    "GENERAL_ELECTIVE",
+  ] as const;
 
   // Build snapshot compatible with parent
-  const initialSnapshot = useMemo<CourseView>(() => ({
-    id: initial?.id,
-    code: initial?.code ?? "",
-    title: initial?.title ?? "",
-    academicYear: initial?.academicYear ?? "",
-    department: initial?.department ?? "",
-    semester: initial?.semester ?? "",
-    degreeProgram: initial?.degreeProgram ?? "",
-    credits: initial?.credits,
-    coordinator: initial?.coordinator ?? "",
-    coordinatorId: initial?.coordinatorId ?? "",
-    email: initial?.email ?? "",
-    assessments: initial?.assessments ?? [],
-  }), [initial]);
+  const initialSnapshot = useMemo<CourseView>(
+    () => ({
+      id: initial?.id,
+      code: initial?.code ?? "",
+      title: initial?.title ?? "",
+      department: initial?.department ?? "",
+      credits: initial?.credits,
+    }),
+    [initial]
+  );
 
   // Local form state (credit as string for the input)
   const [code, setCode] = useState(initialSnapshot.code);
   const [title, setTitle] = useState(initialSnapshot.title);
-  const [academicYear, setAcademicYear] = useState(initialSnapshot.academicYear ?? "");
-  const [department, setDepartment] = useState(initialSnapshot.department ?? "");
-  const [semester, setSemester] = useState(initialSnapshot.semester ?? "");
-  const [degreeProgram, setDegreeProgram] = useState(initialSnapshot.degreeProgram ?? "");
+  const [department, setDepartment] = useState(
+    initialSnapshot.department ?? ""
+  );
   const [creditValue, setCreditValue] = useState(
     initialSnapshot.credits != null ? String(initialSnapshot.credits) : ""
   );
-  const [coordinator, setCoordinator] = useState(initialSnapshot.coordinator ?? "");
-  const [coordinatorId, setCoordinatorId] = useState(initialSnapshot.coordinatorId ?? "");
-  const [email, setEmail] = useState(initialSnapshot.email ?? "");
-  const [assessments, setAssessments] = useState<string[]>(initialSnapshot.assessments ?? []);
+
+  // Backend-driven dropdowns and mapping
+  const userId = useAppSelector(selectUserId);
+  const [departments, setDepartments] = useState<DepartmentDto[]>([]);
+  const [semesters, setSemesters] = useState<SemesterDto[]>([]);
+  const [departmentId, setDepartmentId] = useState<number | null>(null);
+  const [lecturerId, setLecturerId] = useState<number | null>(null);
+
+  // Allocations for this course (owned by current lecturer)
+  type AllocationItem = {
+    allocationId: number;
+    courseType: string;
+    course: { id: number; courseCode: string; courseName: string };
+    semester: { id: number; name: string };
+    pass?: {
+      caPassPercent?: number;
+      endExamPassPercent?: number;
+      overallPassPercent?: number;
+    };
+    description?: string;
+  };
+  const [allocations, setAllocations] = useState<AllocationItem[]>([]);
+  const [selectedAllocId, setSelectedAllocId] = useState<number | null>(null);
+  const [allocCourseType, setAllocCourseType] = useState<string>("CORE");
+  const [allocSemesterId, setAllocSemesterId] = useState<number | null>(null);
+  const [allocSemesterLabel, setAllocSemesterLabel] = useState<string>("");
+  const [allocCaPass, setAllocCaPass] = useState<string>("40");
+  const [allocEndPass, setAllocEndPass] = useState<string>("40");
+  const [allocOverallPass, setAllocOverallPass] = useState<string>("40");
+  const [allocDescription, setAllocDescription] = useState<string>("");
+  const [courseId, setCourseId] = useState<number | null>(
+    initialSnapshot.id != null ? Number(initialSnapshot.id) : null
+  );
+
+  // If allocation id is provided by parent, use it
+  useEffect(() => {
+    if (allocationId != null) {
+      setSelectedAllocId(Number(allocationId));
+    }
+  }, [allocationId]);
+
+  // removed placeholder effects
+
+  // Assessments for selected allocation (CA only, edit via Update endpoint)
+  type AssessmentRow = {
+    assessmentId: number;
+    assessmentTypeId: number;
+    title: string;
+    maxMarks: number;
+    weight?: number;
+    date?: string;
+    description?: string;
+  };
+  const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
+  const [assLoading, setAssLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  // Keep an immutable baseline to detect per-row edits
+  const [assInitial, setAssInitial] = useState<Record<number, AssessmentRow>>({});
 
   // Sync form whenever a different course is passed in
   useEffect(() => {
     setCode(initialSnapshot.code);
     setTitle(initialSnapshot.title);
-    setAcademicYear(initialSnapshot.academicYear ?? "");
     setDepartment(initialSnapshot.department ?? "");
-    setSemester(initialSnapshot.semester ?? "");
-    setDegreeProgram(initialSnapshot.degreeProgram ?? "");
-    setCreditValue(initialSnapshot.credits != null ? String(initialSnapshot.credits) : "");
-    setCoordinator(initialSnapshot.coordinator ?? "");
-    setCoordinatorId(initialSnapshot.coordinatorId ?? "");
-    setEmail(initialSnapshot.email ?? "");
-    setAssessments(initialSnapshot.assessments ?? []);
+    setCreditValue(
+      initialSnapshot.credits != null ? String(initialSnapshot.credits) : ""
+    );
   }, [initialSnapshot]);
 
+  // Load dropdown data + lecturer id + allocations for this course
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [depRes, semRes] = await Promise.all([
+          api.get("/v1/departments/GetAll"),
+          api.get("/v1/semesters/GetCurrent-semesters"),
+        ]);
+        const depRaw = depRes.data?.data ?? depRes.data;
+        const semRaw = semRes.data?.data ?? semRes.data;
+        setDepartments(Array.isArray(depRaw) ? depRaw : []);
+        setSemesters(Array.isArray(semRaw) ? semRaw : []);
+      } catch (e: any) {
+        // non-fatal
+      }
+      // Map user -> lecturer
+      try {
+        if (userId) {
+          const r = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
+          const d = r.data?.data ?? r.data;
+          setLecturerId(Number(d?.id) || null);
+        }
+      } catch {}
+    };
+    load();
+  }, [userId]);
+
+  // Map department label -> id
+  useEffect(() => {
+    if (!department) {
+      setDepartmentId(null);
+      return;
+    }
+    const m = departments.find(
+      (x) => `${x.code} - ${x.departmentName}` === department
+    );
+    setDepartmentId(m?.departmentId ?? null);
+  }, [department, departments]);
+
+  // Load allocations for this course under this lecturer
+  useEffect(() => {
+    const fetchAllocations = async () => {
+      if (selectedAllocId != null) return; // parent provided
+      if (!lecturerId) return;
+      try {
+        const res = await api.get(`../lecturers/${lecturerId}/allocations`);
+        const data = (res.data?.data ?? res.data) as any[];
+        const all = Array.isArray(data) ? data : [];
+        setAllocations(all as AllocationItem[]);
+        // Try to auto-pick one matching current course code or id, else first
+        const byCode = all.find((a: any) => a.course?.courseCode === code);
+        const byId = all.find(
+          (a: any) => a.course?.id === Number(initialSnapshot.id)
+        );
+        const pick = byCode ?? byId ?? all[0];
+        if (pick) setSelectedAllocId(pick.allocationId);
+      } catch {}
+    };
+    fetchAllocations();
+  }, [lecturerId, initialSnapshot.id, selectedAllocId, code]);
+
+  // When selected allocation changes, populate form + fetch assessments (CA)
+  useEffect(() => {
+    const sel = allocations.find((a) => a.allocationId === selectedAllocId);
+    if (!sel) return;
+    // Fetch fresh allocation details by id
+    (async () => {
+      try {
+        const allocRes = await api.get(
+          `/v1/course-allocations/GetById/${sel.allocationId}`
+        );
+        const a = allocRes.data?.data ?? allocRes.data;
+        setAllocCourseType(a?.courseType ?? "CORE");
+        if (a?.course?.id) setCourseId(Number(a.course.id));
+        setAllocSemesterId(a?.semester?.id ?? null);
+        setAllocSemesterLabel(a?.semester?.name ?? "");
+        setAllocCaPass(String(a?.caPassPercent ?? "40"));
+        setAllocEndPass(String(a?.endExamPassPercent ?? "40"));
+        setAllocOverallPass(String(a?.overallPassPercent ?? "40"));
+        setAllocDescription(a?.description ?? "");
+      } catch {
+        setAllocCourseType(sel.courseType ?? "CORE");
+        setAllocSemesterId(sel.semester?.id ?? null);
+        setAllocSemesterLabel(sel.semester?.name ?? "");
+      }
+    })();
+
+    const loadCA = async () => {
+      setAssLoading(true);
+      try {
+        const r = await api.get(`../results/preview`, {
+          params: {
+            allocationId: sel.allocationId,
+            type: "CA",
+            page: 0,
+            size: 1,
+            includeMeta: true,
+          },
+        });
+        const header = (r.data?.data ?? r.data)?.header;
+        const basic: AssessmentRow[] = Array.isArray(header?.assessments)
+          ? header.assessments.map((a: any) => ({
+              assessmentId: a.assessmentId,
+              assessmentTypeId: a.assessmentTypeId,
+              title: a.title,
+              maxMarks: a.maxMarks,
+              weight: a.weight,
+              date: a.date,
+              description: "",
+            }))
+          : [];
+        // Fetch full details per assessment id
+        const detailed = await Promise.all(
+          basic.map(async (b) => {
+            try {
+              const ad = await api.get(
+                `/v1/assessments/GetById/${b.assessmentId}`
+              );
+              const d = ad.data?.data ?? ad.data;
+              return {
+                assessmentId: d?.id ?? b.assessmentId,
+                assessmentTypeId: d?.assessmentTypeId ?? b.assessmentTypeId,
+                title: d?.title ?? b.title,
+                maxMarks: d?.maxMarks ?? b.maxMarks,
+                weight: d?.weight ?? b.weight,
+                date: d?.date ?? b.date,
+                description: d?.description ?? b.description,
+              } as AssessmentRow;
+            } catch {
+              return b;
+            }
+          })
+        );
+        setAssessments(detailed);
+        // snapshot initial values for dirty detection
+        const base: Record<number, AssessmentRow> = {};
+        detailed.forEach((a) => {
+          base[a.assessmentId] = { ...a };
+        });
+        setAssInitial(base);
+      } catch {
+        setAssessments([]);
+      } finally {
+        setAssLoading(false);
+      }
+    };
+    loadCA();
+  }, [selectedAllocId, allocations]);
+
+  // Fetch course by code (preferred) or by id to prefill
+  useEffect(() => {
+    const loadCourse = async () => {
+      try {
+        if (initialSnapshot.code) {
+          const r = await api.get(
+            `/v1/courses/GetByCode/${encodeURIComponent(initialSnapshot.code)}`
+          );
+          const d = r.data?.data ?? r.data;
+          if (d?.id) setCourseId(Number(d.id));
+          if (d?.courseCode) setCode(String(d.courseCode));
+          if (d?.courseName) setTitle(String(d.courseName));
+          if (d?.credits != null) setCreditValue(String(d.credits));
+          if (d?.departmentCode && d?.departmentName)
+            setDepartment(`${d.departmentCode} - ${d.departmentName}`);
+          return;
+        }
+      } catch {}
+      try {
+        const idNum = Number(initialSnapshot.id);
+        if (!idNum) return;
+        const res = await api.get(`/v1/courses/GetById/${idNum}`);
+        const d = res.data?.data ?? res.data;
+        if (d?.id) setCourseId(Number(d.id));
+        if (d?.courseCode) setCode(String(d.courseCode));
+        if (d?.courseName) setTitle(String(d.courseName));
+        if (d?.credits != null) setCreditValue(String(d.credits));
+        if (d?.departmentCode && d?.departmentName)
+          setDepartment(`${d.departmentCode} - ${d.departmentName}`);
+      } catch {}
+    };
+    loadCourse();
+  }, [initialSnapshot.id, initialSnapshot.code]);
+
   // Dirty detection
-  const isDirty = useMemo(() => {
+  const courseDirty = useMemo(() => {
     const snap = initialSnapshot;
     const snapCredit = snap.credits != null ? String(snap.credits) : "";
     return !(
       code === snap.code &&
       title === snap.title &&
-      (academicYear ?? "") === (snap.academicYear ?? "") &&
-      (department ?? "") === (snap.department ?? "") &&
-      (semester ?? "") === (snap.semester ?? "") &&
-      (degreeProgram ?? "") === (snap.degreeProgram ?? "") &&
-      creditValue === snapCredit &&
-      (coordinator ?? "") === (snap.coordinator ?? "") &&
-      (coordinatorId ?? "") === (snap.coordinatorId ?? "") &&
-      (email ?? "") === (snap.email ?? "") &&
-      JSON.stringify(assessments) === JSON.stringify(snap.assessments ?? [])
+      department === (snap.department ?? "") &&
+      creditValue === snapCredit
     );
-  }, [
-    code, title, academicYear, department, semester, degreeProgram,
-    creditValue, coordinator, coordinatorId, email, assessments, initialSnapshot
-  ]);
+  }, [code, title, department, creditValue, initialSnapshot]);
 
-  // Assessment helpers
-  const [assessmentInput, setAssessmentInput] = useState("");
-  const addAssessment = (raw: string) => {
-    const v = raw.trim().replace(/\s+/g, " ");
-    if (!v) return;
-    setAssessments((prev) =>
-      prev.some((x) => x.toLowerCase() === v.toLowerCase()) ? prev : [...prev, v]
-    );
-  };
-  const removeAssessment = (name: string) =>
-    setAssessments((prev) => prev.filter((x) => x !== name));
-  const handleAssessmentsKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addAssessment(assessmentInput);
-      setAssessmentInput("");
-    } else if (e.key === "Backspace" && !assessmentInput) {
-      setAssessments((prev) => prev.slice(0, -1));
+  const updateCourse = async () => {
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
+    try {
+      // Resolve course id: prefer fetched courseId; else initial snapshot; else allocations
+      let id = Number(courseId ?? initialSnapshot.id);
+      if (!Number.isFinite(id) || id <= 0) {
+        const sel = allocations.find((a) => a.allocationId === selectedAllocId);
+        if (sel?.course?.id) id = Number(sel.course.id);
+      }
+      if (!Number.isFinite(id) || id <= 0) {
+        const byCode = allocations.find((a) => a.course?.courseCode === code);
+        if (byCode?.course?.id) id = Number(byCode.course.id);
+      }
+      if (!Number.isFinite(id) || id <= 0) throw new Error("Missing course id");
+      if (!departmentId) throw new Error("Select a department");
+      const creditsNum = Number(creditValue);
+      if (!Number.isFinite(creditsNum) || creditsNum <= 0)
+        throw new Error("Credits must be > 0");
+      const body = {
+        courseCode: code.trim(),
+        courseName: title.trim(),
+        credits: creditsNum,
+        departmentId,
+      };
+      const res = await api.put(`/v1/courses/Update/${id}`, body);
+      const data = res.data?.data ?? res.data;
+      setSuccess("Course updated successfully");
+      toast.success("Course updated successfully");
+      onUpdate?.({
+        id,
+        code: data.courseCode ?? code,
+        title: data.courseName ?? title,
+        department,
+        credits: creditsNum,
+      });
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message || e?.message || "Course update failed";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setSaving(false);
     }
   };
 
-  // Actions
-  const handleUpdate = () => {
-    const creditsNum =
-      creditValue.trim() === "" ? undefined : Number(creditValue.trim());
-
-    const payload: CourseView = {
-      id: initialSnapshot.id,
-      code,
-      title,
-      academicYear: academicYear || undefined,
-      department: department || undefined,
-      semester: semester || undefined,
-      degreeProgram: degreeProgram || undefined,
-      credits: Number.isFinite(creditsNum) ? (creditsNum as number) : undefined,
-      coordinator: coordinator || undefined,
-      coordinatorId: coordinatorId || undefined,
-      email: email || undefined,
-      assessments,
-    };
-    onUpdate?.(payload);
+  const updateAllocation = async () => {
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
+    try {
+      const allocId = selectedAllocId;
+      if (!allocId) throw new Error("Select an allocation");
+      const courseIdVal = Number(courseId ?? initialSnapshot.id);
+      if (!courseIdVal) throw new Error("Missing course id");
+      if (!lecturerId) throw new Error("Missing lecturer id");
+      if (!allocSemesterId) throw new Error("Select semester");
+      const body = {
+        courseId: courseIdVal,
+        courseType: allocCourseType,
+        lecturerId,
+        semesterId: allocSemesterId,
+        caPassPercent: Number(allocCaPass) || 0,
+        endExamPassPercent: Number(allocEndPass) || 0,
+        overallPassPercent: Number(allocOverallPass) || 0,
+        description: allocDescription || undefined,
+      };
+      await api.put(`/v1/course-allocations/Update/${allocId}`, body);
+      setSuccess("Allocation updated successfully");
+      toast.success("Allocation updated successfully");
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message || e?.message || "Allocation update failed";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleCancel = () => {
-    // restore snapshot
-    setCode(initialSnapshot.code);
-    setTitle(initialSnapshot.title);
-    setAcademicYear(initialSnapshot.academicYear ?? "");
-    setDepartment(initialSnapshot.department ?? "");
-    setSemester(initialSnapshot.semester ?? "");
-    setDegreeProgram(initialSnapshot.degreeProgram ?? "");
-    setCreditValue(initialSnapshot.credits != null ? String(initialSnapshot.credits) : "");
-    setCoordinator(initialSnapshot.coordinator ?? "");
-    setCoordinatorId(initialSnapshot.coordinatorId ?? "");
-    setEmail(initialSnapshot.email ?? "");
-    setAssessments(initialSnapshot.assessments ?? []);
-    onCancel?.();
+  const saveAssessment = async (row: AssessmentRow) => {
+    setError(null);
+    setSuccess(null);
+    setSaving(true);
+    try {
+      const id = row.assessmentId;
+      const body = {
+        assessmentTypeId: row.assessmentTypeId,
+        title: row.title?.trim(),
+        maxMarks: Number(row.maxMarks) || 0,
+        weight: Number(row.weight) || 0,
+        date: row.date || undefined,
+        description: row.description || undefined,
+      };
+      await api.put(`/v1/assessments/Update/${id}`, body);
+      setSuccess("Assessment updated");
+      // refresh baseline for this row so button returns to normal color
+      setAssInitial((prev) => ({ ...prev, [row.assessmentId]: { ...row } }));
+      toast.success("Assessment updated");
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message || e?.message || "Assessment update failed";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // removed legacy actions (academic year / coordinator fields)
+
+  const isAssessmentDirty = (row: AssessmentRow) => {
+    const base = assInitial[row.assessmentId];
+    if (!base) return false;
+    const norm = (s?: string) => (s ?? "").trim();
+    return (
+      norm(row.title) !== norm(base.title) ||
+      (row.maxMarks ?? 0) !== (base.maxMarks ?? 0) ||
+      (row.weight ?? 0) !== (base.weight ?? 0) ||
+      norm(row.date) !== norm(base.date) ||
+      norm(row.description) !== norm(base.description)
+    );
   };
 
   return (
@@ -226,7 +526,7 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
         className="form-content"
         onSubmit={(e) => {
           e.preventDefault();
-          handleUpdate();
+          updateCourse();
         }}
       >
         <div className="section course-section">
@@ -242,14 +542,17 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
                   onChange={(e) => setCode(e.target.value)}
                 />
               </div>
-
-              <CustomDropdown
-                label="Academic Year"
-                options={academicYears}
-                value={academicYear}
-                placeholder="Select Academic Year"
-                onChange={setAcademicYear}
-              />
+              <div>
+                <div className="form-group">
+                  <label>Credit Value</label>
+                  <input
+                    className="input"
+                    placeholder="Credit Value"
+                    value={creditValue}
+                    onChange={(e) => setCreditValue(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
             <div>
@@ -265,122 +568,308 @@ const EditCourseDetails: React.FC<Props> = ({ initial, onUpdate, onCancel }) => 
 
               <CustomDropdown
                 label="Department"
-                options={departments}
+                options={(Array.isArray(departments) ? departments : []).map(
+                  (d) => `${d.code} - ${d.departmentName}`
+                )}
                 value={department}
-                placeholder="Select Department"
+                placeholder={
+                  Array.isArray(departments) && departments.length
+                    ? "Select Department"
+                    : "Loading..."
+                }
                 onChange={setDepartment}
               />
             </div>
-
-            <div>
-              <CustomDropdown
-                label="Semester"
-                options={semesters}
-                value={semester}
-                placeholder="Select Semester"
-                onChange={setSemester}
-              />
-
-              <div className="form-group">
-                <label>Degree Program</label>
-                <input
-                  className="input"
-                  placeholder="Degree Program"
-                  value={degreeProgram}
-                  onChange={(e) => setDegreeProgram(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="form-group">
-                <label>Credit Value</label>
-                <input
-                  className="input"
-                  placeholder="Credit Value"
-                  value={creditValue}
-                  onChange={(e) => setCreditValue(e.target.value)}
-                />
-              </div>
-            </div>
+          </div>
+          <div
+            className="form-actions bottom-actions"
+            style={{ justifyContent: "flex-end" }}
+          >
+            <button
+              type="submit"
+              className="btn primary"
+              disabled={!courseDirty || saving}
+            >
+              Save Course
+            </button>
           </div>
         </div>
 
+        {/* Allocation panel */}
         <div className="section coordinator-section">
-          <h3 className="section-headingCC">Coordinator Details</h3>
+          <h3 className="section-headingCC">Allocation</h3>
           <div className="form-grid">
+            {/* Hide allocation selector if parent passed allocationId */}
+            {selectedAllocId == null && (
+              <CustomDropdown
+                label="Select Allocation"
+                options={(Array.isArray(allocations) ? allocations : []).map(
+                  (a) =>
+                    `${a.allocationId} - ${a.course?.courseCode ?? ""} ${
+                      a.course?.courseName ?? ""
+                    } (${a.semester?.name ?? ""})`
+                )}
+                value={
+                  selectedAllocId
+                    ? (() => {
+                        const a = (
+                          Array.isArray(allocations) ? allocations : []
+                        ).find((x) => x.allocationId === selectedAllocId);
+                        return a
+                          ? `${a.allocationId} - ${
+                              a.course?.courseCode ?? ""
+                            } ${a.course?.courseName ?? ""} (${
+                              a.semester?.name ?? ""
+                            })`
+                          : "";
+                      })()
+                    : ""
+                }
+                placeholder={
+                  Array.isArray(allocations) && allocations.length
+                    ? "Select Allocation"
+                    : "No allocations"
+                }
+                onChange={(label) => {
+                  const id = Number(String(label).split(" - ")[0]);
+                  setSelectedAllocId(Number.isFinite(id) ? id : null);
+                }}
+              />
+            )}
+            <CustomDropdown
+              label="Course Type"
+              options={COURSE_TYPES as unknown as string[]}
+              value={allocCourseType}
+              placeholder="Select type"
+              onChange={setAllocCourseType}
+            />
+            <CustomDropdown
+              label="Semester"
+              options={(Array.isArray(semesters) ? semesters : []).map(
+                (s) => `${s.id} - ${s.name}`
+              )}
+              value={
+                allocSemesterId
+                  ? (() => {
+                      const s = (
+                        Array.isArray(semesters) ? semesters : []
+                      ).find((x) => x.id === allocSemesterId);
+                      const nm = s?.name ?? allocSemesterLabel;
+                      return `${allocSemesterId} - ${nm ?? ""}`;
+                    })()
+                  : ""
+              }
+              placeholder={
+                Array.isArray(semesters) && semesters.length
+                  ? "Select Semester"
+                  : "Loading..."
+              }
+              onChange={(label) => {
+                const id = Number(String(label).split(" - ")[0]);
+                setAllocSemesterId(Number.isFinite(id) ? id : null);
+              }}
+            />
             <div className="form-group">
-              <label>Coordinator</label>
+              <label>CA Pass %</label>
               <input
                 className="input"
-                placeholder="Coordinator"
-                value={coordinator}
-                onChange={(e) => setCoordinator(e.target.value)}
+                inputMode="numeric"
+                value={allocCaPass}
+                onChange={(e) => setAllocCaPass(e.target.value)}
               />
             </div>
-
             <div className="form-group">
-              <label>Coordinator Staff ID</label>
+              <label>End Exam Pass %</label>
               <input
                 className="input"
-                placeholder="Coordinator Staff ID"
-                value={coordinatorId}
-                onChange={(e) => setCoordinatorId(e.target.value)}
+                inputMode="numeric"
+                value={allocEndPass}
+                onChange={(e) => setAllocEndPass(e.target.value)}
               />
             </div>
-
+            <div className="form-group">
+              <label>Overall Pass %</label>
+              <input
+                className="input"
+                inputMode="numeric"
+                value={allocOverallPass}
+                onChange={(e) => setAllocOverallPass(e.target.value)}
+              />
+            </div>
             <div className="form-group full-width">
-              <label>Email Address</label>
+              <label>Description</label>
               <input
                 className="input"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={allocDescription}
+                onChange={(e) => setAllocDescription(e.target.value)}
               />
             </div>
+          </div>
+          <div
+            className="form-actions bottom-actions"
+            style={{ justifyContent: "flex-end" }}
+          >
+            <button
+              type="button"
+              className="btn primary"
+              onClick={updateAllocation}
+              disabled={saving || !selectedAllocId}
+            >
+              Save Allocation
+            </button>
           </div>
         </div>
 
         <div className="assessment-section">
-          <h3 className="section-headingCC">Assessment Components</h3>
-
-          <div className="form-group" style={{ marginBottom: "10px" }}>
-            <input
-              className="input"
-              placeholder="Type assessment and press Enter"
-              value={assessmentInput}
-              onChange={(e) => setAssessmentInput(e.target.value)}
-              onKeyDown={handleAssessmentsKeyDown}
-              aria-label="Add assessment"
-            />
-          </div>
-
-          {assessments.length > 0 && (
-            <div className="chip-wrap">
-              {assessments.map((a) => (
-                <span className="chip" key={a}>
-                  {a}
-                  <button
-                    type="button"
-                    className="chip-x"
-                    aria-label={`Remove ${a}`}
-                    onClick={() => removeAssessment(a)}
+          <h3 className="section-headingCC">Assessments (CA)</h3>
+          {assLoading ? (
+            <div>Loading assessments...</div>
+          ) : assessments.length === 0 ? (
+            <div>No CA assessments found for this allocation.</div>
+          ) : (
+            <div className="form-grid">
+              {/* Column headings for assessments */}
+              <div className="cd-item" style={{ gridColumn: "1 / -1" }}>
+                <div className="cd-k" style={{ fontWeight: 700 }}>
+                  No.
+                </div>
+                <div
+                  className="cd-v"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(5, minmax(120px, 1fr)) 120px",
+                    gap: "8px",
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    color: "#0b235c",
+                  }}
+                >
+                  <div>Title</div>
+                  <div>Max</div>
+                  <div>Weight %</div>
+                  <div>Date</div>
+                  <div>Description</div>
+                  <div>Actions</div>
+                </div>
+              </div>
+              {assessments.map((row, idx) => (
+                <div
+                  key={row.assessmentId}
+                  className="cd-item"
+                  style={{ gridColumn: "1 / -1" }}
+                >
+                  <div className="cd-k">{`#${idx + 1}`} </div>
+                  <div
+                    className="cd-v"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(5, minmax(120px, 1fr)) 120px",
+                      gap: "8px",
+                    }}
                   >
-                    ×
-                  </button>
-                </span>
+                    <input
+                      className="input"
+                      value={row.title}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, title: e.target.value }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Title"
+                    />
+                    <input
+                      className="input"
+                      value={row.maxMarks}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, maxMarks: Number(e.target.value) || 0 }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Max"
+                      inputMode="numeric"
+                    />
+                    <input
+                      className="input"
+                      value={row.weight ?? ""}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, weight: Number(e.target.value) || 0 }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Weight %"
+                      inputMode="numeric"
+                    />
+                    <input
+                      className="input"
+                      type="date"
+                      value={row.date ?? ""}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, date: e.target.value }
+                              : r
+                          )
+                        )
+                      }
+                    />
+                    <input
+                      className="input"
+                      value={row.description ?? ""}
+                      onChange={(e) =>
+                        setAssessments((prev) =>
+                          prev.map((r) =>
+                            r.assessmentId === row.assessmentId
+                              ? { ...r, description: e.target.value }
+                              : r
+                          )
+                        )
+                      }
+                      placeholder="Description (optional)"
+                    />
+                    <button
+                      type="button"
+                      className={`btn ${isAssessmentDirty(row) ? 'primary' : ''}`}
+                      onClick={() => saveAssessment(row)}
+                      disabled={saving}
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           )}
         </div>
 
         <div className="form-actions bottom-actions">
-          <button type="button" className="btn ghost" onClick={handleCancel}>
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => {
+              try {
+                onCancel?.();
+              } catch {}
+              navigate("/courses");
+            }}
+          >
             Cancel
           </button>
-          <button type="submit" className="btn primary" disabled={!isDirty}>
-            Update
-          </button>
+          {/* {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
+          {success && <div style={{ color: '#15803d' }}>{success}</div>} */}
         </div>
       </form>
     </div>

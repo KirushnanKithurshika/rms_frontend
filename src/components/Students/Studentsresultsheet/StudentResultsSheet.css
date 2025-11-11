@@ -24,7 +24,6 @@ body {
 
 
 .results-page {
-  max-width: 800px;
   background: #ffffff;
   padding: 16px 12px 40px;
   overflow: auto;

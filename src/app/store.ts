@@ -2,16 +2,20 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import studentResultsReducer from "../features/studentResults/studentResultsSlice";
 import studentCourseReducer from "../features/studentCourses/studentCoursesSlice";
+import studentCAReducer from "../features/studentCA/studentCASlice";
 import lecturerDashboardReducer from "../features/lecturerDashboard/lecturerDashboardSlice";
 import lecturerCoursesReducer from "../features/lecturerCourses/lecturerCoursesSlice";
+import resultsPreviewReducer from "../features/resultsPreview/resultsPreviewSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     studentResults: studentResultsReducer,
     studentCourses: studentCourseReducer,
+    studentCA: studentCAReducer,
     lecturerDashboard: lecturerDashboardReducer,
     lecturerCourses: lecturerCoursesReducer,
+    resultsPreview: resultsPreviewReducer,
   },
   middleware: (getDefault) => getDefault({ serializableCheck: false }),
 });
