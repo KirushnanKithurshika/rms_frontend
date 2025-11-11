@@ -80,6 +80,8 @@ export default function SemesterTable() {
 
   // server paging (0-based)
   const [page, setPage] = useState(0);
+  // page input as 1-based string for smooth editing
+  const [pageInput, setPageInput] = useState<string>("1");
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -137,6 +139,11 @@ export default function SemesterTable() {
       }
     })();
   }, [page, pageSize, reloadKey]);
+
+  // keep text input in sync when page changes via buttons/api
+  useEffect(() => {
+    setPageInput(String((page ?? 0) + 1));
+  }, [page]);
 
   // Load reference lists (batches and faculties) once for label composition
   useEffect(() => {
@@ -421,11 +428,25 @@ export default function SemesterTable() {
             <input
               className="app-input w-90px"
               type="number"
-              min={0}
-              value={page}
+              min={1}
+              value={pageInput}
               onChange={(e) => {
-                const v = Number(e.target.value);
-                setPage(Number.isFinite(v) && v >= 0 ? v : 0);
+                // allow empty while typing; strip non-digits
+                const raw = e.target.value.replace(/[^\d]/g, "");
+                setPageInput(raw);
+              }}
+              onBlur={() => {
+                const n = Number(pageInput);
+                if (!Number.isFinite(n) || n < 1) { setPageInput(String(page + 1)); return; }
+                const total = Math.max(1, totalPages || 1);
+                const clamped = Math.min(total, n);
+                setPageInput(String(clamped));
+                setPage(clamped - 1);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  (e.target as HTMLInputElement).blur();
+                }
               }}
             />
           </label>
