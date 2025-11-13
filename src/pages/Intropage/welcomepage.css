@@ -53,7 +53,8 @@
   }
 
   .welcome-img {
-    max-width: 80%;
+    width: 80%;
+    
   }
 
   .welcome-container {
@@ -79,7 +80,7 @@
   }
 
   .welcome-img {
-    max-width: 80%;
+    width: 80%;
   }
 
   .welcome-container {

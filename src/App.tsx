@@ -39,6 +39,7 @@ import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTable
 import DepartmentsTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/DepartmentTable";
 import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/SemesterTable";
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
+import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 
 function App() {
   return (
@@ -55,20 +56,21 @@ function App() {
           <Route path="/verification" element={<TwoStepVerification />} />
           <Route path="/account-setting" element={<AccountSettings />} />
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
 
-          {/* Admin */}
+      
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
           <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
 
-          {/* Student */}
+      
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
           <Route path="/student/transcript" element={<StudentTranscript />} />
