@@ -1,0 +1,249 @@
+.stu-enroll-panel {
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+.stu-enroll-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.stu-enroll-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0b3054;
+  margin-bottom: 10px;
+}
+
+.stu-enroll-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: #b45309;
+  font-weight: 500;
+}
+
+
+.stu-enroll-filterbar {
+  display: flex;
+  flex-direction: column; 
+  gap: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+
+.stu-enroll-toprow {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
+  row-gap: 12px;
+  align-items: flex-end;
+}
+
+
+.stu-enroll-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+}
+
+.stu-enroll-field label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #0b3054;
+}
+
+.stu-enroll-field select {
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 13px;
+}
+
+
+.stu-enroll-upload {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 350px;
+}
+
+
+.upload-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.upload-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0b3054;
+}
+
+.upload-hint {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.file-dropzone {
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    box-shadow 0.15s ease;
+  display: block;
+  width: 100%;
+}
+
+.file-dropzone-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5f0ff;
+}
+
+.file-upload-icon {
+  font-size: 18px;
+  color: #0b3054;
+}
+
+.file-dropzone-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-dropzone-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b3054;
+}
+
+.file-dropzone-sub {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+
+.file-dropzone input[type="file"] {
+  display: none;
+}
+
+.file-dropzone:hover {
+  border-color: #0b3054;
+  background: #f1f5f9;
+  box-shadow: 0 0 0 1px rgba(11, 48, 84, 0.1);
+}
+
+
+.btn-sample {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #0b3054;
+  color: #ffffff;
+}
+
+
+.stu-enroll-error {
+  font-size: 12px;
+  color: #b91c1c;
+  background: #fee2e2;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+
+.stu-enroll-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.stu-enroll-meta span strong {
+  color: #0b3054;
+}
+
+.stu-enroll-table-wrap {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.stu-enroll-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.stu-enroll-table thead {
+  background: #f3f4f6;
+}
+
+.stu-enroll-table th,
+.stu-enroll-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.stu-enroll-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+
+.stu-enroll-empty {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 12px 0;
+}
+
+
+@media (max-width: 768px) {
+  .stu-enroll-panel {
+    padding: 12px 14px;
+  }
+
+  .stu-enroll-toprow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stu-enroll-field,
+  .stu-enroll-upload {
+   width:350px;
+  }
+}
