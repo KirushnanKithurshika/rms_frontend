@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 import { useAppSelector } from "../../app/hooks";
 import { selectUserId } from "../../features/auth/selectors";
 import "./EditCourseDetails.css";
@@ -200,25 +201,12 @@ const EditCourseDetails: React.FC<Props> = ({
   useEffect(() => {
     const load = async () => {
       try {
-        const [depRes, semRes] = await Promise.all([
-          api.get("/v1/departments/GetAll"),
-          api.get("/v1/semesters/GetCurrent-semesters"),
-        ]);
-        const depRaw = depRes.data?.data ?? depRes.data;
-        const semRaw = semRes.data?.data ?? semRes.data;
-        setDepartments(Array.isArray(depRaw) ? depRaw : []);
-        setSemesters(Array.isArray(semRaw) ? semRaw : []);
-      } catch (e: any) {
-        // non-fatal
-      }
-      // Map user -> lecturer
-      try {
-        if (userId) {
-          const r = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
-          const d = r.data?.data ?? r.data;
-          setLecturerId(Number(d?.id) || null);
-        }
+        // Integration removed: provide empty dropdowns
+        setDepartments([]);
+        setSemesters([]);
       } catch {}
+      // Map user -> lecturer (offline assumption)
+      if (userId) setLecturerId(Number(userId) || null);
     };
     load();
   }, [userId]);
@@ -237,146 +225,38 @@ const EditCourseDetails: React.FC<Props> = ({
 
   // Load allocations for this course under this lecturer
   useEffect(() => {
-    const fetchAllocations = async () => {
-      if (selectedAllocId != null) return; // parent provided
-      if (!lecturerId) return;
-      try {
-        const res = await api.get(`../lecturers/${lecturerId}/allocations`);
-        const data = (res.data?.data ?? res.data) as any[];
-        const all = Array.isArray(data) ? data : [];
-        setAllocations(all as AllocationItem[]);
-        // Try to auto-pick one matching current course code or id, else first
-        const byCode = all.find((a: any) => a.course?.courseCode === code);
-        const byId = all.find(
-          (a: any) => a.course?.id === Number(initialSnapshot.id)
-        );
-        const pick = byCode ?? byId ?? all[0];
-        if (pick) setSelectedAllocId(pick.allocationId);
-      } catch {}
-    };
-    fetchAllocations();
+    if (selectedAllocId != null) return;
+    if (!lecturerId) return;
+    // Integration removed: keep allocations empty
+    setAllocations([]);
   }, [lecturerId, initialSnapshot.id, selectedAllocId, code]);
 
   // When selected allocation changes, populate form + fetch assessments (CA)
   useEffect(() => {
     const sel = allocations.find((a) => a.allocationId === selectedAllocId);
-    if (!sel) return;
-    // Fetch fresh allocation details by id
-    (async () => {
-      try {
-        const allocRes = await api.get(
-          `/v1/course-allocations/GetById/${sel.allocationId}`
-        );
-        const a = allocRes.data?.data ?? allocRes.data;
-        setAllocCourseType(a?.courseType ?? "CORE");
-        if (a?.course?.id) setCourseId(Number(a.course.id));
-        setAllocSemesterId(a?.semester?.id ?? null);
-        setAllocSemesterLabel(a?.semester?.name ?? "");
-        setAllocCaPass(String(a?.caPassPercent ?? "40"));
-        setAllocEndPass(String(a?.endExamPassPercent ?? "40"));
-        setAllocOverallPass(String(a?.overallPassPercent ?? "40"));
-        setAllocDescription(a?.description ?? "");
-      } catch {
-        setAllocCourseType(sel.courseType ?? "CORE");
-        setAllocSemesterId(sel.semester?.id ?? null);
-        setAllocSemesterLabel(sel.semester?.name ?? "");
-      }
-    })();
-
-    const loadCA = async () => {
-      setAssLoading(true);
-      try {
-        const r = await api.get(`../results/preview`, {
-          params: {
-            allocationId: sel.allocationId,
-            type: "CA",
-            page: 0,
-            size: 1,
-            includeMeta: true,
-          },
-        });
-        const header = (r.data?.data ?? r.data)?.header;
-        const basic: AssessmentRow[] = Array.isArray(header?.assessments)
-          ? header.assessments.map((a: any) => ({
-              assessmentId: a.assessmentId,
-              assessmentTypeId: a.assessmentTypeId,
-              title: a.title,
-              maxMarks: a.maxMarks,
-              weight: a.weight,
-              date: a.date,
-              description: "",
-            }))
-          : [];
-        // Fetch full details per assessment id
-        const detailed = await Promise.all(
-          basic.map(async (b) => {
-            try {
-              const ad = await api.get(
-                `/v1/assessments/GetById/${b.assessmentId}`
-              );
-              const d = ad.data?.data ?? ad.data;
-              return {
-                assessmentId: d?.id ?? b.assessmentId,
-                assessmentTypeId: d?.assessmentTypeId ?? b.assessmentTypeId,
-                title: d?.title ?? b.title,
-                maxMarks: d?.maxMarks ?? b.maxMarks,
-                weight: d?.weight ?? b.weight,
-                date: d?.date ?? b.date,
-                description: d?.description ?? b.description,
-              } as AssessmentRow;
-            } catch {
-              return b;
-            }
-          })
-        );
-        setAssessments(detailed);
-        // snapshot initial values for dirty detection
-        const base: Record<number, AssessmentRow> = {};
-        detailed.forEach((a) => {
-          base[a.assessmentId] = { ...a };
-        });
-        setAssInitial(base);
-      } catch {
-        setAssessments([]);
-      } finally {
-        setAssLoading(false);
-      }
-    };
-    loadCA();
+    if (!sel) {
+      setAssessments([]);
+      setAssInitial({});
+      return;
+    }
+    // Integration removed: use selected allocation fields only
+    setAllocCourseType(sel.courseType ?? "CORE");
+    setAllocSemesterId(sel.semester?.id ?? null);
+    setAllocSemesterLabel(sel.semester?.name ?? "");
+    setAllocCaPass("40");
+    setAllocEndPass("40");
+    setAllocOverallPass("40");
+    setAllocDescription("");
+    setAssLoading(true);
+    setAssessments([]);
+    setAssInitial({});
+    setAssLoading(false);
   }, [selectedAllocId, allocations]);
 
   // Fetch course by code (preferred) or by id to prefill
   useEffect(() => {
-    const loadCourse = async () => {
-      try {
-        if (initialSnapshot.code) {
-          const r = await api.get(
-            `/v1/courses/GetByCode/${encodeURIComponent(initialSnapshot.code)}`
-          );
-          const d = r.data?.data ?? r.data;
-          if (d?.id) setCourseId(Number(d.id));
-          if (d?.courseCode) setCode(String(d.courseCode));
-          if (d?.courseName) setTitle(String(d.courseName));
-          if (d?.credits != null) setCreditValue(String(d.credits));
-          if (d?.departmentCode && d?.departmentName)
-            setDepartment(`${d.departmentCode} - ${d.departmentName}`);
-          return;
-        }
-      } catch {}
-      try {
-        const idNum = Number(initialSnapshot.id);
-        if (!idNum) return;
-        const res = await api.get(`/v1/courses/GetById/${idNum}`);
-        const d = res.data?.data ?? res.data;
-        if (d?.id) setCourseId(Number(d.id));
-        if (d?.courseCode) setCode(String(d.courseCode));
-        if (d?.courseName) setTitle(String(d.courseName));
-        if (d?.credits != null) setCreditValue(String(d.credits));
-        if (d?.departmentCode && d?.departmentName)
-          setDepartment(`${d.departmentCode} - ${d.departmentName}`);
-      } catch {}
-    };
-    loadCourse();
+    // Integration removed: keep initial snapshot values only
+    setCourseId(initialSnapshot.id != null ? Number(initialSnapshot.id) : null);
   }, [initialSnapshot.id, initialSnapshot.code]);
 
   // Dirty detection
@@ -417,10 +297,10 @@ const EditCourseDetails: React.FC<Props> = ({
         credits: creditsNum,
         departmentId,
       };
-      const res = await api.put(`/v1/courses/Update/${id}`, body);
-      const data = res.data?.data ?? res.data;
-      setSuccess("Course updated successfully");
-      toast.success("Course updated successfully");
+      // Integration removed: no server call
+      const data = { courseCode: code, courseName: title } as any;
+      setSuccess("Course updated (offline)");
+      toast.success("Course updated (offline)");
       onUpdate?.({
         id,
         code: data.courseCode ?? code,
@@ -459,9 +339,9 @@ const EditCourseDetails: React.FC<Props> = ({
         overallPassPercent: Number(allocOverallPass) || 0,
         description: allocDescription || undefined,
       };
-      await api.put(`/v1/course-allocations/Update/${allocId}`, body);
-      setSuccess("Allocation updated successfully");
-      toast.success("Allocation updated successfully");
+      // Integration removed: no server call
+      setSuccess("Allocation updated (offline)");
+      toast.success("Allocation updated (offline)");
     } catch (e: any) {
       const msg =
         e?.response?.data?.message || e?.message || "Allocation update failed";
@@ -486,11 +366,11 @@ const EditCourseDetails: React.FC<Props> = ({
         date: row.date || undefined,
         description: row.description || undefined,
       };
-      await api.put(`/v1/assessments/Update/${id}`, body);
-      setSuccess("Assessment updated");
+      // Integration removed: no server call
+      setSuccess("Assessment updated (offline)");
       // refresh baseline for this row so button returns to normal color
       setAssInitial((prev) => ({ ...prev, [row.assessmentId]: { ...row } }));
-      toast.success("Assessment updated");
+      toast.success("Assessment updated (offline)");
     } catch (e: any) {
       const msg =
         e?.response?.data?.message || e?.message || "Assessment update failed";

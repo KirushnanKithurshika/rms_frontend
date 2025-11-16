@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 import { useAppSelector } from "../../app/hooks";
 import { selectUserId } from "../../features/auth/selectors";
 import "./createcourseform.css";
@@ -145,20 +146,9 @@ const CreateCourseForm: React.FC = () => {
   // Fetch departments and semesters from backend
   useEffect(() => {
     const load = async () => {
-      try {
-        const [depRes, semRes] = await Promise.all([
-          api.get("/v1/departments/GetAll"),
-          api.get("/v1/semesters/GetCurrent-semesters"),
-        ]);
-        const depRaw = depRes.data?.data ?? depRes.data;
-        const semRaw = semRes.data?.data ?? semRes.data;
-        const depList: DepartmentDto[] = Array.isArray(depRaw) ? depRaw : [];
-        const semList: SemesterDto[] = Array.isArray(semRaw) ? semRaw : [];
-        setDepartments(depList);
-        setSemesters(semList);
-      } catch (e: any) {
-        setError(e?.message ?? "Failed to load dropdown data");
-      }
+      // Integration removed: provide empty dropdowns
+      setDepartments([]);
+      setSemesters([]);
     };
     load();
   }, []);
@@ -167,13 +157,8 @@ const CreateCourseForm: React.FC = () => {
   useEffect(() => {
     const fetchLecturer = async () => {
       if (!userId) return;
-      try {
-        const res = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
-        const data = res.data?.data ?? res.data;
-        setLecturerId(Number(data?.id) || null);
-      } catch {
-        setLecturerId(null);
-      }
+      // Integration removed: assume lecturerId equals userId for UI flow
+      setLecturerId(Number(userId) || null);
     };
     fetchLecturer();
   }, [userId]);
@@ -275,73 +260,10 @@ const CreateCourseForm: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // Step 1: Create course
-      const createBody = {
-        courseCode: courseCode.trim(),
-        courseName: courseTitle.trim(),
-        credits: creditsNum,
-        departmentId: departmentId,
-      };
-
-      const courseRes = await api.post("/v1/courses/Create", createBody);
-      const created = (courseRes.data?.data ?? courseRes.data) as {
-        id: number;
-        courseCode: string;
-        courseName: string;
-      };
-      const courseId = created.id;
-
-      // Step 2: Allocate course
-      const allocationBody = {
-        courseId,
-        courseType: courseType,
-        lecturerId: lecturerId,
-        semesterId: semesterId,
-        caPassPercent: caP,
-        endExamPassPercent: endP,
-        overallPassPercent: overP,
-        description: description.trim() || undefined,
-      };
-      const allocRes = await api.post(
-        "/v1/course-allocations/Create",
-        allocationBody
-      );
-      const allocation = (allocRes.data?.data ?? allocRes.data) as {
-        id: number;
-      };
-      const allocationId = allocation?.id;
-
-      // Step 3+4: For each assessment, create its type (name = title, no weight/description), then create the assessment
-      let createdAssessCount = 0;
-      if (allocationId) {
-        for (const a of assessments) {
-          if (!a.title.trim()) continue;
-          // Create assessment type with name=title, group selected by user
-          const typeRes = await api.post("/v1/assessment-types/Create", {
-            name: a.title.trim(),
-            assessmentGroup: a.assessmentGroup,
-          });
-          const createdType = (typeRes.data?.data ?? typeRes.data) as {
-            id: number;
-          };
-          const typeId = createdType?.id;
-          if (!typeId) continue;
-          const body = {
-            courseAllocationId: allocationId,
-            assessmentTypeId: typeId,
-            title: a.title.trim(),
-            maxMarks: Number(a.maxMarks) || 0,
-            weight: Number(a.weight) || 0,
-            date: a.date || undefined,
-            description: a.description?.trim() || undefined,
-          };
-          await api.post("/v1/assessments/Create", body);
-          createdAssessCount += 1;
-        }
-      }
-
+      // Integration removed: no server calls; emulate success
+      const createdAssessCount = assessments.length;
       setSuccess(
-        `Course created, allocated, ${createdAssessCount} assessment(s) processed.`
+        `Course created (offline), allocation saved (offline), ${createdAssessCount} assessment(s) processed (offline).`
       );
       // Optionally reset form
       setCourseCode("");

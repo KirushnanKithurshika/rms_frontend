@@ -11,16 +11,9 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import ResultUploadInterface from "../../../components/resultuploadinterface/ResultUploadInterface.tsx";
-import api from "../../../services/api";
 import FileUploadCard from "../../../components/fileuploadcard/fileuploadcard.tsx";
 import EditCourseDetails from "../../../components/EditCourseDetails/EditCourseDetails.tsx";
-import {
-  FaEdit,
-  FaTrash,
-  FaInfoCircle,
-  FaArrowLeft,
-  FaEllipsisV,
-} from "react-icons/fa";
+import { FaEdit, FaTrash, FaInfoCircle, FaArrowLeft } from "react-icons/fa";
 
 // Extend Course with optional fields used in this view
 type CourseEx = Course & {
@@ -55,21 +48,6 @@ const Courses: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<CourseEx | null>(null);
   const [editCourse, setEditCourse] = useState<CourseEx | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const [lecturerId, setLecturerId] = useState<number | null>(null);
-  const [allocationId, setAllocationId] = useState<number | null>(null);
-  type AssessmentRow = {
-    id?: number;
-    title: string;
-    group: "CA" | "END_EXAM";
-    maxMarks?: number;
-    weight?: number;
-    date?: string;
-  };
-  const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
-  const [loadingAssess, setLoadingAssess] = useState(false);
-  const [selectedAssessment, setSelectedAssessment] =
-    useState<AssessmentRow | null>(null);
-  const loadedForCourseRef = useRef<string | null>(null);
 
   const [activeMenuIndex, setActiveMenuIndex] = useState<number | null>(null);
 
@@ -87,7 +65,7 @@ const Courses: React.FC = () => {
 
   const navigate = useNavigate();
 
-
+  // --- Dropdown & Modal Handlers ---
   const handleDropdownToggle = (idx: number) =>
     setActiveMenuIndex((prev) => (prev === idx ? null : idx));
   const openDeleteModal = (course: Course) => {
@@ -124,6 +102,7 @@ const Courses: React.FC = () => {
       course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // --- Navigation & View Handlers ---
   const handleCourseClick = (course: Course) => {
     setDetailsCourse(course);
     setView("details");
@@ -136,16 +115,15 @@ const Courses: React.FC = () => {
     setEditCourse(null);
     setUploadedFileName(null);
   };
-  const handleGoToUpload = (a?: AssessmentRow) => {
+  const handleGoToUpload = () => {
     if (detailsCourse) {
       setSelectedCourse(detailsCourse);
-      setSelectedAssessment(a ?? null);
       setView("upload");
     }
   };
   const handleCreateCourse = () => navigate("/createcourseui");
 
- 
+  // --- Close dropdown on click outside ---
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -157,132 +135,6 @@ const Courses: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Load lecturerId
-  useEffect(() => {
-    const mapLecturer = async () => {
-      if (!userId) return;
-      try {
-        const r = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
-        const d = r.data?.data ?? r.data;
-        setLecturerId(Number(d?.id) || null);
-      } catch {}
-    };
-    mapLecturer();
-  }, [userId]);
-
-  // When a course is selected, resolve allocation and assessments
-  useEffect(() => {
-    const load = async () => {
-      if (!detailsCourse || !lecturerId) return;
-      if (loadedForCourseRef.current === detailsCourse.code) return; // prevent refetch loop
-      loadedForCourseRef.current = detailsCourse.code; // lock for this course code
-      setLoadingAssess(true);
-      try {
-        // fetch allocations for lecturer and find matching course
-        const res = await api.get(`../lecturers/${lecturerId}/allocations`);
-        const all = (res.data?.data ?? res.data) as any[];
-        const match = (all || []).find(
-          (a) =>
-            a.course?.courseCode === detailsCourse.code ||
-            a.course?.id === (detailsCourse as any)?.id
-        );
-        const allocId = match?.allocationId ?? null;
-        setAllocationId(allocId);
-        // Prefill semester from allocation and enrich course details
-        if (match?.semester?.name) {
-          setDetailsCourse((prev) =>
-            prev ? { ...prev, semester: match.semester.name } : prev
-          );
-        }
-        try {
-          const cr = await api.get(
-            `/v1/courses/GetByCode/${encodeURIComponent(detailsCourse.code)}`
-          );
-          const cd = cr.data?.data ?? cr.data;
-          setDetailsCourse((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  credits: cd?.credits ?? prev.credits,
-                  department: cd?.departmentName ?? prev.department,
-                }
-              : prev
-          );
-        } catch {}
-        const rows: AssessmentRow[] = [];
-        if (allocId) {
-          // CA list via preview
-          try {
-            const r = await api.get(`../results/preview`, {
-              params: {
-                allocationId: allocId,
-                type: "CA",
-                page: 0,
-                size: 1,
-                includeMeta: true,
-              },
-            });
-            const header = (r.data?.data ?? r.data)?.header;
-            const cas = Array.isArray(header?.assessments)
-              ? header.assessments
-              : [];
-            // hydrate each by id for rich details
-            for (const a of cas) {
-              try {
-                const ax = await api.get(
-                  `/v1/assessments/GetById/${a.assessmentId}`
-                );
-                const ad = ax.data?.data ?? ax.data;
-                rows.push({
-                  id: ad?.id ?? a.assessmentId,
-                  title: ad?.title ?? a.title,
-                  group: "CA",
-                  maxMarks: ad?.maxMarks ?? a.maxMarks,
-                  weight: ad?.weight ?? a.weight,
-                  date: ad?.date ?? a.date,
-                });
-              } catch {
-                rows.push({
-                  id: a.assessmentId,
-                  title: a.title,
-                  group: "CA",
-                  maxMarks: a.maxMarks,
-                  weight: a.weight,
-                  date: a.date,
-                });
-              }
-            }
-          } catch {}
-          // End exam info (best-effort from preview)
-          try {
-            const r2 = await api.get(`../results/preview`, {
-              params: {
-                allocationId: allocId,
-                type: "END_EXAM",
-                page: 0,
-                size: 1,
-                includeMeta: true,
-              },
-            });
-            const h2 = (r2.data?.data ?? r2.data)?.header;
-            if (h2?.endExam) {
-              rows.push({
-                title: "Final Exam",
-                group: "END_EXAM",
-                maxMarks: h2.endExam.maxMarks,
-                weight: h2.endExam.weight,
-              });
-            }
-          } catch {}
-        }
-        setAssessments(rows);
-      } finally {
-        setLoadingAssess(false);
-      }
-    };
-    load();
-  }, [detailsCourse, lecturerId]);
 
   // --- Close modal on Escape ---
   useEffect(() => {
@@ -342,7 +194,7 @@ const Courses: React.FC = () => {
                     filteredCourses.map((course, idx) => (
                       <div
                         className="course-card"
-                        key={`${course.code}-${idx}`}
+                        key={course.id}
                         onClick={() => handleCourseClick(course)}
                       >
                         <div className="card-top">
@@ -350,10 +202,14 @@ const Courses: React.FC = () => {
                             className="card-options"
                             onClick={(e) => {
                               e.stopPropagation();
+                              setActiveMenuIndex(
+                                activeMenuIndex === idx ? null : idx
+                              );
+                              e.stopPropagation();
                               handleDropdownToggle(idx);
                             }}
                           >
-                            <FaEllipsisV className="eclipse" />
+                            â‹®
                           </div>
 
                           {activeMenuIndex === idx && (
@@ -450,7 +306,18 @@ const Courses: React.FC = () => {
                     <div className="cd-k">Credits</div>
                     <div className="cd-v">{detailsCourse.credits ?? "-"}</div>
                   </div>
-
+                  <div className="cd-item">
+                    <div className="cd-k">Coordinator</div>
+                    <div className="cd-v">
+                      {detailsCourse.coordinator ?? "-"}
+                    </div>
+                  </div>
+                  <div className="cd-item">
+                    <div className="cd-k">Degree Program</div>
+                    <div className="cd-v">
+                      {detailsCourse.degreeProgram ?? "-"}
+                    </div>
+                  </div>
                   <div className="cd-item cd-span-2">
                     <div className="cd-k">Description</div>
                     <div className="cd-v">
@@ -458,58 +325,12 @@ const Courses: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Assessments list for upload */}
-                <div style={{ marginTop: 16 }}>
-                  <h4 className="cd-title">Assessments</h4>
-                  {loadingAssess ? (
-                    <div>Loading assessments…</div>
-                  ) : assessments.length === 0 ? (
-                    <div>No assessments found.</div>
-                  ) : (
-                    <div className="rp-table-wrap">
-                      <table className="rp-table">
-                        <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>Group</th>
-                            <th>Title</th>
-                            <th>Max</th>
-                            <th>Weight %</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {assessments.map((a, idx) => (
-                            <tr key={(a.id ?? `${a.group}-${idx}`).toString()}>
-                              <td>{idx + 1}</td>
-                              <td>{a.group}</td>
-                              <td>{a.title}</td>
-                              <td>{a.maxMarks ?? "-"}</td>
-                              <td>{a.weight ?? "-"}</td>
-                              <td>{a.date ?? "-"}</td>
-                              <td>
-                                <button
-                                  className="cd-btn primary"
-                                  onClick={() => handleGoToUpload(a)}
-                                >
-                                  Upload
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
               </div>
-              {/* <div className="details-actions">
-                <button className="cd-btn primary" onClick={() => handleGoToUpload(undefined)}>
+              <div className="details-actions">
+                <button className="cd-btn primary" onClick={handleGoToUpload}>
                   Upload Results
                 </button>
-              </div> */}
+              </div>
             </div>
           )}
 
@@ -539,8 +360,6 @@ const Courses: React.FC = () => {
                 </div>
                 <ResultUploadInterface
                   course={selectedCourse}
-                  allocationId={allocationId}
-                  assessment={selectedAssessment}
                   onBack={handleBackToList}
                   onFileUpload={(name: string) => setUploadedFileName(name)}
                 />
@@ -574,7 +393,7 @@ const Courses: React.FC = () => {
                   } as CourseEx;
 
                   setView("details");
-                  setDetailsCourse(normalized);
+                  setDetailsCourse(normalized); 
                   setEditCourse(null);
                 }}
                 onCancel={() => {

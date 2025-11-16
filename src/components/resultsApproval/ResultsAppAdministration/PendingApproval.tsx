@@ -4,36 +4,41 @@ import "./PendingApproval.css";
 
 export type ApprovalItem = { id: string; title: string };
 
-type PendingApprovalsProps = {
-  items: ApprovalItem[];             // ✅ add items prop
+type ApprovalCardProps = {
+  item: ApprovalItem;
   onApprove: (id: string) => void;
 };
 
-const PendingApprovals: React.FC<PendingApprovalsProps> = ({ items, onApprove }) => {
-  return (
-    <section className="pa-scope pa-wrap">
-      <div className="pa-list">
-        {items.map((item) => (
-          <div key={item.id} className="pa-card" role="group" aria-label={item.title}>
-            <div className="pa-card-left">
-              <FaRegFilePdf className="pa-icon" aria-hidden="true" />
-              <div className="pa-title" title={item.title}>
-                {item.title}
-              </div>
-            </div>
+const ApprovalCard: React.FC<ApprovalCardProps> = ({ item, onApprove }) => (
+  <div className="pa-card" role="group" aria-label={item.title}>
+    <div className="pa-card-left">
+      <FaRegFilePdf className="pa-icon" aria-hidden="true" focusable="false" />
+      <div className="pa-title" title={item.title}>{item.title}</div>
+    </div>
+    <button
+      className="pa-button"
+      onClick={() => onApprove(item.id)}
+      aria-label={`View and approve ${item.title}`}
+    >
+      View &amp; Approve
+    </button>
+  </div>
+);
 
-            <button
-              className="pa-button"
-              onClick={() => onApprove(item.id)}
-              aria-label={`View and approve ${item.title}`}
-            >
-              View &amp; Approve
-            </button>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+type PendingApprovalsProps = {
+  items: ApprovalItem[];
+  onApprove: (id: string) => void;
 };
+
+const PendingApprovals: React.FC<PendingApprovalsProps> = ({ items, onApprove }) => (
+  <section className="pa-scope pa-wrap">
+    <h4 className="pa-heading">pending Results Approval</h4>
+    <div className="pa-list">
+      {items.map((it) => (
+        <ApprovalCard key={it.id} item={it} onApprove={onApprove} />
+      ))}
+    </div>
+  </section>
+);
 
 export default PendingApprovals;

@@ -10,7 +10,7 @@ import {
   fetchAllocationsByLecturer,
   fetchResultsPreview,
 } from "../../features/resultsPreview/resultsPreviewSlice";
-import api from "../../services/api";
+// Backend integration removed – no direct API calls here
 
 // No dummy data; wired to backend
 
@@ -105,20 +105,13 @@ const ResultsPreview: React.FC = () => {
   const [lecturerId, setLecturerId] = useState<number | null>(null);
 
 useEffect(() => {
-if (!userId) return;
-(async () => {
-try {
-const r = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
-const d = r.data?.data ?? r.data;
-const lid = Number(d?.id) || null;
-setLecturerId(lid);
-if (lid) {
-dispatch(fetchAllocationsByLecturer(lid));
-}
-} catch {
-// optionally toast or set local error
-}
-})();
+  if (!userId) return;
+  // Integration removed: assume lecturerId equals userId for UI flow only
+  const lid = Number(userId);
+  setLecturerId(Number.isFinite(lid) ? lid : null);
+  if (lid) {
+    dispatch(fetchAllocationsByLecturer(lid));
+  }
 }, [dispatch, userId]);
 
   const courseOptions: Option[] = useMemo(() => {
@@ -226,7 +219,6 @@ dispatch(fetchAllocationsByLecturer(lid));
       <div className="rp-header no-print">
         <h3 className="rp-title">Results Preview</h3>
         <div className="rp-select-row">
-          <div className="rp-select">
           <CustomDropdownVL
             label="Select Course Allocation"
             options={courseOptions}
@@ -236,7 +228,6 @@ dispatch(fetchAllocationsByLecturer(lid));
             }
             onChange={handleCourseChange}
           />
-        </div>
         </div>
         <hr className="rp-divider" />
       </div>

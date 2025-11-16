@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 
 interface MarksRange {
   studentCounts: number[]; // e.g., [1,0,3,6,0]
@@ -53,16 +54,19 @@ export const fetchLecturerDashboard = createAsyncThunk(
   "lecturerDashboard/fetch",
   async (lecturerId: number, { rejectWithValue }) => {
     try {
-      const res = await api.get(
-        `/v1/course-allocations/GetByLecturerId/${lecturerId}`
-      );
-      return res.data.data; // backend wraps data inside .data
+      // Integration removed: return empty dashboard data
+      const empty: LecturerDashboardData = {
+        cards: {
+          currentlyAssignedCourses: 0,
+          totalEnrolledStudents: 0,
+          managingSemesters: [],
+        },
+        availableCourses: [],
+        analyticsData: {},
+      };
+      return empty;
     } catch (err: any) {
-      const message =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to fetch lecturer dashboard";
-      return rejectWithValue(message);
+      return rejectWithValue("Failed to fetch lecturer dashboard");
     }
   }
 );

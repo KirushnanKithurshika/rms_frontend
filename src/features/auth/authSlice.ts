@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AuthState, LoginPayload, VerifyOtpPayload } from "./types";
-import api from "../../services/api";
+// Backend integration removed for offline/UI-only flow
+// import api from "../../services/api";
 import { showSuccess, showError } from "../../utils/toast";
 
 type JwtClaims = {
@@ -42,20 +43,10 @@ export const loginThunk = createAsyncThunk<
   { rejectValue: string }
 >("auth/login", async (body, { rejectWithValue }) => {
   try {
-    const res = await api.post("/auth/login", body);
-
-    if (res.data.status === "success") {
-      showSuccess(res.data.message || "Login successful!");
-    } else {
-      showError(res.data.message || "Login failed!");
-    }
-
+    // Integration removed: immediately proceed to OTP step without network
     return;
   } catch (e: any) {
-    const msg =
-      e?.response?.data?.message ||
-      e?.response?.data?.error ||
-      "Login failed. Check username/password.";
+    const msg = "Login failed.";
     showError(msg);
     return rejectWithValue(msg);
   }
@@ -67,25 +58,22 @@ export const verifyOtpThunk = createAsyncThunk<
   { rejectValue: string }
 >("auth/verifyOtp", async (body, { rejectWithValue }) => {
   try {
-    const res = await api.post<ApiResponse<string>>("/auth/verify-otp", body);
-
-    if (res.data.status !== "success") {
-      const msg = res.data.message || "OTP verification failed!";
-      showError(msg);
-      return rejectWithValue(msg);
-    }
-
-    const token = res.data.data;
-    if (!token)
-      return rejectWithValue("Verification failed: no token received.");
-
-    showSuccess(res.data.message || "OTP verified successfully!");
+    // Integration removed: fabricate a lightweight JWT-like token
+    const payload = {
+      sub: body.username,
+      roles: ["ROLE_USER"],
+      authorities: [],
+      userId: 0,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    } as JwtClaims;
+    const header = btoa(JSON.stringify({ alg: "none", typ: "JWT" }));
+    const bodyB64 = btoa(JSON.stringify(payload as any));
+    const token = `${header}.${bodyB64}.`;
+    showSuccess("OTP verified (offline mode)");
     return token;
   } catch (e: any) {
-    const msg =
-      e?.response?.data?.message ||
-      e?.response?.data?.error ||
-      "Invalid or expired code.";
+    const msg = "Invalid or expired code.";
     showError(msg);
     return rejectWithValue(msg);
   }
@@ -98,23 +86,12 @@ export const logoutThunk = createAsyncThunk<
 >("auth/logout", async (_, { getState, rejectWithValue }) => {
   const { token, pendingUsername } = getState().auth;
   try {
-    const sub = (() => {
-      try {
-        if (!token) return null;
-        const [, payload] = token.split(".");
-        return payload ? JSON.parse(atob(payload))?.sub || null : null;
-      } catch {
-        return null;
-      }
-    })();
-
-    const username = sub || pendingUsername || "";
-    await api
-      .post("/auth/logout", null, { params: { username } })
-      .catch(() => {});
+    // Integration removed: no server call on logout
+    void token; void pendingUsername; // keep references to avoid TS unused warnings
+    return;
   } catch (e: any) {
     return rejectWithValue(
-      e?.response?.data?.message || e?.message || "Logout failed."
+      (e && (e as any).message) || "Logout failed."
     );
   }
 });

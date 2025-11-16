@@ -3,7 +3,8 @@ import {
   createSlice,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 
 // Component-level marks within a course (Assignment, Project, Quiz 1, etc.)
 export interface CourseComponentMark {
@@ -62,12 +63,18 @@ export const fetchStudentCAByUser = createAsyncThunk<
   { rejectValue: string }
 >("studentCA/fetchByUser", async (userId, thunkAPI) => {
   try {
-    const res = await api.get(`/v1/students/ca-results`, {
-      params: { userId },
-    });
-    return (res.data?.data ?? res.data) as StudentCASheet;
+    // Integration removed: return empty CA sheet
+    const empty: StudentCASheet = {
+      university: "",
+      departmentLine: "",
+      batchText: "",
+      sheetTitle: "",
+      student: { name: "", regNo: "" },
+      semesters: [],
+    };
+    return empty;
   } catch (err: any) {
-    return thunkAPI.rejectWithValue(err?.message ?? "Failed to fetch CA marks");
+    return thunkAPI.rejectWithValue("Failed to fetch CA marks");
   }
 });
 

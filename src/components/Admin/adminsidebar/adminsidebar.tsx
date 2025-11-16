@@ -11,11 +11,9 @@ import {
   FaGavel,
   FaMoneyBillAlt,
   FaBuilding,
-  FaBullhorn,
+  FaCommentDots,
   FaChevronLeft,
-  FaChevronRight,
-  FaScroll,     
-  FaUniversity     
+  FaChevronRight
 } from 'react-icons/fa';
 
 type SidebarState = 'expanded' | 'collapsed' | 'hidden';
@@ -26,8 +24,8 @@ const AdminSidebar: React.FC = () => {
   const handleToggle = () => {
     setSidebarState(prev =>
       prev === 'expanded' ? 'collapsed' :
-      prev === 'collapsed' ? 'hidden' :
-      'expanded'
+        prev === 'collapsed' ? 'hidden' :
+          'expanded'
     );
   };
 
@@ -54,6 +52,7 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>User Management</span>}
           </NavLink>
 
+        
           <NavLink to="/admin/student-management" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaUserGraduate className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Student Management</span>}
@@ -64,21 +63,9 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Results Management</span>}
           </NavLink>
 
-          {/* NEW: Transcript Requests */}
-          <NavLink to="/admin/transcripts" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <FaScroll className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Transcript Requests </span>}
-          </NavLink>
-
-          {/* NEW: Academic Setup panel (University / Semester / Faculty / Departments / Batches) */}
-          <NavLink to="/admin/academicsetup" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <FaUniversity className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Academic Setup </span>}
-          </NavLink>
-
           <NavLink to="/admin/role-management" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaUserShield className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Role &amp; Management</span>}
+            {sidebarState === 'expanded' && <span>Role & Management</span>}
           </NavLink>
 
           <NavLink to="/admin/audit-logs" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
@@ -93,7 +80,7 @@ const AdminSidebar: React.FC = () => {
 
           <NavLink to="/admin/fees" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaMoneyBillAlt className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Fee &amp; Dues Management</span>}
+            {sidebarState === 'expanded' && <span>Fee & Dues Management</span>}
           </NavLink>
 
           <NavLink to="/admin/department-control" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
@@ -102,8 +89,8 @@ const AdminSidebar: React.FC = () => {
           </NavLink>
 
           <NavLink to="/admin/feedback" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <FaBullhorn className="sidebar-icon" />
-            {sidebarState === 'expanded' && <span>Announcement</span>}
+            <FaCommentDots className="sidebar-icon" />
+            {sidebarState === 'expanded' && <span>Feedback</span>}
           </NavLink>
         </>
       )}

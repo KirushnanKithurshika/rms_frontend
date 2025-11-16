@@ -1,6 +1,7 @@
 ﻿// BatchesTable.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import api from "../../../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../../../services/api";
 import { FaSearch, FaPlus, FaTimes, FaSort, FaSortUp, FaSortDown, FaEye } from "react-icons/fa";
 import { MdEdit, MdDelete } from "react-icons/md";
 import "./table.css";
@@ -81,45 +82,15 @@ export default function BatchesTable() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const res = await api.get(`/faculties`).catch(() => null as any);
-        const list = Array.isArray(res?.data?.data)
-          ? res!.data.data
-          : (Array.isArray(res?.data) ? res!.data : []);
-        setFaculties(
-          list.map((f: any) => ({
-            id: f.id ?? f.facultyId,
-            name: f.name ?? f.facultyName,
-            code: f.code ?? f.shortName,
-            universityCode: f.universityCode,
-          }))
-        );
-      } catch {
-        setFaculties([]);
-      }
+      // Integration removed: no faculties from backend
+      setFaculties([]);
     })();
   }, []);
 
   useEffect(() => {
     (async () => {
-      try {
-        setLoading(true);
-        const res = await api.get(`/v1/batches/GetAll`);
-        const arr = Array.isArray(res?.data?.data) ? res.data.data : (Array.isArray(res?.data) ? res.data : []);
-        const mapped: Batch[] = (arr as any[]).map((b: any) => ({
-          id: b.id,
-          name: b.name,
-          startYear: b.startYear,
-          durationYears: b.durationYears,
-          facultyId: b.facultyId,
-          facultyName: b.facultyName,
-        }));
-        setRows(mapped.slice().sort((a, b) => a.id - b.id));
-      } catch {
-        setRows([]);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(false);
+      setRows([]);
     })();
   }, []);
 
@@ -158,38 +129,17 @@ export default function BatchesTable() {
   // View details
   const handleView = async (id: number) => {
     setViewingError(null);
-    try {
-      const res = await api.get(`/v1/batches/GetById/${id}`);
-      const data = res?.data?.data ?? res?.data;
-      if (data) { setViewing(data); return; }
-      throw new Error("Empty response");
-    } catch (e: any) {
-      const local = rows.find((x) => x.id === id) || null;
-      if (local) setViewing(local);
-      const d = e?.response?.data;
-      const msg = (d?.message || (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) || d?.error || e?.message || "An unexpected error occurred");
-      setViewingError(String(msg));
-    }
+    const local = rows.find((x) => x.id === id) || null;
+    if (local) setViewing(local);
+    else setViewingError("Not found (offline)");
   };
 
   // Edit
   const handleOpenEdit = async (id: number) => {
     setEditingError(null);
-    try {
-      const res = await api.get(`/v1/batches/GetById/${id}`);
-      const b = res?.data?.data ?? res?.data;
-      if (b) {
-        setEditing({ id: b.id, name: b.name, startYear: b.startYear, durationYears: b.durationYears, facultyId: b.facultyId, facultyName: b.facultyName });
-        return;
-      }
-      throw new Error("Empty response");
-    } catch (e: any) {
-      const local = rows.find((x) => x.id === id) || null;
-      if (local) setEditing(local);
-      const d = e?.response?.data;
-      const msg = (d?.message || (Array.isArray(d?.errors) ? d.errors.join(", ") : undefined) || d?.error || e?.message || "An unexpected error occurred");
-      setEditingError(String(msg));
-    }
+    const local = rows.find((x) => x.id === id) || null;
+    if (local) setEditing(local);
+    else setEditingError("Not found (offline)");
   };
 
   const handleUpdate = async (id: number, payload: Omit<Batch, "id">) => {
@@ -197,19 +147,9 @@ export default function BatchesTable() {
     setSavingEdit(true);
     const body = { name: payload.name.trim(), startYear: Number(payload.startYear), durationYears: Number(payload.durationYears), facultyId: Number(payload.facultyId) };
     try {
-      const res = await api.put(`/v1/batches/Update/${id}`, body);
-      const d = res?.data?.data ?? res?.data;
-      if (res && res.status >= 200 && res.status < 300) {
-        if (d) {
-          const mapped: Batch = { id: d.id, name: d.name, startYear: d.startYear, durationYears: d.durationYears, facultyId: d.facultyId, facultyName: d.facultyName };
-          setRows((prev) => prev.map((x) => (x.id === id ? mapped : x)).slice().sort((a, b) => a.id - b.id));
-        }
-        setEditing(null);
-      }
-    } catch (e: any) {
-      const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
-      setEditingError(String(msg));
+      const mapped: Batch = { id, name: body.name, startYear: body.startYear, durationYears: body.durationYears, facultyId: body.facultyId, facultyName: "" };
+      setRows((prev) => prev.map((x) => (x.id === id ? mapped : x)).slice().sort((a, b) => a.id - b.id));
+      setEditing(null);
     } finally {
       setSavingEdit(false);
     }
@@ -221,17 +161,10 @@ export default function BatchesTable() {
     setSavingCreate(true);
     const body = { name: String(payload.name).trim(), startYear: Number(payload.startYear), durationYears: Number(payload.durationYears), facultyId: Number(payload.facultyId) };
     try {
-      const res = await api.post(`/v1/batches/Create`, body);
-      const d = res?.data?.data ?? res?.data;
-      if (res && res.status >= 200 && res.status < 300 && d) {
-        const mapped: Batch = { id: d.id, name: d.name, startYear: d.startYear, durationYears: d.durationYears, facultyId: d.facultyId, facultyName: d.facultyName };
-        setRows((prev) => prev.concat(mapped).slice().sort((a, b) => a.id - b.id));
-        setCreating(false);
-      }
-    } catch (e: any) {
-      const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(', ') : undefined) || data?.error || e?.message || 'An unexpected error occurred');
-      setCreatingError(String(msg));
+      const newId = Math.max(0, ...rows.map((r) => r.id)) + 1;
+      const mapped: Batch = { id: newId, name: body.name, startYear: body.startYear, durationYears: body.durationYears, facultyId: body.facultyId, facultyName: "" };
+      setRows((prev) => prev.concat(mapped).slice().sort((a, b) => a.id - b.id));
+      setCreating(false);
     } finally {
       setSavingCreate(false);
     }
@@ -244,15 +177,8 @@ export default function BatchesTable() {
     setDeleting(true);
     setDeleteError(null);
     try {
-      const res = await api.delete(`/v1/batches/Delete/${toDelete.id}`);
-      if (res && res.status >= 200 && res.status < 300) {
-        setRows((prev) => prev.filter((x) => x.id !== toDelete.id));
-        closeDelete();
-      }
-    } catch (e: any) {
-      const data = e?.response?.data;
-      const msg = (data?.message || (Array.isArray(data?.errors) ? data.errors.join(", ") : undefined) || data?.error || e?.message || "An unexpected error occurred");
-      setDeleteError(String(msg));
+      setRows((prev) => prev.filter((x) => x.id !== toDelete.id));
+      closeDelete();
     } finally {
       setDeleting(false);
     }

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 
 interface Course {
   code: string;
@@ -43,17 +44,10 @@ export const fetchStudentCourses = createAsyncThunk(
   "studentCourses/fetchByUser",
   async (userId: number, { rejectWithValue }) => {
     try {
-      const response = await api.get(
-        `/v1/enrolled-courses/GetByUser/${userId}`
-      );
-      // Backend wraps actual data inside response.data.data
-      return response.data.data;
+      // Integration removed: return empty student + semesters
+      return { student: null, semesters: [] } as any;
     } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch student courses";
-      return rejectWithValue(message);
+      return rejectWithValue("Failed to fetch student courses");
     }
   }
 );

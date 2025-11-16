@@ -4,7 +4,8 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 
 export interface CourseItem {
   code: string;
@@ -56,17 +57,20 @@ export const fetchStudentResultsSheet = createAsyncThunk<
   { rejectValue: string }
 >("student/fetchResultsSheet", async (userId, thunkAPI) => {
   try {
-    // Primary path
-    try {
-      const response = await api.get(`/students/${userId}/results-sheet`);
-      return (response.data?.data ?? response.data) as StudentResultsSheet;
-    } catch (e) {
-      // Fallback path under /v1
-      const response = await api.get(`/v1/students/${userId}/results-sheet`);
-      return (response.data?.data ?? response.data) as StudentResultsSheet;
-    }
+    // Integration removed: return empty results sheet
+    const empty: StudentResultsSheet = {
+      university: "",
+      facultyLine: "",
+      specialization: "",
+      sheetTitle: "",
+      provisionalLine: "",
+      semesters: [],
+      student: { name: "", regNo: "", gradesByCode: {} },
+      note: "",
+    };
+    return empty;
   } catch (err: any) {
-    return thunkAPI.rejectWithValue(err.message ?? "Failed to fetch results");
+    return thunkAPI.rejectWithValue("Failed to fetch results");
   }
 });
 

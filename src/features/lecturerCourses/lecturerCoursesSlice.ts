@@ -1,6 +1,5 @@
 // src/features/lecturerCourses/lecturerCoursesSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../services/api";
 import type { Course } from "./course";
 
 interface LecturerCoursesState {
@@ -15,16 +14,17 @@ const initialState: LecturerCoursesState = {
   error: null,
 };
 
-export const fetchLecturerCourses = createAsyncThunk(
+export const fetchLecturerCourses = createAsyncThunk<
+  Course[],
+  number,
+  { rejectValue: string }
+>(
   "lecturerCourses/fetchLecturerCourses",
-  async (userId: number, { rejectWithValue }) => {
+  async (_userId: number, { rejectWithValue }) => {
     try {
-      const res = await api.get(
-        `/v1/course-allocations/GetCoursesForLecturer/${userId}`
-      );
-      return res.data.data;
+      return [] as Course[];
     } catch (err: any) {
-      return rejectWithValue(err.response?.data || "Error fetching courses");
+      return rejectWithValue("Error fetching courses");
     }
   }
 );
@@ -40,17 +40,15 @@ const lecturerCoursesSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchLecturerCourses.fulfilled, (state, action) => {
-        // 👇 Fix: unwrap .data if exists
-        state.courses = Array.isArray(action.payload)
-          ? action.payload
-          : action.payload.data ?? [];
+        state.courses = action.payload;
         state.loading = false;
       })
       .addCase(fetchLecturerCourses.rejected, (state, action) => {
-        state.error = action.error.message ?? "Failed to fetch courses";
+        state.error = (action.payload as string) ?? action.error.message ?? "Failed to fetch courses";
         state.loading = false;
       });
   },
 });
 
 export default lecturerCoursesSlice.reducer;
+

@@ -3,7 +3,8 @@ import {
   createSlice,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import api from "../../services/api";
+// Backend integration removed: keep UI without network calls
+// import api from "../../services/api";
 
 export type AllocationItem = {
   allocationId: number;
@@ -141,14 +142,10 @@ export const fetchAllocationsByLecturer = createAsyncThunk<
   { rejectValue: string }
 >("resultsPreview/fetchAllocationsByLecturer", async (lecturerId, thunkAPI) => {
   try {
-    // Try non-/api path by escaping base '/api' with ../
-    const res = await api.get(`../lecturers/${lecturerId}/allocations`);
-    const data = res.data?.data ?? res.data;
-    return Array.isArray(data) ? (data as AllocationItem[]) : [];
+    // Integration removed: return empty list
+    return [] as AllocationItem[];
   } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err?.message ?? "Failed to fetch allocations"
-    );
+    return thunkAPI.rejectWithValue("Failed to fetch allocations");
   }
 });
 
@@ -163,17 +160,48 @@ export const fetchResultsPreview = createAsyncThunk<
   },
   { rejectValue: string }
 >("resultsPreview/fetchResults", async (args, thunkAPI) => {
-  const { allocationId, type, page = 0, size = 50, includeMeta = true } = args;
+  const { allocationId, type } = args;
   try {
-    const res = await api.get(`../results/preview`, {
-      params: { allocationId, type, page, size, includeMeta },
-    });
-    const data = res.data?.data ?? res.data;
-    return data as ResultsPreviewCAResponse | ResultsPreviewEndResponse;
+    // Integration removed: return empty structures matching the expected shape
+    if (type === "CA") {
+      const empty: ResultsPreviewCAResponse = {
+        header: {
+          allocationId: allocationId,
+          courseType: "",
+          course: { id: 0, courseCode: "", courseName: "" },
+          semester: { id: 0, name: "" },
+          lecturer: undefined,
+          assessments: [],
+          totals: {},
+        },
+        students: [],
+        page: 0,
+        size: 0,
+        totalElements: 0,
+        totalPages: 0,
+      };
+      return empty;
+    } else {
+      const empty: ResultsPreviewEndResponse = {
+        header: {
+          allocationId: allocationId,
+          courseType: "",
+          course: { id: 0, courseCode: "", courseName: "" },
+          semester: { id: 0, name: "" },
+          lecturer: undefined,
+          endExam: { maxMarks: 0 },
+          passRules: {},
+        },
+        students: [],
+        page: 0,
+        size: 0,
+        totalElements: 0,
+        totalPages: 0,
+      };
+      return empty;
+    }
   } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err?.message ?? "Failed to fetch results preview"
-    );
+    return thunkAPI.rejectWithValue("Failed to fetch results preview");
   }
 });
 

@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { FaFileExcel, FaFile, FaFolder, FaDownload } from "react-icons/fa";
 import "./ResultUploadInterface.css";
-import api from "../../services/api";
+// Backend integration removed: keep UI only
+// import api from "../../services/api";
 import { toast } from "react-toastify";
 
 interface ResultUploadInterfaceProps {
@@ -54,14 +55,8 @@ const ResultUploadInterface: React.FC<ResultUploadInterfaceProps> = ({
     }
     try {
       setUploading(true);
-      const form = new FormData();
-      form.append("assessmentId", String(assessment.id));
-      form.append("file", selectedFile);
-      const res = await api.post("/v1/assessment-results/Upload", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      const msg = res.data?.message || "Assessment results uploaded successfully";
-      toast.success(msg);
+      // Integration removed: no server call; emulate success
+      toast.success("Assessment results uploaded (offline)");
       onBack();
     } catch (e: any) {
       const msg = e?.response?.data?.message || e?.message || "Upload failed";

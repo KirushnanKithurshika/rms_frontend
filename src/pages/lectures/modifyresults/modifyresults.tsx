@@ -64,7 +64,7 @@ const ModifyResults: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await api.get<Result[]>(`/courses/${selectedCourseId}/results`);
+                const res = await api.get(`/courses/${selectedCourseId}/results`);
                 const data = res.data as unknown as Result[];
                 setResults(data);
             } catch (err: any) {
@@ -120,7 +120,7 @@ const ModifyResults: React.FC = () => {
         setResults((r) => r.map((it) => (it.id === toSave.id ? toSave : it)));
 
         try {
-            const res = await api.put<Result>(`/results/${toSave.id}`, {
+            const res = await api.put(`/results/${toSave.id}`, {
                 project: toSave.project,
                 quiz1: toSave.quiz1,
                 quiz2: toSave.quiz2,
@@ -234,3 +234,4 @@ const ModifyResults: React.FC = () => {
 };
 
 export default ModifyResults;
+
