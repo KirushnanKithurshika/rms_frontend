@@ -1,11 +1,11 @@
-// pages/Admin/TranscriptApprovalsAR/TraPendApprovalAR.tsx
+
 import { useState, useMemo, useRef } from "react";
 import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 import AdminSidebar from "../../../components/Admin/adminsidebar/adminsidebar.tsx";
 import TranscriptApprovalCard from "../../../components/Admin/transcriptapproval/TranscriptApprovalAR/transcriptApprovalCard.tsx";
 import Transcript, { type TranscriptData } from "../../../components/Admin/transcriptapproval/Transcript/Transcript.tsx";
-import { downloadTranscriptPDF } from "../../../utils/downloadTranscriptPdf"; // ⬅️ new
+import { downloadTranscriptPDF } from "../../../utils/downloadTranscriptPdf"; 
 import "./TraPendApprovalAR.css";
 
 const TrasncriptApprovalsAR: React.FC = () => {
@@ -13,7 +13,7 @@ const TrasncriptApprovalsAR: React.FC = () => {
   const [open, setOpen] = useState(false);
   const printRootRef = useRef<HTMLDivElement | null>(null);
 
-  // sample transcript data (use real data later)
+
   const sampleData: TranscriptData = useMemo(
     () => ({
       serialNo: "EG-TR-009991",
@@ -102,7 +102,7 @@ const TrasncriptApprovalsAR: React.FC = () => {
 
                     <div className="tAR-inline-spacer" />
 
-                    {/* ⬇️ Download PDF (no print dialog) */}
+                 
                     <button
                       type="button"
                       className="taAR-btn taAR-btn--ghost"
