@@ -72,7 +72,7 @@ const StudentsConAss: React.FC<Props> = ({
             </div>
           </section>
 
-          {/* CA tables – one per subject like your picture */}
+     
           <section className="ca-blocks">
             {ca.map((row, idx) => {
               const total = getTotal(row);

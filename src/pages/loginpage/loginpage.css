@@ -3,14 +3,14 @@
   display: flex;
   justify-content: center;
   align-items: flex-start; 
-  padding-top: 120px; 
+  padding-top: 100px; 
 }
 .login-form {
-  display: block;          /* override any global form { display:flex } */
+  display: block;          
   width: 100%;
 }
 
-/* Keep labels on their own line */
+
 .login-box label {
   display: block;
   margin: 12px 0 6px;
@@ -22,13 +22,13 @@
   box-sizing: border-box;
 }
 .login-box {
- height:fit-content;
+  height:fit-content;
   margin-top: 40px;
   background-color: white;
   padding: 30px 40px;
   border-radius: 4px;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
-  width: 350px;
+  width: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -51,9 +51,11 @@
   font-weight: 600;
 }
 
+
 .login-input {
+  height:30px;
   color: #0a2558;
-  padding: 8px 12px;
+  padding: 20px 18px;
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;

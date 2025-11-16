@@ -4,6 +4,7 @@ import StudentSubNav from '../../../components/Students/StudentsubNav/Studentsub
 import './studenthomepage.css';
 import StudentMetrics from '../../../components/Students/studenthomepagegraphs/studenthomepagegraph.tsx';
 import ResultsTabsButtomSection from '../../../components/Students/StudentHomePageButtonSection/studenthomebuttonsection.tsx';
+import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 
 
 const StudentDashboard = () => {
@@ -11,15 +12,15 @@ const StudentDashboard = () => {
 
   return (
     <div className="lec-dashboard-container">
-      {/* Navbar */}
+   
       <div className="nav">
         <Navbarin />
       </div>
 
 
-      {/* <div className="breadcrumb">
+       <div className="breadcrumb">
         <BreadcrumbNav />
-      </div>*/}
+      </div>
 
 
       <div className="dashboard-content">

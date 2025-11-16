@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
 import CreateCourseForm from "./components/createcourseform/createcourseform";
 import "./App.css";
 import WelcomePage from "./pages/Intropage/welcomepage";
@@ -20,31 +19,34 @@ import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 import StudentManagement from "./pages/Admin/studentmanagementpage/studentmanagement";
 import StudentDashboard from "./pages/Students/StudentsHomePage/studenthomepage";
 import StudentResultsSheet from "./components/Students/Studentsresultsheet/StudentResultsSheet";
-import StudentCourses from "./pages/Students/StudentsCourse/studentscourseinterface";
 import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscourseinterface";
 import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
-import TranscriptStatusTimeline from "./components/Students/StuTraSta/StuTraSta";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
 import ApprovalPage from "./pages/Approval/Approvalpage/Approval";
 import ApprovalHistory from "./pages/Approval/ApprovalHistory/Approvalhistorypage";
-
 import CourseHistory from "./pages/lectures/History/History";
-import ModifyResultsPage from "./pages/lectures/modifyresults/modifyresults";
-import SignatureBoard from "./components/resultsApproval/ResultsApprovalSenate/ResultsAppSenate";
+import SignatureBoard from "./components/SignatureCanvas/SignatureCanvas";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
+import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
+import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
 
-
+// Academic Setup (with nested tabs)
+import AcademicSetup from "./pages/Admin/academicsetupLayout/academicsetup";
+import UniversitiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/University";
+import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/FacultyTable";
+import DepartmentsTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/DepartmentTable";
+import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/SemesterTable";
+import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
+import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 
 function App() {
   return (
     <Router>
-
       <div className="mt-16">
-
         <Routes>
-          {/* Public */}
+          {/* Public / general */}
           <Route path="/" element={<WelcomePage />} />
           <Route path="/drop" element={<UserDropdown />} />
           <Route path="/login" element={<LoginPage />} />
@@ -54,34 +56,48 @@ function App() {
           <Route path="/verification" element={<TwoStepVerification />} />
           <Route path="/account-setting" element={<AccountSettings />} />
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
+          <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
+
+      
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
+          <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
+
+      
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
           <Route path="/student/transcript" element={<StudentTranscript />} />
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
+
+          {/* Approvals / Lectures */}
           <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
           <Route path="/course-history" element={<CourseHistory />} />
-          <Route path="/modify-results" element={<ModifyResultsPage />} />
+          <Route path="/modify-results" element={<ModifyResults />} />
           <Route path="/signatureboard" element={<SignatureBoard />} />
-          <Route path="/results-approval-requests" element={<ResultsApprovalPage/>} />
-<Route path="/lec-announcement-page" element={<AnnouncementPage/>}/>
+          <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
+          <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
 
-        
+          {/* Academic setup with nested routes */}
+          <Route path="/admin/academicsetup" element={<AcademicSetup />}>
+            <Route index element={<Navigate to="universities" replace />} />
+            <Route path="universities" element={<UniversitiesTable />} />
+            <Route path="faculties" element={<FacultiesTable />} />
+            <Route path="departments" element={<DepartmentsTable />} />
+            <Route path="semesters" element={<SemestersTable />} />
+            <Route path="batches" element={<BatchesTable/>} />
+          </Route>
 
-
-
-        
-
+          {/* Optional: 404 */}
+          {/* <Route path="*" element={<div>Not Found</div>} /> */}
         </Routes>
       </div>
     </Router>

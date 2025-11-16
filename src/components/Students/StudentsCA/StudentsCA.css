@@ -1,6 +1,6 @@
 /* Page scaffold */
-.results-page {
-    background: #fafeff;
+.results-page {width:210mm;
+    background: #ffffff;
     min-height: 100vh;
     padding: 24px;
 }
@@ -163,7 +163,7 @@
     filter: brightness(1.05);
 }
 
-/* Print */
+
 @media print {
     .no-print {
         display: none !important;

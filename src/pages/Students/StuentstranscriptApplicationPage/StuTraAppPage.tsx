@@ -6,16 +6,19 @@ import StudentSidebar from "../../../components/Students/Studentsidebar/Students
 
 
 import TranscriptForm from "../../../components/Students/StuTraAppForm/StuTraAppform.tsx";
+import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 
 const StudentTranscriptRequestForm = () => {
- 
+
 
   return (
     <div className="lec-dashboard-container">
       <div className="nav">
         <Navbarin />
       </div>
-
+      <div className="breadcrumb">
+        <BreadcrumbNav />
+      </div>
       <div className="dashboard-content-students-transcript">
         <StudentSubNav />
         <div className="subnav-divider" />
@@ -26,7 +29,7 @@ const StudentTranscriptRequestForm = () => {
           </div>
 
           <div className="card-students-trsnscript">
-        <TranscriptForm/>
+            <TranscriptForm />
           </div>
         </div>
       </div>

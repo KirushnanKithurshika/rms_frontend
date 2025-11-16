@@ -5,6 +5,7 @@ import './studentscoursesinterface.css';
 import StudentMetrics from '../../../components/Students/studenthomepagegraphs/studenthomepagegraph.tsx';
 import ResultsTabsButtomSection from '../../../components/Students/StudentHomePageButtonSection/studenthomebuttonsection.tsx';
 import SemesterCourses from '../../../components/Students/StudentCourseInterface/studentcourses.tsx';
+import BreadcrumbNav from '../../../components/breadcrumbnav/breadcrumbnav.tsx';
 
 
 const StudentCoursesPage = () => {
@@ -18,9 +19,9 @@ const StudentCoursesPage = () => {
       </div>
 
 
-     {/* <div className="breadcrumb">
-        <BreadcrumbNav />
-      </div>*/}
+      <div className="breadcrumb">
+        <BreadcrumbNav/>
+      </div>
 
    
       <div className="dashboard-content">
