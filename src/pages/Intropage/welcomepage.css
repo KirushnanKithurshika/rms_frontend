@@ -19,6 +19,7 @@
   width: 100%;
   max-width: 600px;
   height: auto;
+  object-fit: contain; /* ✅ prevents distortion */
 }
 
 .welcome-right {
@@ -53,8 +54,10 @@
   }
 
   .welcome-img {
-    width: 80%;
-    
+    width: 100%;       /* ✅ let it scale with container */
+    max-width: 450px;  /* cap size but keep ratio */
+    height: auto;
+    object-fit: contain;
   }
 
   .welcome-container {
@@ -80,8 +83,10 @@
   }
 
   .welcome-img {
-    width: 80%;
+    width: 100%;       /* ✅ no fixed 350px */
+    max-width: 350px;
     height: auto;
+    object-fit: contain;
   }
 
   .welcome-container {
@@ -94,3 +99,13 @@
   }
 }
 
+@media screen and (max-width: 450px) {
+  .welcome-container {
+    padding: 20px;
+    flex-direction: column;
+  }
+
+  .welcome-right {
+    padding: 10px;
+  }
+}

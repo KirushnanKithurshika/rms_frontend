@@ -242,8 +242,13 @@
     align-items: stretch;
   }
 
-  .stu-enroll-field,
+
+  .file-dropzone {
+
+  width: 80%;
+}
+  /* .stu-enroll-field,
   .stu-enroll-upload {
    width:350px;
-  }
+  } */
 }
