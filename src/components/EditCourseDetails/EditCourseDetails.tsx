@@ -168,7 +168,7 @@ const EditCourseDetails: React.FC<Props> = ({
 
   // removed placeholder effects
 
-  // Assessments for selected allocation (CA only, edit via Update endpoint)
+  // Assessments for selected allocation (CA + END_EXAM, edit via Update endpoint)
   type AssessmentRow = {
     assessmentId: number;
     assessmentTypeId: number;
@@ -177,6 +177,7 @@ const EditCourseDetails: React.FC<Props> = ({
     weight?: number;
     date?: string;
     description?: string;
+    group?: "CA" | "END_EXAM";
   };
   const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
   const [assLoading, setAssLoading] = useState(false);
@@ -184,7 +185,9 @@ const EditCourseDetails: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   // Keep an immutable baseline to detect per-row edits
-  const [assInitial, setAssInitial] = useState<Record<number, AssessmentRow>>({});
+  const [assInitial, setAssInitial] = useState<Record<number, AssessmentRow>>(
+    {}
+  );
 
   // Sync form whenever a different course is passed in
   useEffect(() => {
@@ -283,56 +286,74 @@ const EditCourseDetails: React.FC<Props> = ({
       }
     })();
 
-    const loadCA = async () => {
+    const loadAssessments = async () => {
       setAssLoading(true);
       try {
-        const r = await api.get(`../results/preview`, {
-          params: {
-            allocationId: sel.allocationId,
-            type: "CA",
-            page: 0,
-            size: 1,
-            includeMeta: true,
-          },
-        });
-        const header = (r.data?.data ?? r.data)?.header;
-        const basic: AssessmentRow[] = Array.isArray(header?.assessments)
-          ? header.assessments.map((a: any) => ({
-              assessmentId: a.assessmentId,
-              assessmentTypeId: a.assessmentTypeId,
-              title: a.title,
-              maxMarks: a.maxMarks,
-              weight: a.weight,
-              date: a.date,
-              description: "",
-            }))
-          : [];
-        // Fetch full details per assessment id
-        const detailed = await Promise.all(
-          basic.map(async (b) => {
-            try {
-              const ad = await api.get(
-                `/v1/assessments/GetById/${b.assessmentId}`
-              );
-              const d = ad.data?.data ?? ad.data;
-              return {
-                assessmentId: d?.id ?? b.assessmentId,
-                assessmentTypeId: d?.assessmentTypeId ?? b.assessmentTypeId,
-                title: d?.title ?? b.title,
-                maxMarks: d?.maxMarks ?? b.maxMarks,
-                weight: d?.weight ?? b.weight,
-                date: d?.date ?? b.date,
-                description: d?.description ?? b.description,
-              } as AssessmentRow;
-            } catch {
-              return b;
+        const combined: AssessmentRow[] = [];
+
+        const loadByType = async (type: "CA" | "END_EXAM") => {
+          try {
+            const r = await api.get(`../results/preview`, {
+              params: {
+                allocationId: sel.allocationId,
+                type,
+                page: 0,
+                size: 1,
+                includeMeta: true,
+              },
+            });
+            const header = (r.data?.data ?? r.data)?.header;
+            const basics: AssessmentRow[] = Array.isArray(header?.assessments)
+              ? header.assessments.map((a: any) => ({
+                  assessmentId: a.assessmentId,
+                  assessmentTypeId: a.assessmentTypeId,
+                  title: a.title,
+                  maxMarks: a.maxMarks,
+                  weight: a.weight,
+                  date: a.date,
+                  description: "",
+                  group: type,
+                }))
+              : [];
+            if (!basics.length && type === "END_EXAM" && header?.endExam) {
+              // If backend exposes only a single end-exam object without id, skip editing
+              return;
             }
-          })
-        );
-        setAssessments(detailed);
+            const detailed = await Promise.all(
+              basics.map(async (b) => {
+                try {
+                  const ad = await api.get(
+                    `/v1/assessments/GetById/${b.assessmentId}`
+                  );
+                  const d = ad.data?.data ?? ad.data;
+                  return {
+                    assessmentId: d?.id ?? b.assessmentId,
+                    assessmentTypeId: d?.assessmentTypeId ?? b.assessmentTypeId,
+                    title: d?.title ?? b.title,
+                    maxMarks: d?.maxMarks ?? b.maxMarks,
+                    weight: d?.weight ?? b.weight,
+                    date: d?.date ?? b.date,
+                    description: d?.description ?? b.description,
+                    group: type,
+                  } as AssessmentRow;
+                } catch {
+                  return b;
+                }
+              })
+            );
+            combined.push(...detailed);
+          } catch {
+            // ignore, let other type load
+          }
+        };
+
+        await loadByType("CA");
+        await loadByType("END_EXAM");
+
+        setAssessments(combined);
         // snapshot initial values for dirty detection
         const base: Record<number, AssessmentRow> = {};
-        detailed.forEach((a) => {
+        combined.forEach((a) => {
           base[a.assessmentId] = { ...a };
         });
         setAssInitial(base);
@@ -342,7 +363,7 @@ const EditCourseDetails: React.FC<Props> = ({
         setAssLoading(false);
       }
     };
-    loadCA();
+    loadAssessments();
   }, [selectedAllocId, allocations]);
 
   // Fetch course by code (preferred) or by id to prefill
@@ -646,17 +667,11 @@ const EditCourseDetails: React.FC<Props> = ({
             <CustomDropdown
               label="Semester"
               options={(Array.isArray(semesters) ? semesters : []).map(
-                (s) => `${s.id} - ${s.name}`
+                (s) => s.name
               )}
               value={
                 allocSemesterId
-                  ? (() => {
-                      const s = (
-                        Array.isArray(semesters) ? semesters : []
-                      ).find((x) => x.id === allocSemesterId);
-                      const nm = s?.name ?? allocSemesterLabel;
-                      return `${allocSemesterId} - ${nm ?? ""}`;
-                    })()
+                  ? semesters.find((s) => s.id === allocSemesterId)?.name ?? ""
                   : ""
               }
               placeholder={
@@ -664,11 +679,14 @@ const EditCourseDetails: React.FC<Props> = ({
                   ? "Select Semester"
                   : "Loading..."
               }
-              onChange={(label) => {
-                const id = Number(String(label).split(" - ")[0]);
-                setAllocSemesterId(Number.isFinite(id) ? id : null);
+              onChange={(selectedName) => {
+                const sem = (semesters ?? []).find(
+                  (s) => s.name === selectedName
+                );
+                setAllocSemesterId(sem?.id ?? null);
               }}
             />
+
             <div className="form-group">
               <label>CA Pass %</label>
               <input
@@ -721,7 +739,7 @@ const EditCourseDetails: React.FC<Props> = ({
         </div>
 
         <div className="assessment-section">
-          <h3 className="section-headingCC">Assessments (CA)</h3>
+          <h3 className="section-headingCC">Assessments (CA & End Exam)</h3>
           {assLoading ? (
             <div>Loading assessments...</div>
           ) : assessments.length === 0 ? (
@@ -729,24 +747,29 @@ const EditCourseDetails: React.FC<Props> = ({
           ) : (
             <div className="form-grid">
               {/* Column headings for assessments */}
-              <div className="cd-item" style={{ gridColumn: "1 / -1" }}>
-                <div className="cd-k" style={{ fontWeight: 700 }}>
-                  No.
-                </div>
-                <div
-                  className="cd-v"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(5, minmax(120px, 1fr)) 120px",
-                    gap: "8px",
-                    fontWeight: 700,
-                    fontSize: "12px",
-                    color: "#0b235c",
-                  }}
-                >
-                  <div>Title</div>
-                  <div>Max</div>
-                  <div>Weight %</div>
+              <div
+                className="cd-item"
+                style={{ gridColumn: "1 / -1", gridTemplateColumns: "60px 1fr" }}
+              >
+                  <div className="cd-k" style={{ fontWeight: 700 }}>
+                    No.
+                  </div>
+                  <div
+                    className="cd-v"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "minmax(80px, 1fr) repeat(5, minmax(120px, 1fr)) 120px",
+                      gap: "8px",
+                      fontWeight: 700,
+                      fontSize: "12px",
+                      color: "#0b235c",
+                    }}
+                  >
+                    <div>Group</div>
+                    <div>Title</div>
+                    <div>Max</div>
+                    <div>Weight %</div>
                   <div>Date</div>
                   <div>Description</div>
                   <div>Actions</div>
@@ -756,7 +779,7 @@ const EditCourseDetails: React.FC<Props> = ({
                 <div
                   key={row.assessmentId}
                   className="cd-item"
-                  style={{ gridColumn: "1 / -1" }}
+                  style={{ gridColumn: "1 / -1", gridTemplateColumns: "60px 1fr" }}
                 >
                   <div className="cd-k">{`#${idx + 1}`} </div>
                   <div
@@ -764,10 +787,15 @@ const EditCourseDetails: React.FC<Props> = ({
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "repeat(5, minmax(120px, 1fr)) 120px",
+                        "minmax(80px, 1fr) repeat(5, minmax(120px, 1fr)) 120px",
                       gap: "8px",
                     }}
                   >
+                    <input
+                      className="input"
+                      value={row.group ?? ""}
+                      disabled
+                    />
                     <input
                       className="input"
                       value={row.title}
@@ -842,7 +870,9 @@ const EditCourseDetails: React.FC<Props> = ({
                     />
                     <button
                       type="button"
-                      className={`btn ${isAssessmentDirty(row) ? 'primary' : ''}`}
+                      className={`btn ${
+                        isAssessmentDirty(row) ? "primary" : ""
+                      }`}
                       onClick={() => saveAssessment(row)}
                       disabled={saving}
                     >
