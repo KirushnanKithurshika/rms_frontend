@@ -87,7 +87,6 @@ const Courses: React.FC = () => {
 
   const navigate = useNavigate();
 
-
   const handleDropdownToggle = (idx: number) =>
     setActiveMenuIndex((prev) => (prev === idx ? null : idx));
   const openDeleteModal = (course: Course) => {
@@ -145,7 +144,6 @@ const Courses: React.FC = () => {
   };
   const handleCreateCourse = () => navigate("/createcourseui");
 
- 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -266,13 +264,31 @@ const Courses: React.FC = () => {
               },
             });
             const h2 = (r2.data?.data ?? r2.data)?.header;
-            if (h2?.endExam) {
-              rows.push({
-                title: "Final Exam",
-                group: "END_EXAM",
-                maxMarks: h2.endExam.maxMarks,
-                weight: h2.endExam.weight,
-              });
+            const cas = Array.isArray(h2?.assessments) ? h2.assessments : [];
+            for (const a of cas) {
+              try {
+                const ax = await api.get(
+                  `/v1/assessments/GetById/${a.assessmentId}`
+                );
+                const ad = ax.data?.data ?? ax.data;
+                rows.push({
+                  id: ad?.id ?? a.assessmentId,
+                  title: ad?.title ?? a.title,
+                  group: ad?.group ?? a.group,
+                  maxMarks: ad?.maxMarks ?? a.maxMarks,
+                  weight: ad?.weight ?? a.weight,
+                  date: ad?.date ?? a.date,
+                });
+              } catch {
+                rows.push({
+                  id: a.assessmentId,
+                  title: a.title,
+                  group: a?.group,
+                  maxMarks: a.maxMarks,
+                  weight: a.weight,
+                  date: a.date,
+                });
+              }
             }
           } catch {}
         }
