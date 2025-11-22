@@ -58,6 +58,7 @@ const ModifyResults: React.FC = () => {
 
   const allocationsLoadedRef = useRef(false);
   const baseRowsRef = useRef<EditableResultRow[]>([]);
+  const hasResultCacheRef = useRef<Record<number, boolean>>({});
 
   // Map user -> lecturer
   useEffect(() => {
@@ -137,6 +138,30 @@ const ModifyResults: React.FC = () => {
         const targetAssessmentId = selectedAssessmentId ?? (ass[0]?.assessmentId ?? null);
         if (!targetAssessmentId) {
           setRows([]);
+          baseRowsRef.current = [];
+          return;
+        }
+
+        // First, check if this assessment has any results at all
+        let hasResults = hasResultCacheRef.current[targetAssessmentId];
+        if (hasResults === undefined) {
+          try {
+            const hr = await api.get(
+              `/v1/assessment-results/${targetAssessmentId}/has-result`
+            );
+            const raw = hr.data?.data ?? hr.data;
+            hasResults = Boolean(raw);
+            hasResultCacheRef.current[targetAssessmentId] = hasResults;
+          } catch {
+            hasResults = false;
+            hasResultCacheRef.current[targetAssessmentId] = false;
+          }
+        }
+
+        if (!hasResults) {
+          setRows([]);
+          baseRowsRef.current = [];
+          setError("This assessment does not have results to edit.");
           return;
         }
 
