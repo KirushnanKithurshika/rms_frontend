@@ -1,236 +1,424 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar.tsx";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
-import CourseSearchBarlechome from "../../../components/SearchDropdown/searchdropdown.tsx";
-import "./modifyresults.css"; // add styles as needed
+import "./modifyresults.css";
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { fetchLecturerCourses } from "../../../features/lecturerCourses/lecturerCoursesSlice";
-import type { Course as LecCourse } from "../../../features/lecturerCourses/course";
+import { useAppSelector } from "../../../app/hooks";
 import { selectUserId } from "../../../features/auth/selectors";
 import api from "../../../services/api";
+import { toast } from "react-toastify";
 
-type SelectedCourseInfo = {
-    id: string;
-    code?: string;
-    title?: string;
+type AllocationItem = {
+  allocationId: number;
+  courseType: string;
+  course: { id: number; courseCode: string; courseName: string };
+  semester: { id: number; name: string };
 };
 
-type Result = {
-    id: string;
-    studentId: string;
-    studentName: string;
-    project: number;
-    quiz1: number;
-    quiz2: number;
-    total: number;
-    status: string;
+type AssessmentInfo = {
+  assessmentId: number;
+  assessmentTypeId: number;
+  title: string;
+  group: "CA" | "END_EXAM";
+  maxMarks?: number;
+  weight?: number;
+  date?: string;
 };
+
+type EditableResultRow = {
+  resultId: number | null;
+  assessmentId: number;
+  studentId: number;
+  studentRegNo: string;
+  studentName: string;
+  marksObtained: number | null;
+  remarks: string;
+};
+
+type ResultType = "CA" | "END_EXAM";
+
+type Option = { value: string; label: string };
 
 const ModifyResults: React.FC = () => {
-    const dispatch = useAppDispatch();
-    const userId = useAppSelector(selectUserId);
-    const { courses: coursesData = [], loading: coursesLoading, error: coursesError } = useAppSelector((s) => s.lecturerCourses);
+  const userId = useAppSelector(selectUserId);
+  const [lecturerId, setLecturerId] = useState<number | null>(null);
 
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [selectedCourse, setSelectedCourse] = useState<SelectedCourseInfo | null>(null);
-    const [selectedCourseId, setSelectedCourseId] = useState<string>("");
+  const [allocations, setAllocations] = useState<AllocationItem[]>([]);
+  const [selectedAllocationId, setSelectedAllocationId] = useState<number | null>(null);
+  const [activeType, setActiveType] = useState<ResultType>("CA");
 
-    const [loading, setLoading] = useState(false);
-    const [results, setResults] = useState<Result[]>([]);
-    const [error, setError] = useState<string | null>(null);
+  const [assessments, setAssessments] = useState<AssessmentInfo[]>([]);
+  const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null);
 
-    // Editing modal state
-    const [editingResult, setEditingResult] = useState<Result | null>(null);
-    const [saving, setSaving] = useState(false);
-    const [validationError, setValidationError] = useState<string | null>(null);
+  const [rows, setRows] = useState<EditableResultRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [savingRowId, setSavingRowId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-    const handleBackdropClick = () => setSidebarOpen(false);
+  const allocationsLoadedRef = useRef(false);
+  const baseRowsRef = useRef<EditableResultRow[]>([]);
 
-    // Load lecturer courses on mount/user change
-    useEffect(() => {
-        if (userId) dispatch(fetchLecturerCourses(userId));
-    }, [dispatch, userId]);
+  // Map user -> lecturer
+  useEffect(() => {
+    const mapLecturer = async () => {
+      if (!userId) return;
+      try {
+        const r = await api.get(`/v1/lecturers/GetByUserId/${userId}`);
+        const d = r.data?.data ?? r.data;
+        const lid = Number(d?.id) || null;
+        setLecturerId(lid);
+      } catch (e: any) {
+        const msg = e?.response?.data?.message || e?.message || "Failed to resolve lecturer";
+        setError(msg);
+        toast.error(msg);
+      }
+    };
+    mapLecturer();
+  }, [userId]);
 
-    // When a course is chosen, fetch its results
-    useEffect(() => {
-        if (!selectedCourseId) {
-            setResults([]);
-            return;
+  // Load allocations once for this lecturer
+  useEffect(() => {
+    const load = async () => {
+      if (!lecturerId || allocationsLoadedRef.current) return;
+      try {
+        const res = await api.get(`../lecturers/${lecturerId}/allocations`);
+        const data = (res.data?.data ?? res.data) as any[];
+        const all = Array.isArray(data) ? (data as AllocationItem[]) : [];
+        setAllocations(all);
+        if (all.length) setSelectedAllocationId(all[0].allocationId);
+        allocationsLoadedRef.current = true;
+      } catch (e: any) {
+        const msg = e?.response?.data?.message || e?.message || "Failed to load allocations";
+        setError(msg);
+        toast.error(msg);
+      }
+    };
+    load();
+  }, [lecturerId]);
+
+  // Load results preview for allocation + type, then build assessments + rows
+  useEffect(() => {
+    const load = async () => {
+      if (!selectedAllocationId) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get(`../results/preview`, {
+          params: {
+            allocationId: selectedAllocationId,
+            type: activeType,
+            page: 0,
+            size: 50,
+            includeMeta: true,
+          },
+        });
+        const data = res.data?.data ?? res.data;
+        const header = data?.header;
+        const students = Array.isArray(data?.students) ? data.students : [];
+
+        const ass: AssessmentInfo[] = Array.isArray(header?.assessments)
+          ? header.assessments.map((a: any) => ({
+              assessmentId: a.assessmentId,
+              assessmentTypeId: a.assessmentTypeId,
+              title: a.title,
+              group: activeType,
+              maxMarks: a.maxMarks,
+              weight: a.weight,
+              date: a.date,
+            }))
+          : [];
+        setAssessments(ass);
+        if (!selectedAssessmentId && ass.length) {
+          setSelectedAssessmentId(ass[0].assessmentId);
         }
 
-        const fetchResults = async () => {
-            setLoading(true);
-            setError(null);
+        // Build rows for a single assessment if already chosen
+        const targetAssessmentId = selectedAssessmentId ?? (ass[0]?.assessmentId ?? null);
+        if (!targetAssessmentId) {
+          setRows([]);
+          return;
+        }
+
+        const built: EditableResultRow[] = await Promise.all(
+          students.map(async (s: any) => {
+            const marksMap = s.marksByAssessmentId || {};
+            const fallbackMarks =
+              marksMap[String(targetAssessmentId)] ??
+              (activeType === "END_EXAM" ? s.endExamMarks : null);
+
             try {
-                const res = await api.get<Result[]>(`/courses/${selectedCourseId}/results`);
-                const data = res.data as unknown as Result[];
-                setResults(data);
-            } catch (err: any) {
-                setError(err.message || "Failed to load results");
-            } finally {
-                setLoading(false);
+              const ar = await api.get(
+                `/v1/assessment-results/GetByStudentAndAssessment`,
+                {
+                  params: {
+                    studentId: s.studentId,
+                    assessmentId: targetAssessmentId,
+                  },
+                }
+              );
+              const d = ar.data?.data ?? ar.data;
+              return {
+                resultId: d?.id != null ? Number(d.id) : null,
+                assessmentId: targetAssessmentId,
+                studentId: d?.studentId ?? s.studentId,
+                studentRegNo: d?.studentRegNo ?? s.regNo,
+                studentName: d?.studentName ?? s.name,
+                marksObtained:
+                  d?.marksObtained != null
+                    ? Number(d.marksObtained)
+                    : fallbackMarks != null
+                    ? Number(fallbackMarks)
+                    : null,
+                remarks: d?.remarks ?? "",
+              } as EditableResultRow;
+            } catch {
+              // No existing result; still show row with fallback marks
+              return {
+                resultId: null,
+                assessmentId: targetAssessmentId,
+                studentId: s.studentId,
+                studentRegNo: s.regNo,
+                studentName: s.name,
+                marksObtained:
+                  fallbackMarks != null ? Number(fallbackMarks) : null,
+                remarks: "",
+              } as EditableResultRow;
             }
-        };
-
-        fetchResults();
-    }, [selectedCourseId]);
-
-    // Open editor for a result
-    const openEdit = (r: Result) => {
-        // clone to avoid mutating list directly
-        setEditingResult({ ...r });
-        setValidationError(null);
+          })
+        );
+        setRows(built);
+        baseRowsRef.current = built;
+      } catch (e: any) {
+        const msg = e?.response?.data?.message || e?.message || "Failed to load results";
+        setError(msg);
+        toast.error(msg);
+        setRows([]);
+      } finally {
+        setLoading(false);
+      }
     };
+    load();
+  }, [selectedAllocationId, activeType, selectedAssessmentId]);
 
-    // Close editor
-    const closeEdit = () => {
-        setEditingResult(null);
-        setValidationError(null);
-    };
+  const allocationOptions: Option[] = useMemo(
+    () =>
+      allocations.map((a) => ({
+        value: String(a.allocationId),
+        label: `${a.course.courseCode} - ${a.course.courseName} (${a.semester.name})`,
+      })),
+    [allocations]
+  );
 
-    // Basic validation: marks are non-negative, total computed if empty
-    const validateAndCompute = (r: Result) => {
-        if (r.project < 0 || r.quiz1 < 0 || r.quiz2 < 0) {
-            return "Marks cannot be negative";
-        }
-        // Example: recompute total
-        r.total = Number(r.project) + Number(r.quiz1) + Number(r.quiz2);
-        r.status = r.total >= 40 ? "Pass" : "Fail"; // simple example rule
-        return null;
-    };
+  const assessmentOptions: Option[] = useMemo(
+    () =>
+      assessments.map((a) => ({
+        value: String(a.assessmentId),
+        label: `${a.title} (${a.group})`,
+      })),
+    [assessments]
+  );
 
-    // Save changes (optimistic update)
-    const saveResult = async () => {
-        if (!editingResult) return;
-        setValidationError(null);
-
-        // copy and validate
-        const toSave = { ...editingResult };
-        const vError = validateAndCompute(toSave);
-        if (vError) {
-            setValidationError(vError);
-            return;
-        }
-
-        setSaving(true);
-        // optimistic UI update: replace locally
-        const prevResults = [...results];
-        setResults((r) => r.map((it) => (it.id === toSave.id ? toSave : it)));
-
-        try {
-            const res = await api.put<Result>(`/results/${toSave.id}`, {
-                project: toSave.project,
-                quiz1: toSave.quiz1,
-                quiz2: toSave.quiz2,
-                total: toSave.total,
-                status: toSave.status,
-            });
-            const updated: Result = res.data as unknown as Result;
-            // make sure UI shows backend canonical result
-            setResults((r) => r.map((it) => (it.id === updated.id ? updated : it)));
-            closeEdit();
-        } catch (err: any) {
-            setError(err.message || "Failed to save result");
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    // Small helper to update editingResult fields from inputs
-    const updateEditingField = (field: keyof Result, value: string | number) => {
-        if (!editingResult) return;
-        setEditingResult((prev) => (prev ? { ...prev, [field]: value } : prev));
-    };
-
-    return (
-        <div className="lec-dashboard-container">
-            <div className="nav">
-                <Navbarin />
-            </div>
-
-            <div className="breadcrumb">
-                <BreadcrumbNav />
-            </div>
-
-            <div className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`} onClick={handleBackdropClick}></div>
-
-            <div className="main-area">
-                <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
-                    <LectureSidebar />
-                </div>
-
-                <div className="dashboard-content">
-                    <div className="card">
-                        <CourseSearchBarlechome
-                            courses={coursesData.map((c: LecCourse) => ({
-                                courseId: String(c.id),
-                                courseDisplayName: `${c.code} - ${c.title}`,
-                            }))}
-                            selectedCourseId={selectedCourseId}
-                            onCourseSelect={(id: string) => {
-                                setSelectedCourseId(id);
-                                const found = coursesData.find((c) => String(c.id) === id);
-                                setSelectedCourse(found ? { id, code: found.code, title: found.title } : null);
-                            }}
-                        />
-
-
-
-
-
-
-
-
-
-                        {loading && <p>Loading results...</p>}
-                        {error && <div className="error">{error}</div>}
-
-                        {!loading && selectedCourseId && results.length === 0 && <p>No results found for this course.</p>}
-
-                        {!loading && results.length > 0 && (
-                            <div className="results-table-wrapper">
-                                <table className="results-table" aria-label="Results table">
-                                    <thead>
-                                        <tr>
-                                            <th>Student</th>
-                                            <th>Project</th>
-                                            <th>Quiz 1</th>
-                                            <th>Quiz 2</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {results.map((r) => (
-                                            <tr key={r.id}>
-                                                <td>{r.studentName}</td>
-                                                <td>{r.project}</td>
-                                                <td>{r.quiz1}</td>
-                                                <td>{r.quiz2}</td>
-                                                <td>{r.total}</td>
-                                                <td>{r.status}</td>
-                                                <td>
-                                                    <button className="btn small" onClick={() => openEdit(r)} aria-label={`Edit ${r.studentName}`}>
-                                                        <FaEdit /> Edit
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Edit Modal */}
-                    
-                </div>
-            </div>
-        </div>
+  const handleMarksChange = (idx: number, value: string) => {
+    setRows((prev) =>
+      prev.map((r, i) =>
+        i === idx ? { ...r, marksObtained: value === "" ? null : Number(value) } : r
+      )
     );
+  };
+
+  const handleRemarksChange = (idx: number, value: string) => {
+    setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, remarks: value } : r)));
+  };
+
+  const isRowDirty = (row: EditableResultRow) => {
+    const base = baseRowsRef.current.find(
+      (r) => r.assessmentId === row.assessmentId && r.studentId === row.studentId
+    );
+    if (!base) return false;
+    return (
+      (base.marksObtained ?? null) !== (row.marksObtained ?? null) ||
+      (base.remarks ?? "") !== (row.remarks ?? "")
+    );
+  };
+
+  const saveRow = async (row: EditableResultRow) => {
+    if (!row.resultId) {
+      toast.error("Result id not available for this row");
+      return;
+    }
+    if (row.marksObtained == null || isNaN(row.marksObtained)) {
+      toast.error("Enter a valid mark");
+      return;
+    }
+    setSavingRowId(row.resultId);
+    try {
+      const body = {
+        marksObtained: row.marksObtained,
+        remarks: row.remarks ?? "",
+      };
+      const res = await api.put(`/v1/assessment-results/Update/${row.resultId}`, body);
+      const msg = res.data?.message || "Assessment result updated";
+      toast.success(msg);
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || "Failed to update";
+      toast.error(msg);
+    } finally {
+      setSavingRowId(null);
+    }
+  };
+
+  return (
+    <div className="lec-dashboard-container">
+      <div className="nav">
+        <Navbarin />
+      </div>
+
+      <div className="breadcrumb">
+        <BreadcrumbNav />
+      </div>
+
+      <div className="main-area">
+        <div className="sidebar">
+          <LectureSidebar />
+        </div>
+
+        <div className="dashboard-content">
+          <div className="card">
+            <h3 className="cd-title">Modify Results</h3>
+
+            {/* Allocation dropdown */}
+            <div className="results-toolbar">
+              <div className="form-group custom-dropdown">
+                <label className="dropdown-label">Course Allocation</label>
+                <select
+                  className="input"
+                  value={selectedAllocationId ? String(selectedAllocationId) : ""}
+                  onChange={(e) => {
+                    const id = Number(e.target.value);
+                    setSelectedAllocationId(Number.isFinite(id) ? id : null);
+                  }}
+                >
+                  <option value="">Select Allocation</option>
+                  {allocationOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Type tabs */}
+              <div className="rp-tabs">
+                <button
+                  className={`rp-tab ${activeType === "CA" ? "is-active" : ""}`}
+                  type="button"
+                  onClick={() => setActiveType("CA")}
+                >
+                  CA
+                </button>
+                <button
+                  className={`rp-tab ${activeType === "END_EXAM" ? "is-active" : ""}`}
+                  type="button"
+                  onClick={() => setActiveType("END_EXAM")}
+                >
+                  End Exam
+                </button>
+              </div>
+
+              {/* Assessment selector */}
+              <div className="form-group custom-dropdown">
+                <label className="dropdown-label">Assessment</label>
+                <select
+                  className="input"
+                  value={selectedAssessmentId ? String(selectedAssessmentId) : ""}
+                  onChange={(e) => {
+                    const id = Number(e.target.value);
+                    setSelectedAssessmentId(Number.isFinite(id) ? id : null);
+                  }}
+                >
+                  <option value="">Select Assessment</option>
+                  {assessmentOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {loading && <p>Loading results...</p>}
+            {error && <div className="error">{error}</div>}
+
+            {!loading && !error && selectedAllocationId && selectedAssessmentId && (
+              <div className="results-table-wrapper">
+                <table className="results-table" aria-label="Assessment results table">
+                  <thead>
+                    <tr>
+                      <th>Reg No</th>
+                      <th>Name</th>
+                      <th>Marks Obtained</th>
+                      <th>Remarks</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r, idx) => (
+                      <tr key={`${r.studentId}-${r.assessmentId}`}>
+                        <td>{r.studentRegNo}</td>
+                        <td>{r.studentName}</td>
+                        <td>
+                          <input
+                            className="input"
+                            type="number"
+                            value={r.marksObtained ?? ""}
+                            onChange={(e) => handleMarksChange(idx, e.target.value)}
+                            style={{ maxWidth: 90 }}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            className="input"
+                            value={r.remarks}
+                            onChange={(e) => handleRemarksChange(idx, e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          {r.resultId ? (
+                            <button
+                              type="button"
+                              className="btn small"
+                              onClick={() => saveRow(r)}
+                              disabled={
+                                (savingRowId !== null && savingRowId === r.resultId) ||
+                                !isRowDirty(r)
+                              }
+                            >
+                              {savingRowId !== null && savingRowId === r.resultId ? (
+                                <FaTimes />
+                              ) : (
+                                <>
+                                  <FaSave style={{ marginRight: 4 }} /> Update
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            <span style={{ color: "#9ca3af", fontSize: 12 }}>
+                              No existing result
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ModifyResults;
