@@ -123,8 +123,6 @@
 }
 .sig-icon-btn:hover { background: #f1f1f1; border-color: #cfcfcf; }
 .sig-icon-btn:active { transform: translateY(1px); }
-
-/* ensure react-icons SVGs fill the button cleanly */
 .sig-icon-btn svg {
   color:#05314d;
   width: 16px;

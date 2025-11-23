@@ -57,7 +57,7 @@ const AnnouncementPage: React.FC = () => {
           id: announcements.length + 1,
           title: newAnnouncement.title,
           content: newAnnouncement.content,
-          postedBy: "You", // You can change this to the logged-in user's name
+          postedBy: "You", 
           time: formattedTime,
         },
       ]);
@@ -67,30 +67,30 @@ const AnnouncementPage: React.FC = () => {
 
   return (
     <div className="lec-dashboard-container">
-      {/* Navbar */}
+     
       <div className="nav">
         <Navbarin />
       </div>
 
-      {/* Breadcrumb */}
+  
       <div className="breadcrumb">
         <BreadcrumbNav />
       </div>
 
-      {/* Sidebar backdrop (mobile) */}
+ 
       <div
         className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`}
         onClick={handleBackdropClick}
       ></div>
 
-      {/* Main Area */}
+
       <div className="main-area">
-        {/* Sidebar */}
+
         <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
           <LectureSidebar />
         </div>
 
-        {/* Content Area */}
+    
         <div className="dashboard-content">
           <div className="card">
             <div className="Ann-head">Announcements</div>

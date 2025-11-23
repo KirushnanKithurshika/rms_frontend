@@ -1,36 +1,52 @@
-// utils/downloadExactHtmlPdf.ts
+
 import html2pdf from "html2pdf.js";
 
 export async function downloadExactHtmlPdf(
   selectorOrEl: string | HTMLElement,
   fileName = "ResultsSheet.pdf"
-) {
-  const el =
+): Promise<void> {
+  const el: HTMLElement | null =
     typeof selectorOrEl === "string"
       ? (document.querySelector(selectorOrEl) as HTMLElement | null)
       : selectorOrEl;
 
-  if (!el) throw new Error("PDF root element not found");
+  if (!el) {
+    throw new Error("PDF root element not found");
+  }
 
-  // Important: ensure all webfonts/images are settled
-  await document.fonts?.ready?.catch(() => {});
 
-  const opt: html2pdf.Options = {
-    margin: [5, 0, 0, 0],                // mm (top, right, bottom, left)
+  try {
+
+    await (document as any).fonts?.ready;
+  } catch {
+
+  }
+
+
+  const opt: any = {
+ 
+    margin: [5, 0, 0, 0],
     filename: fileName,
-    image: { type: "jpeg", quality: 0.98 },
+    image: {
+      type: "jpeg",
+      quality: 0.98,
+    },
     html2canvas: {
-      scale: 3,                           // higher = sharper
+      scale: 3, 
       useCORS: true,
       backgroundColor: "#ffffff",
-      scrollY: -window.scrollY,
+      scrollY: -window.scrollY, 
     },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    },
     pagebreak: {
-      mode: ["css", "legacy"],            // obey our CSS break rules
-      avoid: [".avoid-break"],            // classes to keep on one page
+      mode: ["css", "legacy"],
+      avoid: [".avoid-break"], 
     },
   };
 
-  await html2pdf().set(opt).from(el).save();
+  await (html2pdf() as any).set(opt).from(el).save();
 }

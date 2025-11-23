@@ -204,7 +204,7 @@ export default function SignatureBoardRS() {
 
   return (
     <div className="sig-wrap">
-      {/* Toolbar OUTSIDE & ABOVE the paper */}
+
       <div className="sig-toolbar-outside" role="toolbar" aria-label="Signature tools">
         <button className="sig-icon-btn" onClick={undo} title="Undo (Ctrl+Z)">
           <FaUndoAlt />
