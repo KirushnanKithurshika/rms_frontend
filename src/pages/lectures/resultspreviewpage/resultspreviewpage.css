@@ -66,12 +66,12 @@
 .uploaded-course-code {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #4f46e5; /* indigo-600 */
+  color: #4f46e5; 
 }
 
 .uploaded-course-name {
   font-size: 0.8rem;
-  color: #4b5563; /* gray-600 */
+  color: #4b5563; 
 }
 
 
@@ -135,14 +135,13 @@
   background:#0a2558;
   color: #ffffff;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.35);
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
 .btn-send-approval:hover {
   background: #0d3071;
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(55, 48, 163, 0.45);
+
 }
 
 .btn-send-approval:active {
