@@ -7,7 +7,6 @@ import TwoStepVerification from "./pages/verificaionpage/verification";
 import UserDropdown from "./components/UserDropdown/userdropdown";
 import LecturerDashboard from "./pages/lectures/homePageLecturer/homeLecturer";
 import CreateCourseUI from "./pages/lectures/createcourse/createcourse";
-import Courses from "./pages/lectures/courses/courses";
 import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
 import AnalizePage from "./pages/lectures/analysepage/analysepage";
 import AdminDashboard from "./pages/Admin/adminhomepage/admindashboard";
@@ -31,8 +30,6 @@ import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/Results
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
 import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
-
-// Academic Setup (with nested tabs)
 import AcademicSetup from "./pages/Admin/academicsetupLayout/academicsetup";
 import UniversitiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/University";
 import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/FacultyTable";
@@ -40,13 +37,14 @@ import DepartmentsTable from "./pages/Admin/academicsetupLayout/AcademicSetupTab
 import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/SemesterTable";
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
+import Courses from "./pages/lectures/courses/courses";
 
 function App() {
   return (
     <Router>
       <div className="mt-16">
         <Routes>
-          {/* Public / general */}
+         
           <Route path="/" element={<WelcomePage />} />
           <Route path="/drop" element={<UserDropdown />} />
           <Route path="/login" element={<LoginPage />} />
@@ -58,7 +56,7 @@ function App() {
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
           <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/courses" element={<Courses />} />
+          <Route path="/courses" element={<Courses/>} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
@@ -77,7 +75,7 @@ function App() {
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
 
-          {/* Approvals / Lectures */}
+   
           <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
           <Route path="/course-history" element={<CourseHistory />} />
@@ -86,7 +84,7 @@ function App() {
           <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
 
-          {/* Academic setup with nested routes */}
+         
           <Route path="/admin/academicsetup" element={<AcademicSetup />}>
             <Route index element={<Navigate to="universities" replace />} />
             <Route path="universities" element={<UniversitiesTable />} />
@@ -96,8 +94,7 @@ function App() {
             <Route path="batches" element={<BatchesTable/>} />
           </Route>
 
-          {/* Optional: 404 */}
-          {/* <Route path="*" element={<div>Not Found</div>} /> */}
+        
         </Routes>
       </div>
     </Router>
