@@ -106,13 +106,13 @@
 }
 
 
-.status-uploaded {
+.status-uploaded-results{
   background-color: #ecfdf5;
   color: #047857; 
   border: 1px solid #a7f3d0; 
 }
 
-.status-pending {
+.status-pending-results{
   background-color: #fffbeb; 
   color: #92400e; 
   border: 1px solid #fcd34d; 

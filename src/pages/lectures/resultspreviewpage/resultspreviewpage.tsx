@@ -112,7 +112,7 @@ const ResultsPreviewPage = () => {
                           <span className="uploaded-status-label">CA Results</span>
                           <span
                             className={`uploaded-status-badge ${
-                              course.caStatus === 'UPLOADED' ? 'status-uploaded' : 'status-pending'
+                              course.caStatus === 'UPLOADED' ? 'status-uploaded-results' : 'status-pending-results'
                             }`}
                           >
                             {course.caStatus === 'UPLOADED' ? 'Uploaded' : 'Pending'}
@@ -124,8 +124,8 @@ const ResultsPreviewPage = () => {
                           <span
                             className={`uploaded-status-badge ${
                               course.finalStatus === 'UPLOADED'
-                                ? 'status-uploaded'
-                                : 'status-pending'
+                                ? 'status-uploaded-results'
+                                : 'status-pending-results'
                             }`}
                           >
                             {course.finalStatus === 'UPLOADED' ? 'Uploaded' : 'Pending'}
@@ -153,7 +153,7 @@ const ResultsPreviewPage = () => {
                 </div>
               </div>
 
-              {/* ---- Existing Results Preview ---- */}
+             
               <div className="rp-page">
                 <ResultsPreview />
               </div>
