@@ -53,12 +53,22 @@ const ModifyResults: React.FC = () => {
 
   const [rows, setRows] = useState<EditableResultRow[]>([]);
   const [loading, setLoading] = useState(false);
-  const [savingRowId, setSavingRowId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const allocationsLoadedRef = useRef(false);
-  const baseRowsRef = useRef<EditableResultRow[]>([]);
   const hasResultCacheRef = useRef<Record<number, boolean>>({});
+
+  const [assessmentHasResults, setAssessmentHasResults] = useState<
+    boolean | null
+  >(null);
+
+  // Edit modal state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingRow, setEditingRow] = useState<EditableResultRow | null>(null);
+  const [editMarks, setEditMarks] = useState<string>("");
+  const [editRemarks, setEditRemarks] = useState<string>("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
 
   // Map user -> lecturer
   useEffect(() => {
@@ -98,12 +108,13 @@ const ModifyResults: React.FC = () => {
     load();
   }, [lecturerId]);
 
-  // Load results preview for allocation + type, then build assessments + rows
+  // Load results preview for allocation + type, then build display rows
   useEffect(() => {
     const load = async () => {
       if (!selectedAllocationId) return;
       setLoading(true);
       setError(null);
+      setAssessmentHasResults(null);
       try {
         const res = await api.get(`../results/preview`, {
           params: {
@@ -135,14 +146,15 @@ const ModifyResults: React.FC = () => {
         }
 
         // Build rows for a single assessment if already chosen
-        const targetAssessmentId = selectedAssessmentId ?? (ass[0]?.assessmentId ?? null);
+        const targetAssessmentId =
+          selectedAssessmentId ?? ass[0]?.assessmentId ?? null;
         if (!targetAssessmentId) {
           setRows([]);
-          baseRowsRef.current = [];
+          setAssessmentHasResults(null);
           return;
         }
 
-        // First, check if this assessment has any results at all
+        // First, check if this assessment has any results at all (single call)
         let hasResults = hasResultCacheRef.current[targetAssessmentId];
         if (hasResults === undefined) {
           try {
@@ -157,65 +169,38 @@ const ModifyResults: React.FC = () => {
             hasResultCacheRef.current[targetAssessmentId] = false;
           }
         }
+        setAssessmentHasResults(hasResults);
 
+        // If there are no results, do not build / show the table rows
         if (!hasResults) {
           setRows([]);
-          baseRowsRef.current = [];
-          setError("This assessment does not have results to edit.");
           return;
         }
 
-        const built: EditableResultRow[] = await Promise.all(
-          students.map(async (s: any) => {
-            const marksMap = s.marksByAssessmentId || {};
-            const fallbackMarks =
-              marksMap[String(targetAssessmentId)] ??
-              (activeType === "END_EXAM" ? s.endExamMarks : null);
+        // Build simple display rows from preview only (no per-student fetch)
+        const built: EditableResultRow[] = students.map((s: any) => {
+          const marksMap = s.marksByAssessmentId || {};
+          const fallbackMarks =
+            marksMap[String(targetAssessmentId)] ??
+            (activeType === "END_EXAM" ? s.endExamMarks : null);
 
-            try {
-              const ar = await api.get(
-                `/v1/assessment-results/GetByStudentAndAssessment`,
-                {
-                  params: {
-                    studentId: s.studentId,
-                    assessmentId: targetAssessmentId,
-                  },
-                }
-              );
-              const d = ar.data?.data ?? ar.data;
-              return {
-                resultId: d?.id != null ? Number(d.id) : null,
-                assessmentId: targetAssessmentId,
-                studentId: d?.studentId ?? s.studentId,
-                studentRegNo: d?.studentRegNo ?? s.regNo,
-                studentName: d?.studentName ?? s.name,
-                marksObtained:
-                  d?.marksObtained != null
-                    ? Number(d.marksObtained)
-                    : fallbackMarks != null
-                    ? Number(fallbackMarks)
-                    : null,
-                remarks: d?.remarks ?? "",
-              } as EditableResultRow;
-            } catch {
-              // No existing result; still show row with fallback marks
-              return {
-                resultId: null,
-                assessmentId: targetAssessmentId,
-                studentId: s.studentId,
-                studentRegNo: s.regNo,
-                studentName: s.name,
-                marksObtained:
-                  fallbackMarks != null ? Number(fallbackMarks) : null,
-                remarks: "",
-              } as EditableResultRow;
-            }
-          })
-        );
+          return {
+            resultId: null, // resolved lazily when editing
+            assessmentId: targetAssessmentId,
+            studentId: s.studentId,
+            studentRegNo: s.regNo,
+            studentName: s.name,
+            marksObtained:
+              fallbackMarks !== undefined && fallbackMarks !== null
+                ? Number(fallbackMarks)
+                : null,
+            remarks: "",
+          } as EditableResultRow;
+        });
         setRows(built);
-        baseRowsRef.current = built;
       } catch (e: any) {
-        const msg = e?.response?.data?.message || e?.message || "Failed to load results";
+        const msg =
+          e?.response?.data?.message || e?.message || "Failed to load results";
         setError(msg);
         toast.error(msg);
         setRows([]);
@@ -244,52 +229,124 @@ const ModifyResults: React.FC = () => {
     [assessments]
   );
 
-  const handleMarksChange = (idx: number, value: string) => {
-    setRows((prev) =>
-      prev.map((r, i) =>
-        i === idx ? { ...r, marksObtained: value === "" ? null : Number(value) } : r
-      )
-    );
-  };
+  const openEditModal = async (row: EditableResultRow) => {
+    if (!selectedAssessmentId) return;
 
-  const handleRemarksChange = (idx: number, value: string) => {
-    setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, remarks: value } : r)));
-  };
-
-  const isRowDirty = (row: EditableResultRow) => {
-    const base = baseRowsRef.current.find(
-      (r) => r.assessmentId === row.assessmentId && r.studentId === row.studentId
-    );
-    if (!base) return false;
-    return (
-      (base.marksObtained ?? null) !== (row.marksObtained ?? null) ||
-      (base.remarks ?? "") !== (row.remarks ?? "")
-    );
-  };
-
-  const saveRow = async (row: EditableResultRow) => {
-    if (!row.resultId) {
-      toast.error("Result id not available for this row");
+    // If assessment has no results at all, avoid per-student call
+    if (assessmentHasResults === false) {
+      toast.info("This assessment does not have results to edit.");
       return;
     }
-    if (row.marksObtained == null || isNaN(row.marksObtained)) {
+
+    setIsEditModalOpen(true);
+    setEditLoading(true);
+    setEditingRow({
+      ...row,
+    });
+    setEditMarks(
+      row.marksObtained !== null && row.marksObtained !== undefined
+        ? String(row.marksObtained)
+        : ""
+    );
+    setEditRemarks(row.remarks ?? "");
+
+    try {
+      const ar = await api.get(
+        `/v1/assessment-results/GetByStudentAndAssessment`,
+        {
+          params: {
+            studentId: row.studentId,
+            assessmentId: row.assessmentId,
+          },
+        }
+      );
+      const d = ar.data?.data ?? ar.data;
+      if (!d || d.id == null) {
+        throw new Error("No existing result found for this student.");
+      }
+
+      const fullRow: EditableResultRow = {
+        resultId: Number(d.id),
+        assessmentId: row.assessmentId,
+        studentId: d.studentId ?? row.studentId,
+        studentRegNo: d.studentRegNo ?? row.studentRegNo,
+        studentName: d.studentName ?? row.studentName,
+        marksObtained:
+          d.marksObtained !== null && d.marksObtained !== undefined
+            ? Number(d.marksObtained)
+            : row.marksObtained,
+        remarks: d.remarks ?? "",
+      };
+      setEditingRow(fullRow);
+      setEditMarks(
+        fullRow.marksObtained !== null && fullRow.marksObtained !== undefined
+          ? String(fullRow.marksObtained)
+          : ""
+      );
+      setEditRemarks(fullRow.remarks ?? "");
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        "No existing result for this student.";
+      toast.error(msg);
+      setIsEditModalOpen(false);
+      setEditingRow(null);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const closeEditModal = () => {
+    if (editSaving) return;
+    setIsEditModalOpen(false);
+    setEditingRow(null);
+    setEditMarks("");
+    setEditRemarks("");
+    setEditLoading(false);
+  };
+
+  const saveEdit = async () => {
+    if (!editingRow || editingRow.resultId == null) {
+      toast.error("Result id not available for this student");
+      return;
+    }
+    const marksNum =
+      editMarks.trim() === "" ? NaN : Number(editMarks.trim());
+    if (!Number.isFinite(marksNum)) {
       toast.error("Enter a valid mark");
       return;
     }
-    setSavingRowId(row.resultId);
+
+    setEditSaving(true);
     try {
       const body = {
-        marksObtained: row.marksObtained,
-        remarks: row.remarks ?? "",
+        marksObtained: marksNum,
+        remarks: editRemarks ?? "",
       };
-      const res = await api.put(`/v1/assessment-results/Update/${row.resultId}`, body);
+      const res = await api.put(
+        `/v1/assessment-results/Update/${editingRow.resultId}`,
+        body
+      );
       const msg = res.data?.message || "Assessment result updated";
       toast.success(msg);
+
+      // Reflect changes in main table
+      setRows((prev) =>
+        prev.map((r) =>
+          r.studentId === editingRow.studentId &&
+          r.assessmentId === editingRow.assessmentId
+            ? { ...r, marksObtained: marksNum, remarks: editRemarks }
+            : r
+        )
+      );
+      closeEditModal();
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "Failed to update";
+      const msg =
+        e?.response?.data?.message || e?.message || "Failed to update";
       toast.error(msg);
     } finally {
-      setSavingRowId(null);
+      setEditSaving(false);
     }
   };
 
@@ -374,8 +431,20 @@ const ModifyResults: React.FC = () => {
 
             {loading && <p>Loading results...</p>}
             {error && <div className="error">{error}</div>}
+            {!loading &&
+              !error &&
+              assessmentHasResults === false &&
+              selectedAssessmentId && (
+                <div className="error">
+                  This assessment does not have results to edit.
+                </div>
+              )}
 
-            {!loading && !error && selectedAllocationId && selectedAssessmentId && (
+            {!loading &&
+              !error &&
+              selectedAllocationId &&
+              selectedAssessmentId &&
+              !!assessmentHasResults && (
               <div className="results-table-wrapper">
                 <table className="results-table" aria-label="Assessment results table">
                   <thead>
@@ -392,45 +461,21 @@ const ModifyResults: React.FC = () => {
                       <tr key={`${r.studentId}-${r.assessmentId}`}>
                         <td>{r.studentRegNo}</td>
                         <td>{r.studentName}</td>
+                        <td>{r.marksObtained ?? "-"}</td>
+                        <td>{r.remarks ?? ""}</td>
                         <td>
-                          <input
-                            className="input"
-                            type="number"
-                            value={r.marksObtained ?? ""}
-                            onChange={(e) => handleMarksChange(idx, e.target.value)}
-                            style={{ maxWidth: 90 }}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            className="input"
-                            value={r.remarks}
-                            onChange={(e) => handleRemarksChange(idx, e.target.value)}
-                          />
-                        </td>
-                        <td>
-                          {r.resultId ? (
-                            <button
-                              type="button"
-                              className="btn small"
-                              onClick={() => saveRow(r)}
-                              disabled={
-                                (savingRowId !== null && savingRowId === r.resultId) ||
-                                !isRowDirty(r)
-                              }
-                            >
-                              {savingRowId !== null && savingRowId === r.resultId ? (
-                                <FaTimes />
-                              ) : (
-                                <>
-                                  <FaSave style={{ marginRight: 4 }} /> Update
-                                </>
-                              )}
-                            </button>
-                          ) : (
+                          {r.marksObtained === null ? (
                             <span style={{ color: "#9ca3af", fontSize: 12 }}>
                               No existing result
                             </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn small"
+                              onClick={() => openEditModal(r)}
+                            >
+                              <FaEdit style={{ marginRight: 4 }} /> Edit
+                            </button>
                           )}
                         </td>
                       </tr>
@@ -442,6 +487,90 @@ const ModifyResults: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Result Modal */}
+      {isEditModalOpen && editingRow && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-result-title"
+          onClick={closeEditModal}
+        >
+          <div
+            className="modal"
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+            tabIndex={-1}
+          >
+            <div className="modal-header">
+              <h4 id="edit-result-title">Edit Result</h4>
+              <button
+                className="close-btn"
+                aria-label="Close"
+                onClick={closeEditModal}
+                disabled={editSaving}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              {editLoading ? (
+                <p>Loading result...</p>
+              ) : (
+                <>
+                  <p>
+                    <strong>Student:</strong> {editingRow.studentRegNo} —{" "}
+                    {editingRow.studentName}
+                  </p>
+                  <p>
+                    <strong>Assessment ID:</strong> {editingRow.assessmentId}
+                  </p>
+                  <div className="form-group">
+                    <label>Marks Obtained</label>
+                    <input
+                      className="input"
+                      type="number"
+                      value={editMarks}
+                      onChange={(e) => setEditMarks(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Remarks</label>
+                    <input
+                      className="input"
+                      value={editRemarks}
+                      onChange={(e) => setEditRemarks(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-delete ghost"
+                onClick={closeEditModal}
+                disabled={editSaving}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-delete danger"
+                onClick={saveEdit}
+                disabled={editSaving || editLoading}
+              >
+                {editSaving ? (
+                  "Saving..."
+                ) : (
+                  <>
+                    <FaSave style={{ marginRight: 4 }} /> Update
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
