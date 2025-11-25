@@ -5,6 +5,7 @@ import {
   FaPlusCircle,
   FaChartBar,
   FaPencilAlt,
+  FaChartLine,
   FaEye,
   FaChevronLeft,
   FaChevronRight,
@@ -36,8 +37,8 @@ const LectureSidebar: React.FC = () => {
       prev === "expanded"
         ? "collapsed"
         : prev === "collapsed"
-        ? "hidden"
-        : "expanded"
+          ? "hidden"
+          : "expanded"
     );
   };
 
@@ -80,9 +81,7 @@ const LectureSidebar: React.FC = () => {
               className={({ isActive }) =>
                 `sidebar-item clickable ${isActive ? "active" : ""}`
               }
-              onClick={(e) => {
-                // optional: prevent navigation and only toggle tree
-                e.preventDefault();
+              onClick={() => {
                 setCoursesExpanded((prev) => !prev);
               }}
             >
@@ -96,6 +95,7 @@ const LectureSidebar: React.FC = () => {
                 </>
               )}
             </NavLink>
+
 
             {coursesExpanded && sidebarState === "expanded" && (
               <div className="sidebar-tree">
@@ -146,9 +146,10 @@ const LectureSidebar: React.FC = () => {
                 `sidebar-item ${isActive ? "active" : ""}`
               }
             >
-              <FaEye className="sidebar-icon" />
-              {sidebarState === "expanded" && <span>Results Preview</span>}
+              <FaChartLine className="sidebar-icon" />
+              {sidebarState === "expanded" && <span>Results Management</span>}
             </NavLink>
+            
 
             <NavLink
               to="/lecturer/student-management"
