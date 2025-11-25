@@ -18,7 +18,6 @@ import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
 // Lecturer
 import LecturerDashboard from "./pages/lectures/homePageLecturer/homeLecturer";
 import CreateCourseUI from "./pages/lectures/createcourse/createcourse";
-import Courses from "./pages/lectures/courses/courses";
 import ResultsPreviewPage from "./pages/lectures/resultspreviewpage/resultspreviewpage";
 import AnalizePage from "./pages/lectures/analysepage/analysepage";
 import CreateCourseForm from "./components/createcourseform/createcourseform";
@@ -65,8 +64,6 @@ import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/Results
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
 import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
-
-// Academic Setup (with nested tabs)
 import AcademicSetup from "./pages/Admin/academicsetupLayout/academicsetup";
 import UniversitiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/University";
 import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/FacultyTable";
@@ -74,6 +71,7 @@ import DepartmentsTable from "./pages/Admin/academicsetupLayout/AcademicSetupTab
 import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/SemesterTable";
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
+import Courses from "./pages/lectures/courses/courses";
 
 function App() {
   return (
@@ -104,7 +102,7 @@ function App() {
           <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/courses" element={<Courses />} />
+          <Route path="/courses" element={<Courses/>} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
