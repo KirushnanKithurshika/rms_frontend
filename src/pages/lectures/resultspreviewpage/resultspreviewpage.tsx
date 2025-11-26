@@ -27,6 +27,7 @@ const ResultsPreviewPage = () => {
   const [courseResults, setCourseResults] = useState<CourseResultStatus[]>([]);
   const [loadingStatuses, setLoadingStatuses] = useState(false);
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [submittingId, setSubmittingId] = useState<number | null>(null);
 
   const handleBackdropClick = () => setSidebarOpen(false);
 
@@ -76,6 +77,17 @@ const ResultsPreviewPage = () => {
     if (!course) return;
 
     try {
+      setSubmittingId(courseId);
+
+      // 1) Compute results for this course allocation
+      //    (safe to call just before submit; backend uses courseAllocationId)
+      await api.post(
+        `/v1/results/compute-by-course-allocation/${courseId}`,
+        null,
+        { params: { courseAllocationId: courseId } }
+      );
+
+      // 2) Submit results for approval
       const body = { remarks: '' };
       const res = await api.post(
         `/v1/results/submit/by-allocation/${courseId}`,
@@ -89,8 +101,10 @@ const ResultsPreviewPage = () => {
       const msg =
         e?.response?.data?.message ||
         e?.message ||
-        'Failed to submit results for approval';
+        'Failed to compute or submit results for approval';
       toast.error(msg);
+    } finally {
+      setSubmittingId(null);
     }
   };
 
@@ -185,8 +199,11 @@ const ResultsPreviewPage = () => {
                               type="button"
                               className="btn-send-approval"
                               onClick={() => handleSendForApproval(course.id)}
+                              disabled={submittingId === course.id}
                             >
-                              Send for approval
+                              {submittingId === course.id
+                                ? 'Submitting...'
+                                : 'Send for approval'}
                             </button>
                           )
                         ) : (
