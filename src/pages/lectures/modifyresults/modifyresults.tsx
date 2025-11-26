@@ -61,6 +61,8 @@ const ModifyResults: React.FC = () => {
   const [assessmentHasResults, setAssessmentHasResults] = useState<
     boolean | null
   >(null);
+  const [isSubmitted, setIsSubmitted] = useState<boolean | null>(null);
+  const [submissionCheckLoading, setSubmissionCheckLoading] = useState(false);
 
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -108,10 +110,53 @@ const ModifyResults: React.FC = () => {
     load();
   }, [lecturerId]);
 
+  // Check if selected allocation is already submitted
+  useEffect(() => {
+    const checkSubmitted = async () => {
+      if (!selectedAllocationId) {
+        setIsSubmitted(null);
+        return;
+      }
+      setSubmissionCheckLoading(true);
+      try {
+        const res = await api.get(
+          `../course-allocations/${selectedAllocationId}/is-submitted`
+        );
+        const raw = res.data?.data ?? res.data;
+        const submitted = Boolean(raw);
+        setIsSubmitted(submitted);
+        if (submitted) {
+          setRows([]);
+          setAssessmentHasResults(null);
+          setError(
+            "You already submitted results for approval; editing is disabled."
+          );
+        } else {
+          // clear any previous submission error
+          setError(null);
+        }
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Failed to check submission status";
+        setError(msg);
+        toast.error(msg);
+      } finally {
+        setSubmissionCheckLoading(false);
+      }
+    };
+    checkSubmitted();
+  }, [selectedAllocationId]);
+
   // Load results preview for allocation + type, then build display rows
   useEffect(() => {
     const load = async () => {
       if (!selectedAllocationId) return;
+      if (isSubmitted) {
+        // already submitted; do not load results for editing
+        return;
+      }
       setLoading(true);
       setError(null);
       setAssessmentHasResults(null);
@@ -209,7 +254,7 @@ const ModifyResults: React.FC = () => {
       }
     };
     load();
-  }, [selectedAllocationId, activeType, selectedAssessmentId]);
+  }, [selectedAllocationId, activeType, selectedAssessmentId, isSubmitted]);
 
   const allocationOptions: Option[] = useMemo(
     () =>
@@ -430,9 +475,13 @@ const ModifyResults: React.FC = () => {
             </div>
 
             {loading && <p>Loading results...</p>}
+            {submissionCheckLoading && (
+              <p className="text-hint">Checking submission status...</p>
+            )}
             {error && <div className="error">{error}</div>}
             {!loading &&
               !error &&
+              !isSubmitted &&
               assessmentHasResults === false &&
               selectedAssessmentId && (
                 <div className="error">
@@ -442,6 +491,7 @@ const ModifyResults: React.FC = () => {
 
             {!loading &&
               !error &&
+              !isSubmitted &&
               selectedAllocationId &&
               selectedAssessmentId &&
               !!assessmentHasResults && (
