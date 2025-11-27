@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./activateaccount.css";
+import api from "../../services/api";
 
 
 const ActivateAccount: React.FC = () => {
