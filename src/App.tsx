@@ -38,6 +38,7 @@ import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTable
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
+import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
           <Route path="/student/student-dashboard" element={<StudentDashboard />} />
           <Route path="/verification" element={<TwoStepVerification />} />
+          <Route path="/activate-account" element={<ActivateAccount />} />
           <Route path="/account-setting" element={<AccountSettings />} />
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
           <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
