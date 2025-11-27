@@ -72,6 +72,7 @@ import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTable
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
+import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
 
 function App() {
   return (
