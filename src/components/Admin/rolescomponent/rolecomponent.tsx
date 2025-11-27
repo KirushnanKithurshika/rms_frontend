@@ -3,7 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { MdEdit, MdDelete } from "react-icons/md";
 import "./rolecomponent.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
 
 // Map HTTP errors to short, friendly messages
 const friendlyHttpError = async (res: Response) => {
@@ -38,7 +39,12 @@ const friendlyHttpError = async (res: Response) => {
   }
 };
 
-type Role = { id?: number; name: string; privileges?: { id: number; name: string }[]; privilegeIds?: number[] };
+type Role = {
+  id?: number;
+  name: string;
+  privileges?: { id: number; name: string }[];
+  privilegeIds?: number[];
+};
 type Priv = { id: number; name: string };
 
 const RolesPanel: React.FC = () => {
@@ -61,19 +67,25 @@ const RolesPanel: React.FC = () => {
     const token = localStorage.getItem("token") || "";
     const load = async () => {
       try {
-        let res = await fetch(`${API_BASE_URL}/v1/roles`, { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) {
-          // fallback to possible alt path
-          res = await fetch(`${API_BASE_URL}/v1/roles/GetAll`, { headers: { Authorization: `Bearer ${token}` } });
-        }
+        // fallback to possible alt path
+        let res = await fetch(`${API_BASE_URL}/v1/roles/GetAll`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         const json = await res.json().catch(() => ({}));
         const payload: any = json?.data;
-        const raw = Array.isArray(payload) ? payload : Array.isArray(payload?.content) ? payload.content : [];
+        const raw = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.content)
+          ? payload.content
+          : [];
         const mapped: Role[] = raw.map((r: any) => ({
           id: r.id,
           name: r.name,
           privileges: Array.isArray(r.privileges) ? r.privileges : [],
-          privilegeIds: Array.isArray(r.privileges) ? r.privileges.map((p: any) => p.id) : [],
+          privilegeIds: Array.isArray(r.privileges)
+            ? r.privileges.map((p: any) => p.id)
+            : [],
         }));
         setRoles(mapped);
         setActiveRole(mapped[0] || null);
@@ -160,24 +172,37 @@ const RolesPanel: React.FC = () => {
         const created: Role = {
           id: json?.data?.id,
           name: json?.data?.name,
-          privileges: Array.isArray(json?.data?.privileges) ? json.data.privileges : [],
-          privilegeIds: Array.isArray(json?.data?.privileges) ? json.data.privileges.map((p: any) => p.id) : [],
+          privileges: Array.isArray(json?.data?.privileges)
+            ? json.data.privileges
+            : [],
+          privilegeIds: Array.isArray(json?.data?.privileges)
+            ? json.data.privileges.map((p: any) => p.id)
+            : [],
         };
         setRoles((prev) => [...prev, created]);
         setActiveRole(created);
         setSuccess("Role created successfully");
       } else if (modalMode === "edit" && activeRole?.id) {
-        const res = await fetch(`${API_BASE_URL}/v1/roles/Update/${activeRole.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(selectedIds),
-        });
+        const res = await fetch(
+          `${API_BASE_URL}/v1/roles/Update/${activeRole.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(selectedIds),
+          }
+        );
         if (!res.ok) throw new Error(await friendlyHttpError(res));
-        setRoles((prev) => prev.map((r) => (r.id === activeRole.id ? { ...r, privilegeIds: [...selectedIds] } : r)));
-      setSuccess("Privileges updated successfully");
+        setRoles((prev) =>
+          prev.map((r) =>
+            r.id === activeRole.id
+              ? { ...r, privilegeIds: [...selectedIds] }
+              : r
+          )
+        );
+        setSuccess("Privileges updated successfully");
       }
       setTimeout(() => {
         setShowModal(false);
@@ -195,10 +220,13 @@ const RolesPanel: React.FC = () => {
     if (!confirm(`Delete role "${activeRole.name}"?`)) return;
     const token = localStorage.getItem("token") || "";
     try {
-      const res = await fetch(`${API_BASE_URL}/v1/roles/Delete/${activeRole.id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/v1/roles/Delete/${activeRole.id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (!res.ok) throw new Error(await friendlyHttpError(res));
       setRoles((prev) => prev.filter((r) => r.id !== activeRole.id));
       setActiveRole(roles.find((r) => r.id !== activeRole.id) || null);
@@ -211,7 +239,9 @@ const RolesPanel: React.FC = () => {
     <div className="roles-container">
       <div className="roles-subheader">
         <div className="left-group">
-          <button className="new-role-btn primary" onClick={openCreate}>Create Role</button>
+          <button className="new-role-btn primary" onClick={openCreate}>
+            Create Role
+          </button>
         </div>
       </div>
 
@@ -228,12 +258,14 @@ const RolesPanel: React.FC = () => {
           <tbody>
             {roles.map((r) => (
               <tr key={r.id ?? r.name} onClick={() => setActiveRole(r)}>
-                <td>{r.id ?? '-'}</td>
+                <td>{r.id ?? "-"}</td>
                 <td style={{ fontWeight: 500 }}>{r.name}</td>
                 <td>
                   <div className="priv-chips">
                     {(r.privileges || []).map((p) => (
-                      <span key={p.id} className="chip">{p.name}</span>
+                      <span key={p.id} className="chip">
+                        {p.name}
+                      </span>
                     ))}
                   </div>
                 </td>
@@ -241,12 +273,20 @@ const RolesPanel: React.FC = () => {
                   <MdEdit
                     title="Edit privileges"
                     className="icon edit-icon"
-                    onClick={(e) => { e.stopPropagation(); setActiveRole(r); openEdit(); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveRole(r);
+                      openEdit();
+                    }}
                   />
                   <MdDelete
                     title="Delete role"
                     className="icon delete-icon"
-                    onClick={(e) => { e.stopPropagation(); setActiveRole(r); handleDelete(); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveRole(r);
+                      handleDelete();
+                    }}
                     style={{ marginLeft: 10 }}
                   />
                 </td>
@@ -270,7 +310,9 @@ const RolesPanel: React.FC = () => {
             aria-modal="true"
             aria-labelledby="add-role-title"
           >
-            <h3 id="add-role-title">{modalMode === 'create' ? 'Add Role' : 'Edit Role Privileges'}</h3>
+            <h3 id="add-role-title">
+              {modalMode === "create" ? "Add Role" : "Edit Role Privileges"}
+            </h3>
 
             <label className="role-name-label">Role Name</label>
             <input
@@ -278,7 +320,7 @@ const RolesPanel: React.FC = () => {
               placeholder="Enter role name"
               value={roleName}
               onChange={(e) => setRoleName(e.target.value)}
-              disabled={submitting || modalMode === 'edit'}
+              disabled={submitting || modalMode === "edit"}
             />
 
             <div className="privileges-picker">
@@ -309,9 +351,17 @@ const RolesPanel: React.FC = () => {
               <button
                 className="add-btn"
                 onClick={handleSave}
-                disabled={submitting || (modalMode === 'create' && !roleName.trim())}
+                disabled={
+                  submitting || (modalMode === "create" && !roleName.trim())
+                }
               >
-                {submitting ? (modalMode === 'create' ? 'Creating...' : 'Saving...') : (modalMode === 'create' ? 'Add Role' : 'Save')}
+                {submitting
+                  ? modalMode === "create"
+                    ? "Creating..."
+                    : "Saving..."
+                  : modalMode === "create"
+                  ? "Add Role"
+                  : "Save"}
               </button>
               <button
                 className="cancel-btn"
