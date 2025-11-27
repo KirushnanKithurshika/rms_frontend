@@ -115,6 +115,7 @@ function App() {
           <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
 
       
+          <Route path="/student/student-dashboard" element={<StudentDashboard />} />
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
           <Route path="/student/transcript" element={<StudentTranscript />} />

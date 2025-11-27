@@ -117,7 +117,8 @@ export function RequireAllRoles({ roles }: { roles: string[] }) {
 export function RequireAnonymous() {
   const token = useAppSelector(selectToken);
   const authed = useMemo(() => isTokenValid(token), [token]);
-  return authed ? <Navigate to="/dashboard" replace /> : <Outlet />;
+  // If already authenticated, send them to role-based landing page
+  return authed ? <Navigate to="/landing" replace /> : <Outlet />;
 }
 
 // ---------- optional tiny helpers ----------
