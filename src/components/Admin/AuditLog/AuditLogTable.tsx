@@ -385,7 +385,7 @@ const AuditLogTable: React.FC = () => {
                         return <Tag color={color}>{a}</Tag>;
                     }}
                 />
-                <Table.Column<AuditLog> title="Name" dataIndex="changedBy" key="changedBy" ellipsis />
+                <Table.Column<AuditLog> title="Changed By" dataIndex="changedBy" key="changedBy" ellipsis />
                 <Table.Column<AuditLog>
                     title="Changed At"
                     dataIndex="changedAt"
