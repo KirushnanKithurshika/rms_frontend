@@ -14,7 +14,7 @@ import LoginPage from "./pages/loginpage/loginpage";
 import TwoStepVerification from "./pages/verificaionpage/verification";
 import ResetPassword from "./pages/ResetPasswordPage/resetpasswordpage";
 import ResetPasswordEmail from "./pages/ResetPasswordEmail/resetpasswordemail";
-import SetPassword from "./pages/SetPassword/SetPassword";
+
 
 // Lecturer
 import LecturerDashboard from "./pages/lectures/homePageLecturer/homeLecturer";
@@ -87,7 +87,7 @@ function App() {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/verification" element={<TwoStepVerification />} />
-          <Route path="/activate-account" element={<SetPassword />} />
+         
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/reset-password-mail" element={<ResetPasswordEmail />} />
         </Route>
