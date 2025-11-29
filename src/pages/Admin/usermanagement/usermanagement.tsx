@@ -103,7 +103,7 @@ const UserManagement: React.FC = () => {
             try {
                 const qs = new URLSearchParams({ page: String(page - 1), size: String(pageSize) });
                 if (searchTerm.trim()) qs.set('search', searchTerm.trim());
-                const res = await fetch(`${API_BASE_URL}/users?${qs.toString()}`, {
+                const res = await fetch(`${API_BASE_URL}/users/not-student?${qs.toString()}`, {
                     headers: {
                         Authorization: token ? `Bearer ${token}` : '',
                         'Content-Type': 'application/json',

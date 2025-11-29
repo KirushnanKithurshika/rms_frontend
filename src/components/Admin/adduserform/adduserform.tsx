@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./adduserform.css";
 import { FaArrowLeft, FaChevronDown, FaUpload, FaCheckCircle } from "react-icons/fa";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8087/api";
+
 interface AddUserFormProps {
   onClose: () => void;
   mode?: 'create' | 'edit';
@@ -35,27 +37,12 @@ interface Role {
   label: string;
 }
 
-const FALLBACK_ROLES: Role[] = [
-  { id: 1, label: "ADMIN" },
-  { id: 2, label: "LECTURER" },
-  { id: 3, label: "HOD" },
-  { id: 4, label: "DEAN" },
-  { id: 5, label: "EXAM_CONTROLLER" },
-  { id: 6, label: "EXAM_OFFICER" },
-  { id: 7, label: "QA_OFFICER" },
-  { id: 8, label: "AR_OFFICER" },
-  { id: 9, label: "REGISTRAR" },
-  { id: 10, label: "LIBRARIAN" },
-  { id: 11, label: "SYSTEM_ADMIN" },
-  { id: 12, label: "PROGRAM_COORDINATOR" },
-];
-
 const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate, onUpdate, mode = 'create', initial }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const [roles, setRoles] = useState<Role[]>(FALLBACK_ROLES);
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(FALLBACK_ROLES[0].id);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [rolesOpen, setRolesOpen] = useState(false);
 
   const [fullName, setFullName] = useState("");
@@ -69,6 +56,50 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onClose, onCreate, onUpdate, 
 
   const selectedRoleLabel =
     roles.find((r) => r.id === selectedRoleId)?.label ?? "Select a role";
+
+  // Fetch roles for dropdown
+  useEffect(() => {
+    const token = localStorage.getItem("token") || "";
+    const loadRoles = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/v1/roles/GetAll`, {
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
+        });
+        const json = await res.json().catch(() => ({}));
+        const payload: any = json?.data ?? json;
+        const raw = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.content)
+          ? payload.content
+          : [];
+        const mapped: Role[] = raw
+          .map((r: any) => {
+            const label = String(
+              r?.name ?? r?.roleName ?? r?.label ?? r?.code ?? ""
+            ).trim();
+            const id =
+              typeof r?.id === "number"
+                ? r.id
+                : Number(r?.id ?? r?.roleId ?? r?.code ?? 0) || undefined;
+            if (!id || !label) return null;
+            return { id, label };
+          })
+          .filter((r): r is Role => Boolean(r?.id && r?.label))
+          .filter((r) => r.label.toUpperCase() !== "STUDENT");
+
+        setRoles(mapped);
+        setSelectedRoleId((prev) => {
+          if (prev != null && mapped.some((r) => r.id === prev)) return prev;
+          return mapped[0]?.id ?? null;
+        });
+      } catch {
+        setRoles([]);
+        setSelectedRoleId(null);
+      }
+    };
+
+    loadRoles();
+  }, []);
 
   // Prefill when editing
   useEffect(() => {
