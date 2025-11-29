@@ -366,6 +366,12 @@ const AuditLogTable: React.FC = () => {
                 scroll={{ x: true }}
             >
                 <Table.Column<AuditLog>
+                    title="No."
+                    key="index"
+                    width={70}
+                    render={(_, __, index) => (page - 1) * pageSize + index + 1}
+                />
+                <Table.Column<AuditLog>
                     title="Entity"
                     dataIndex="entity"
                     key="entity"
