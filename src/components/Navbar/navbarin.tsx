@@ -5,10 +5,11 @@ import MobileLogo from "../../assets/SRMS_mobile_logo.png";
 import { FaBell, FaUserCircle } from "react-icons/fa";
 import UserDropdown from "../UserDropdown/userdropdown";
 import { useAppSelector } from "../../app/hooks";
-import { selectUsername } from "../../features/auth/selectors";
+import { selectUsername, selectUserRoles } from "../../features/auth/selectors";
 
 const Navbarin: React.FC = () => {
   const username = useAppSelector(selectUsername);
+  const userRoles = useAppSelector(selectUserRoles);
   const [isMobile, setIsMobile] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -47,9 +48,12 @@ const Navbarin: React.FC = () => {
         />
       </div>
 
-      <div className="navbar-center">Welcome {username}!</div>
-
-      <div className="navbar-right">
+      <div className="flex items-center justify-center gap-2 px-4 py-2 text-base sm:text-lg md:text-xl">
+        <span className="text-gray-500 font-light tracking-wide">Welcome </span>
+        <span className="font-bold text-transparent bg-clip-text bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 capitalize animate-pulse">
+          {userRoles}
+        </span>
+      </div>      <div className="navbar-right">
         <FaBell className="iconbell" />
 
         <div className="dropdown" ref={dropdownRef}>
