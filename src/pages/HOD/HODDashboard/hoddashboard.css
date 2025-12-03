@@ -45,19 +45,11 @@
   display: inline-block;
 }
 
-.hod-pending-label {
-  font-size: 11px;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background-color: #ffe6b3;
-  color: #8a5a00;
-}
 
 
 .pa-button.hod-pending {
-  background-color: #cbd2e0;
-  color: #444;
+ background-color: #ffe6b3;
+  color: #8a5a00;
   cursor: default;
 }
 

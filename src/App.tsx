@@ -39,6 +39,7 @@ import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
 import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
+import HODDashboard from "./pages/hod/HODDashboard/HODDashboard";
 
 function App() {
   return (
@@ -85,7 +86,7 @@ function App() {
           <Route path="/signatureboard" element={<SignatureBoard />} />
           <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
-
+ <Route path="/hod-approval" element={<HODDashboard/>} />
          
           <Route path="/admin/academicsetup" element={<AcademicSetup />}>
             <Route index element={<Navigate to="universities" replace />} />

@@ -3,14 +3,13 @@ import Navbarin from "../../../components/Navbar/navbarin";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav";
 import { FaRegFilePdf } from "react-icons/fa";
 import "./hoddashboard.css";
+import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf";
 
-import FinalResultsHOD from "../../../components/HOD/HODViewResultsSheet/HODViewResultsSheet";
+import FinalResultsHOD from "../../../components/Hod/HODViewResultsSheet/HODViewResultsSheet";
 import type {
   SubjectMeta,
   StudentResult,
-} from "../../../components/HOD/HODViewResultsSheet/HODViewResultsSheet";
-
-/* -------- Types -------- */
+} from "../../../components/Hod/HODViewResultsSheet/HODViewResultsSheet";
 
 interface HODResultSheet {
   id: number;
@@ -29,8 +28,6 @@ type CourseSummary = {
   batch: string;
   semester: "Semester 01" | "Semester 02";
 };
-
-/* ---------- All current subjects (for pending detection) ---------- */
 
 const allCourses: CourseSummary[] = [
   {
@@ -114,24 +111,9 @@ const HODDashboard: React.FC = () => {
   const [sheets, setSheets] = useState<HODResultSheet[]>(initialSheets);
   const [activeSheetId, setActiveSheetId] = useState<number | null>(null);
 
-
-  const semester01 = sheets.filter((s) => s.semester === "Semester 01");
-  const semester02 = sheets.filter((s) => s.semester === "Semester 02");
-
   const activeSheet = activeSheetId
     ? sheets.find((s) => s.id === activeSheetId) || null
     : null;
-
- 
-  const pendingCourses = allCourses.filter((course) => {
-    const sheet = sheets.find(
-      (s) =>
-        s.courseCode === course.code &&
-        s.semester === course.semester &&
-        s.batch === course.batch
-    );
-    return !sheet; 
-  });
 
   const openSheet = (sheet: HODResultSheet) => {
     setActiveSheetId(sheet.id);
@@ -139,9 +121,7 @@ const HODDashboard: React.FC = () => {
 
   const handleApproveSheet = (sheetId: number) => {
     setSheets((prev) =>
-      prev.map((s) =>
-        s.id === sheetId ? { ...s, approved: true } : s
-      )
+      prev.map((s) => (s.id === sheetId ? { ...s, approved: true } : s))
     );
     setActiveSheetId(null);
   };
@@ -150,22 +130,108 @@ const HODDashboard: React.FC = () => {
     setActiveSheetId(null);
   };
 
+  const getCoursesBySemester = (semester: "Semester 01" | "Semester 02") =>
+    allCourses.filter((c) => c.semester === semester);
+
+  // top-bar approve button: uses active sheet
+  const handleTopBarApprove = () => {
+    if (!activeSheet) return;
+    handleApproveSheet(activeSheet.id);
+    alert("Approved successfully!");
+  };
+
+  // top-bar download button: generate PDF from #results-pdf-root
+  const handleDownloadPdf = async () => {
+    if (!activeSheet) return;
+
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => resolve())
+    );
+
+    await downloadExactHtmlPdf(
+      "#results-pdf-root",
+      `${activeSheet.courseCode}-${activeSheet.courseTitle}.pdf`
+    );
+  };
+
+  const renderSemesterSection = (semester: "Semester 01" | "Semester 02") => {
+    const courses = getCoursesBySemester(semester);
+
+    return (
+      <section className="hod-semester-section">
+        <div className="hod-semester-header">
+          <span>{semester}</span>
+          <span className="hod-batch-label">22nd Batch</span>
+        </div>
+
+        <section className="pa-scope pa-wrap">
+          <div className="pa-list">
+            {courses.length === 0 && (
+              <span className="hod-empty-placeholder" />
+            )}
+
+            {courses.map((course) => {
+              const sheet = sheets.find(
+                (s) =>
+                  s.courseCode === course.code &&
+                  s.semester === course.semester &&
+                  s.batch === course.batch
+              );
+
+              const isPending = !sheet;
+
+              return (
+                <div
+                  key={`${semester}-${course.code}`}
+                  className="pa-card"
+                  role="group"
+                  aria-label={`${course.code}-${course.title}`}
+                >
+                  <div className="pa-card-left">
+                    <FaRegFilePdf className="pa-icon" aria-hidden="true" />
+                    <div className="pa-title">
+                      {course.code}-{course.title}
+                    </div>
+                  </div>
+
+                  <button
+                    className={`pa-button ${
+                      sheet?.approved
+                        ? "hod-approved"
+                        : isPending
+                        ? "hod-pending"
+                        : ""
+                    }`}
+                    onClick={() => sheet && !sheet.approved && openSheet(sheet)}
+                    disabled={!sheet || sheet.approved}
+                  >
+                    {isPending
+                      ? "Pending"
+                      : sheet.approved
+                      ? "Approved"
+                      : "View & Approve"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </section>
+    );
+  };
+
   return (
     <div className="lec-dashboard-container">
-
       <div className="hod-role-label">HOD</div>
-
 
       <div className="nav">
         <Navbarin />
       </div>
 
-  
       <div className="breadcrumb">
         <BreadcrumbNav />
       </div>
 
-     
       <div className="dashboard-content-approval">
         <div className="main-area-approval">
           <div className="card-approval">
@@ -174,139 +240,10 @@ const HODDashboard: React.FC = () => {
                 <span className="tAR-heading">Pending Results Approval</span>
               </div>
 
-          
               {!activeSheet && (
                 <div className="tAR-inline-body-results">
-               
-                  {pendingCourses.length > 0 && (
-                    <section className="hod-semester-section">
-                      <div className="hod-semester-header">
-                        <span>Pending Result Subjects</span>
-                        <span className="hod-batch-label">22nd Batch</span>
-                      </div>
-
-                      <section className="pa-scope pa-wrap">
-                        <div className="pa-list">
-                          {pendingCourses.map((course) => (
-                            <div
-                              key={`pending-${course.semester}-${course.code}`}
-                              className="pa-card"
-                              role="group"
-                              aria-label={`${course.code}-${course.title}`}
-                            >
-                              <div className="pa-card-left">
-                                <FaRegFilePdf
-                                  className="pa-icon"
-                                  aria-hidden="true"
-                                />
-                                <div className="pa-title">
-                                  {course.code}-{course.title}
-                                  <span className="hod-pending-label">
-                                    Pending
-                                  </span>
-                                </div>
-                              </div>
-
-                              <button
-                                className="pa-button hod-pending"
-                                disabled
-                              >
-                                Pending
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </section>
-                    </section>
-                  )}
-
-                  <section className="hod-semester-section">
-                    <div className="hod-semester-header">
-                      <span>Semester 01</span>
-                      <span className="hod-batch-label">22nd Batch</span>
-                    </div>
-
-                    <section className="pa-scope pa-wrap">
-                      <div className="pa-list">
-                        {semester01.map((sheet) => (
-                          <div
-                            key={sheet.id}
-                            className="pa-card"
-                            role="group"
-                            aria-label={`${sheet.courseCode}-${sheet.courseTitle}`}
-                          >
-                            <div className="pa-card-left">
-                              <FaRegFilePdf
-                                className="pa-icon"
-                                aria-hidden="true"
-                              />
-                              <div className="pa-title">
-                                {sheet.courseCode}-{sheet.courseTitle}
-                              </div>
-                            </div>
-
-                            <button
-                              className={`pa-button ${
-                                sheet.approved ? "hod-approved" : ""
-                              }`}
-                              onClick={() =>
-                                !sheet.approved && openSheet(sheet)
-                              }
-                              disabled={sheet.approved}
-                            >
-                              {sheet.approved ? "Approved" : "View & Approve"}
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  </section>
-
-                  
-                  <section className="hod-semester-section">
-                    <div className="hod-semester-header">
-                      <span>Semester 02</span>
-                      <span className="hod-batch-label">22nd Batch</span>
-                    </div>
-
-                    <section className="pa-scope pa-wrap">
-                      <div className="pa-list">
-                        {semester02.length === 0 && (
-                          <span className="hod-empty-placeholder" />
-                        )}
-                        {semester02.map((sheet) => (
-                          <div
-                            key={sheet.id}
-                            className="pa-card"
-                            role="group"
-                            aria-label={`${sheet.courseCode}-${sheet.courseTitle}`}
-                          >
-                            <div className="pa-card-left">
-                              <FaRegFilePdf
-                                className="pa-icon"
-                                aria-hidden="true"
-                              />
-                              <div className="pa-title">
-                                {sheet.courseCode}-{sheet.courseTitle}
-                              </div>
-                            </div>
-
-                            <button
-                              className={`pa-button ${
-                                sheet.approved ? "hod-approved" : ""
-                              }`}
-                              onClick={() =>
-                                !sheet.approved && openSheet(sheet)
-                              }
-                              disabled={sheet.approved}
-                            >
-                              {sheet.approved ? "Approved" : "View & Approve"}
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  </section>
+                  {renderSemesterSection("Semester 01")}
+                  {renderSemesterSection("Semester 02")}
                 </div>
               )}
 
@@ -320,6 +257,24 @@ const HODDashboard: React.FC = () => {
                         onClick={handleBackFromResults}
                       >
                         ← Back
+                      </button>
+
+                      <div className="tAR-inline-spacer" />
+
+                      <button
+                        type="button"
+                        className="taAR-btn taAR-btn--ghost"
+                        onClick={handleDownloadPdf}
+                      >
+                        Download PDF
+                      </button>
+
+                      <button
+                        type="button"
+                        className="taAR-btn"
+                        onClick={handleTopBarApprove}
+                      >
+                        Approve
                       </button>
                     </div>
                   </div>
