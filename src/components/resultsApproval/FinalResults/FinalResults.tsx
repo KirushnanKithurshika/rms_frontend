@@ -27,10 +27,10 @@ type ResultApprovalViewerProps = {
   onDownload?: (signedPdfBlobUrl?: string) => void;
   approveLabel?: string;
   autoDownloadAfterSign?: boolean;
-  onBack?: () => void; // optional custom back handler (parent can override)
+  onBack?: () => void;
 };
 
-/* ----------------- Helpers ----------------- */
+
 
 function dataUrlToUint8(dataUrl: string) {
   const m = dataUrl.match(/^data:(.*?);base64,(.*)$/);
@@ -224,7 +224,7 @@ const SignatureDialog: React.FC<{
   );
 };
 
-/* ----------------- Main Viewer ----------------- */
+
 
 const ResultApprovalViewer: React.FC<ResultApprovalViewerProps> = ({
   pdfUrl,
