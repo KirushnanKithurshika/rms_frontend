@@ -3,10 +3,10 @@ import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import LectureSidebar from "../../../components/sidebarlecturer/coursesidebar.tsx";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
 import CourseSearchBarlechome from "../../../components/SearchDropdown/searchdropdown.tsx";
-import "./modifyresults.css"; // add styles as needed
+import "./modifyresults.css"; 
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
 
-// The imported component may not have proper prop types; create a loose-typed alias to allow passing props here.
+
 const CourseSearchBarlechomeAny = CourseSearchBarlechome as unknown as React.ComponentType<any>;
 
 type Course = {
@@ -165,7 +165,7 @@ const ModifyResults: React.FC = () => {
                 <div className="dashboard-content">
                     <div className="card">
                         <CourseSearchBarlechomeAny
-                            // assume this component accepts onCourseSelect
+                    
                             onCourseSelect={(c: Course) => setSelectedCourse(c)}
                             selectedCourse={selectedCourse}
                         />
@@ -219,8 +219,7 @@ const ModifyResults: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Edit Modal */}
-                    
+
                 </div>
             </div>
         </div>
