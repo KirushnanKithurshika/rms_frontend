@@ -5,11 +5,11 @@ import { FaRegFilePdf } from "react-icons/fa";
 import "./hoddashboard.css";
 import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf";
 
-import FinalResultsHOD from "../../../components/Hod/HODViewResultsSheet/HODViewResultsSheet";
+import FinalResultsHOD from "../../../components/HOD/HODViewResultsSheet/HODViewResultsSheet";
 import type {
   SubjectMeta,
   StudentResult,
-} from "../../../components/Hod/HODViewResultsSheet/HODViewResultsSheet";
+} from "../../../components/HOD/HODViewResultsSheet/HODViewResultsSheet";
 
 interface HODResultSheet {
   id: number;
@@ -56,7 +56,7 @@ const allCourses: CourseSummary[] = [
   },
 ];
 
-/* ---------- Initial uploaded result sheets (dummy data) ---------- */
+
 
 const initialSheets: HODResultSheet[] = [
   {
@@ -133,14 +133,14 @@ const HODDashboard: React.FC = () => {
   const getCoursesBySemester = (semester: "Semester 01" | "Semester 02") =>
     allCourses.filter((c) => c.semester === semester);
 
-  // top-bar approve button: uses active sheet
+ 
   const handleTopBarApprove = () => {
     if (!activeSheet) return;
     handleApproveSheet(activeSheet.id);
     alert("Approved successfully!");
   };
 
-  // top-bar download button: generate PDF from #results-pdf-root
+
   const handleDownloadPdf = async () => {
     if (!activeSheet) return;
 

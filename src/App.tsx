@@ -39,7 +39,7 @@ import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
 import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
-import HODDashboard from "./pages/hod/HODDashboard/HODDashboard";
+import HODDashboard from "./pages/HOD/HODDashboard/HODDashboard";
 
 function App() {
   return (

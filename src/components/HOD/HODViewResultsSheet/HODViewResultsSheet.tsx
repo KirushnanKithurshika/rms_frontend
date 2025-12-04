@@ -2,7 +2,6 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
-
 export type SubjectMeta = {
   code: string;
   title: string;
@@ -18,7 +17,7 @@ export type StudentResult = {
   index: number;
   regNo: string;
   name: string;
-  grade: string; // A, A-, B+, C, etc.
+  grade: string; 
 };
 
 type FinalResultsProps = {
@@ -56,6 +55,9 @@ const FinalResultsHOD: React.FC<FinalResultsProps> = ({
       { index: 4, regNo: "EG/2020/4030", name: "Pamith P.", grade: "C" },
     ];
 
+  const gradeRow = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "E", "N", "W"];
+  const gpRow = ["4.0", "4.0", "3.7", "3.3", "3.0", "2.7", "2.3", "2.0", "1.7", "0.0", "-", "-"];
+
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -73,83 +75,118 @@ const FinalResultsHOD: React.FC<FinalResultsProps> = ({
 
   return (
     <section className="sr-shell">
-      <header className="sr-header">
-        <button
-          className="sr-back-btn"
-          onClick={handleBack}
-          aria-label="Back"
-          title="Back"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </button>
+     
+      
 
-        <div className="sr-header-main">
-          <h2 className="sr-title">
-            {meta.code} — {meta.title}
-          </h2>
-          <div className="sr-meta-row">
-            <span>{meta.batch}</span>
-            <span>• {meta.semester}</span>
-            {meta.academicYear && <span>• {meta.academicYear}</span>}
-          </div>
-        </div>
-
-        <div className="sr-header-right">
-          {meta.degreeProgram && (
-            <div className="sr-detail-line">{meta.degreeProgram}</div>
-          )}
-          {meta.coordinator && (
-            <div className="sr-detail-line">
-              Coordinator: {meta.coordinator}
+     
+      <section className="sheet a4" id="results-pdf-root">
+        <div role="document" aria-label="A4 Results Sheet">
+          <div className="rs-top avoid-break">
+         
+            <div className="hdr uni">Faculty of Engineering, University of Ruhuna</div>
+            {meta.degreeProgram && (
+              <div className="hdr under">{meta.degreeProgram}</div>
+            )}
+            <div className="hdr spec">
+              {meta.code} — {meta.title}
             </div>
-          )}
-          {meta.credits != null && (
-            <div className="sr-detail-line">Credits: {meta.credits}</div>
-          )}
-          {/* Approve button */}
-          <button
-            className={`sr-approve-btn ${
-              isApproved ? "sr-approve-btn--done" : ""
-            }`}
-            onClick={handleApproveClick}
-            disabled={isApproved}
-          >
-            {isApproved ? "Approved" : "Approve"}
-          </button>
-        </div>
-      </header>
+            <div className="hdr title">
+              Final Results Sheet ({meta.batch}, {meta.semester})
+            </div>
+            {meta.academicYear && (
+              <div className="hdr under">Academic Year: {meta.academicYear}</div>
+            )}
 
-      <main className="sr-main">
-        <div className="sr-card">
-          <div className="sr-card-header">
-            <h3>Final Results</h3>
-            <span className="sr-count">{rows.length} Students</span>
-          </div>
+  
+            <div className="section-title avoid-break">Course / Subject Information</div>
+            <table className="list avoid-break meta-table">
+              <tbody>
+                <tr>
+                  <td className="meta-label">Course Code</td>
+                  <td className="meta-value">{meta.code}</td>
+                  <td className="meta-label">Course Title</td>
+                  <td className="meta-value">{meta.title}</td>
+                </tr>
+                <tr>
+                  <td className="meta-label">Batch</td>
+                  <td className="meta-value">{meta.batch}</td>
+                  <td className="meta-label">Semester</td>
+                  <td className="meta-value">{meta.semester}</td>
+                </tr>
+                {meta.academicYear && (
+                  <tr>
+                    <td className="meta-label">Academic Year</td>
+                    <td className="meta-value">{meta.academicYear}</td>
+                    <td className="meta-label">Credits</td>
+                    <td className="meta-value">{meta.credits ?? "-"}</td>
+                  </tr>
+                )}
+                {meta.coordinator && (
+                  <tr>
+                    <td className="meta-label">Course Coordinator</td>
+                    <td className="meta-value" colSpan={3}>
+                      {meta.coordinator}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
 
-          <div className="sr-table-wrapper">
-            <table className="sr-table">
+           
+            <div className="section-title avoid-break">
+              Final Grades – {rows.length} Students
+            </div>
+
+            <div className="rs-box">
+         
+              
+
+      
+              <table className="list avoid-break grades-table">
+                <thead>
+                  <tr>
+                    <th className="legend-head">Grade</th>
+                    {gradeRow.map((g) => (
+                      <th key={g} className="legend-cell">
+                        {g}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="legend-head">Grade Point</td>
+                    {gpRow.map((g, i) => (
+                      <td key={i} className="legend-cell">
+                        {g}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+
+              <table className="results-table clean-table">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Reg. No</th>
-                  <th>Name</th>
-                  <th>Grade</th>
+                  <th className="center">Student Reg.No</th>
+                  <th className="center">Name</th>
+                  <th className="center">Result</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
-                  <tr key={r.index}>
-                    <td>{r.index}</td>
-                    <td>{r.regNo}</td>
-                    <td>{r.name}</td>
-                    <td className="sr-grade-cell">{r.grade}</td>
+                {rows.map((r, idx) => (
+                  <tr key={idx} className={idx % 2 === 0 ? "row-light" : "row-dark"}>
+                    <td className="center">{r.regNo}</td>
+                    <td className="center">{r.name}</td>
+                    <td className="center">{r.grade}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
-      </main>
+      </section>
     </section>
   );
 };
