@@ -47,6 +47,7 @@ const breadcrumbMap: CrumbMap = {
   "/results-approval-requests": "Results Approval Requests",
   "/lec-announcement-page": "Lecturer Announcements",
   "/lecturer/student-management":"Student Management",
+  "/hod-approval":"Results Approval"
 };
 
 const BreadcrumbNav: React.FC = () => {

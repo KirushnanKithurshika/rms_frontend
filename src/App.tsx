@@ -72,6 +72,8 @@ import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTable
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
+import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
+import HODDashboard from "./pages/HOD/HODDashboard/HODDashboard";
 
 function App() {
   return (
@@ -95,6 +97,7 @@ function App() {
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/landing" element={<LandingRedirect />} />
           <Route path="/drop" element={<UserDropdown />} />
+          <Route path="/activate-account" element={<ActivateAccount />} />
           <Route path="/account-setting" element={<AccountSettings />} />
 
           {/* Lecturer routes */}
@@ -139,7 +142,7 @@ function App() {
           />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
         </Route>
-
+ <Route path="/hod-approval" element={<HODDashboard/>} />
         {/* ------------------ ADMIN-ONLY AREA ------------------ */}
         <Route element={<RequireRole roles={["ADMIN"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
