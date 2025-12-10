@@ -72,6 +72,7 @@ import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTable
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
+import TranscriptVerifyPage from "./pages/TranscriptVerify/TranscriptVerifyPage";
 
 function App() {
   return (
@@ -79,6 +80,8 @@ function App() {
       <Routes>
         {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
         <Route path="/not-authorized" element={<NotAuthorized />} />
+        {/* Public transcript verification (QR landing) */}
+        <Route path="/verify-transcript" element={<TranscriptVerifyPage />} />
 
         {/* Welcome + auth pages: only for anonymous users */}
         <Route element={<RequireAnonymous />}>
