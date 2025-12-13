@@ -2,13 +2,17 @@
 import React, { useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
-import { selectPrivileges } from "../features/auth/selectors";
+import { selectPrivileges, selectUserRoles } from "../features/auth/selectors";
 import { resolveLandingPath } from "./landing";
 
 const LandingRedirect: React.FC = () => {
   const privs = useAppSelector(selectPrivileges);
+  const roles = useAppSelector(selectUserRoles);
   const location = useLocation();
-  const path = useMemo(() => resolveLandingPath(privs), [privs]);
+  const path = useMemo(
+    () => resolveLandingPath(privs, roles),
+    [privs, roles]
+  );
 
   // Avoid redirect loops if we're somehow already there
   if (location.pathname === path) return null;

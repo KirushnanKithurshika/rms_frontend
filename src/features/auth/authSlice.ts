@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { jwtDecode } from "jwt-decode";
 import type { AuthState, LoginPayload, VerifyOtpPayload } from "./types";
 import api from "../../services/api";
 import { showSuccess, showError } from "../../utils/toast";
@@ -15,9 +16,7 @@ type JwtClaims = {
 function decodeJwt(token: string | null): JwtClaims | null {
   if (!token) return null;
   try {
-    const [, payload] = token.split(".");
-    if (!payload) return null;
-    return JSON.parse(atob(payload)) as JwtClaims;
+    return jwtDecode<JwtClaims>(token);
   } catch {
     return null;
   }

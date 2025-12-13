@@ -45,15 +45,19 @@ function rolesFromToken(token: string | null): string[] {
 function hasAny(required: string[], mine: string[]): boolean {
   if (!required?.length) return true; // no requirement
   if (!mine?.length) return false;
-  const set = new Set(mine);
-  return required.some((r) => set.has(r));
+  const set = new Set(mine.map((r) => normalizeRole(r)));
+  return required.some((r) => set.has(normalizeRole(r)));
 }
 
 function hasAll(required: string[], mine: string[]): boolean {
   if (!required?.length) return true; // no requirement
   if (!mine?.length) return false;
-  const set = new Set(mine);
-  return required.every((r) => set.has(r));
+  const set = new Set(mine.map((r) => normalizeRole(r)));
+  return required.every((r) => set.has(normalizeRole(r)));
+}
+
+function normalizeRole(role: string | undefined | null): string {
+  return (role || "").trim().toUpperCase().replace(/^ROLE_/, "");
 }
 
 // ---------- Guards ----------
@@ -82,7 +86,8 @@ export function RequireRole({ roles }: { roles: string[] }) {
 
   // Prefer roles already stored in Redux (from /auth/me), fallback to JWT
   const reduxRoles = useAppSelector(selectUserRoles);
-  const effectiveRoles = reduxRoles ?? [];
+  const effectiveRoles =
+    reduxRoles && reduxRoles.length > 0 ? reduxRoles : rolesFromToken(token);
 
   const allowed = useMemo(
     () => hasAny(roles, effectiveRoles),
@@ -103,7 +108,8 @@ export function RequireAllRoles({ roles }: { roles: string[] }) {
   }
 
   const reduxRoles = useAppSelector(selectUserRoles);
-  const effectiveRoles = reduxRoles ?? [];
+  const effectiveRoles =
+    reduxRoles && reduxRoles.length > 0 ? reduxRoles : rolesFromToken(token);
 
   const allowed = useMemo(
     () => hasAll(roles, effectiveRoles),

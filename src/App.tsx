@@ -141,8 +141,10 @@ function App() {
             element={<ResultsApprovalPage />}
           />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
+          <Route element={<RequireRole roles={["HOD"]} />}>
+            <Route path="/hod-approval" element={<HODDashboard />} />
+          </Route>
         </Route>
- <Route path="/hod-approval" element={<HODDashboard/>} />
         {/* ------------------ ADMIN-ONLY AREA ------------------ */}
         <Route element={<RequireRole roles={["ADMIN"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
