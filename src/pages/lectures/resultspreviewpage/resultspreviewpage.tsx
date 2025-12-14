@@ -81,7 +81,7 @@ const ResultsPreviewPage = () => {
         <div className="dashboard-content">
           <div className="dashboard-cards-preview">
             <div className="cardcourse">
-              {/* ---- Uploaded Results Status Block ---- */}
+          
               <div className="Uploaded-results-status">
                 <div className="uploaded-header">
                   <h2 className="uploaded-title">Your Course Results Status</h2>

@@ -58,8 +58,8 @@ const StudentResultsSheet: React.FC<Props> = ({
   const handlePrint = () => window.print();
 
   return (
-    <div className="results-page">
-      {/* The sheet sits inside the page scroller */}
+    <div className="results-page-students">
+
       <div className="sheet-scroller">
         <div className="a4-sheet" role="document" aria-label="A4 Results Sheet">
           <div className="rs-top">
