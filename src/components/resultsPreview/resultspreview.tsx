@@ -1,8 +1,7 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import "./resultspreview.css";
 import Logo from "../../assets/ResultsP_Logo.png";
+import { downloadResultsSheetPdf } from "../../utils/downloadResultsSheetPreview"; 
 
 // Dummy Data
 const dummyData = [
@@ -87,10 +86,14 @@ const CustomDropdownVL: React.FC<{
   );
 };
 
-/** ------- Main Component ------- */
+
 const ResultsPreview: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"CA" | "FE">("CA");
   const [selectedCourse, setSelectedCourse] = useState(courses[0]);
+
+
+  const caPageRef = useRef<HTMLDivElement | null>(null);
+  const fePageRef = useRef<HTMLDivElement | null>(null);
 
   const courseOptions: Option[] = useMemo(
     () => courses.map((c) => ({ value: c.code, label: `${c.code} - ${c.name}` })),
@@ -102,32 +105,14 @@ const ResultsPreview: React.FC = () => {
     if (course) setSelectedCourse(course);
   };
 
-  // -------- PDF Export (only results content) ----------
   const handleExportPDF = async () => {
-    const input = document.querySelector(".rp-results-content") as HTMLElement;
-    if (!input) return;
+    const node = activeTab === "CA" ? caPageRef.current : fePageRef.current;
+    if (!node) return;
 
-    const canvas = await html2canvas(input, { scale: 3, useCORS: true });
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
-
-    let heightLeft = pdfHeight;
-    let position = 0;
-
-    while (heightLeft > 0) {
-      pdf.addImage(imgData, "PNG", 0, position, pageWidth, pdfHeight);
-      heightLeft -= pageHeight;
-      position -= pageHeight;
-      if (heightLeft > 0) pdf.addPage();
-    }
-
-    pdf.save(`${selectedCourse.code}_Results.pdf`);
+    await downloadResultsSheetPdf(
+      node,
+      `${selectedCourse.code}_${activeTab}_ResultsSheet.pdf`
+    );
   };
 
   return (
@@ -137,14 +122,14 @@ const ResultsPreview: React.FC = () => {
         <h3 className="rp-title">Results Preview</h3>
         <div className="rp-select-row">
           <div className="rp-select">
-          <CustomDropdownVL
-            label="Select Course"
-            options={courseOptions}
-            value={selectedCourse.code}
-            placeholder="Select Course"
-            onChange={handleCourseChange}
-          />
-        </div>
+            <CustomDropdownVL
+              label="Select Course"
+              options={courseOptions}
+              value={selectedCourse.code}
+              placeholder="Select Course"
+              onChange={handleCourseChange}
+            />
+          </div>
         </div>
         <hr className="rp-divider" />
       </div>
@@ -168,12 +153,11 @@ const ResultsPreview: React.FC = () => {
         </button>
       </div>
 
-      {/* Results Page */}
       <div className="rp-page">
         {activeTab === "CA" && (
           <div className="rp-card">
             <div className="rp-results-content">
-              <div className="results-page">
+              <div className="results-page-preview" ref={caPageRef}>
                 <div className="rp-card-header">
                   <div className="rp-section">
                     <h4>{selectedCourse.name}</h4>
@@ -191,6 +175,7 @@ const ResultsPreview: React.FC = () => {
                     </p>
                   </div>
                 </div>
+
                 <div className="rp-table-wrap">
                   <table className="rp-table">
                     <thead>
@@ -207,7 +192,7 @@ const ResultsPreview: React.FC = () => {
                     </thead>
                     <tbody>
                       {dummyData.map((s, idx) => (
-                        <tr key={s.id}>
+                        <tr key={s.id} className="avoid-break">
                           <td>{idx + 1}</td>
                           <td>{s.id}</td>
                           <td>{s.name}</td>
@@ -221,7 +206,10 @@ const ResultsPreview: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-                <footer className="rp-print-footer">Printed on: {new Date().toLocaleDateString()}</footer>
+
+                <footer className="rp-print-footer">
+                  Printed on: {new Date().toLocaleDateString()}
+                </footer>
               </div>
             </div>
           </div>
@@ -230,7 +218,7 @@ const ResultsPreview: React.FC = () => {
         {activeTab === "FE" && (
           <div className="rp-card">
             <div className="rp-results-content">
-              <div className="results-page">
+              <div className="results-page" ref={fePageRef}>
                 <div className="rp-card-header">
                   <div className="rp-section">
                     <h4>{selectedCourse.name}</h4>
@@ -248,6 +236,7 @@ const ResultsPreview: React.FC = () => {
                     </p>
                   </div>
                 </div>
+
                 <div className="rp-table-wrap">
                   <table className="rp-table">
                     <thead>
@@ -263,7 +252,7 @@ const ResultsPreview: React.FC = () => {
                       {dummyData.map((s, idx) => {
                         const fe = Math.max(0, (s.total ?? 0) - 40);
                         return (
-                          <tr key={s.id}>
+                          <tr key={s.id} className="avoid-break">
                             <td>{idx + 1}</td>
                             <td>{s.id}</td>
                             <td>{s.name}</td>
@@ -275,7 +264,10 @@ const ResultsPreview: React.FC = () => {
                     </tbody>
                   </table>
                 </div>
-                <footer className="rp-print-footer">Printed on: {new Date().toLocaleDateString()}</footer>
+
+                <footer className="rp-print-footer">
+                  Printed on: {new Date().toLocaleDateString()}
+                </footer>
               </div>
             </div>
           </div>

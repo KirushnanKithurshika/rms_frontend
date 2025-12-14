@@ -42,7 +42,7 @@ const StudentsConAss: React.FC<Props> = ({
   const getStatus = (total: number) => (total >= passThreshold ? "Pass" : "Fail");
 
   return (
-    <div className="results-page">
+    <div className="results-page-students">
       <div className="sheet-scroller">
         <div className="a4-sheet" role="document" aria-label="A4 CA Marks Sheet">
           {/* Header */}

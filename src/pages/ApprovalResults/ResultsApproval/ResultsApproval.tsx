@@ -4,7 +4,7 @@ import "./ResultsApproval.css";
 import PendingApprovals from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
 import ResultsSheetAP from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
-import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf"; // ✅ correct util
+import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf"; 
 
 const ResultsApprovalPage = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
