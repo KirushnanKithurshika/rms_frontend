@@ -50,6 +50,7 @@ const breadcrumbMap: CrumbMap = {
   "/hod-approval":"Results Approval",
   "/admin/transcript-requests/pending": "Pending Transcript Requests",
   "/admin/transcript-requests/rejected": "Rejected Transcript Requests",
+  "/admin/Announcement": "Announcements",
 };
 
 const BreadcrumbNav: React.FC = () => {
