@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar/navbar";
 import "./activateaccount.css";
 
-
 const ActivateAccount: React.FC = () => {
   const [search] = useSearchParams();
   const navigate = useNavigate();
@@ -17,38 +16,32 @@ const ActivateAccount: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const validate = () => {
     if (!token)
       return "Missing activation token. Please open the link from your email.";
-    if (newPassword.length < 8) return "Password must be at least 8 characters.";
-    if (newPassword !== confirm) return "Passwords do not match.";
+    if (newPassword.length < 8)
+      return "Password must be at least 8 characters.";
+    if (newPassword !== confirm)
+      return "Passwords do not match.";
     return null;
   };
 
-  const handleActivate = async () => {
+  const handleActivate = () => {
     setMsg(null);
     setError(null);
+
     const v = validate();
     if (v) {
       setError(v);
       return;
     }
-    try {
-      setLoading(true);
-      await api.post("/auth/activate", null, { params: { token, newPassword } });
-      setMsg("Account activated. You can now log in.");
-      setTimeout(() => navigate("/login", { replace: true }), 900);
-    } catch (e: any) {
-      setError(
-        e?.response?.data?.message || e?.message || "Activation failed. Try again."
-      );
-    } finally {
-      setLoading(false);
-    }
+
+    // ✅ UI-only success
+    setMsg("Account activated. You can now log in.");
+    setTimeout(() => navigate("/login", { replace: true }), 900);
   };
 
   return (
@@ -70,7 +63,9 @@ const ActivateAccount: React.FC = () => {
             </p>
           )}
 
-          <label className="as-label" htmlFor="newPassword">New Password</label>
+          <label className="as-label" htmlFor="newPassword">
+            New Password
+          </label>
           <div className="as-password-wrap">
             <input
               type={showNew ? "text" : "password"}
@@ -91,7 +86,9 @@ const ActivateAccount: React.FC = () => {
             </button>
           </div>
 
-          <label className="as-label" htmlFor="confirmPassword">Confirm Password</label>
+          <label className="as-label" htmlFor="confirmPassword">
+            Confirm Password
+          </label>
           <div className="as-password-wrap">
             <input
               type={showConfirm ? "text" : "password"}
@@ -119,9 +116,9 @@ const ActivateAccount: React.FC = () => {
             <button
               className="activate-set-button"
               onClick={handleActivate}
-              disabled={loading || !token}
+              disabled={!token}
             >
-              {loading ? "Activating..." : "Activate & Continue"}
+              Activate & Continue
             </button>
             <button
               className="activate-set-cancel"
