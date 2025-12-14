@@ -14,7 +14,7 @@ body {
   flex-direction: column;
   height: 100vh;
   min-height: 0;
-  /* allow inner scroll */
+
 }
 
 @page {
