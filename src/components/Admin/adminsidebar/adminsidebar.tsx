@@ -100,7 +100,7 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Department Control Panel</span>}
           </NavLink>
 
-          <NavLink to="/admin/feedback" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/admin/Announcement" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaBullhorn className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Announcement</span>}
           </NavLink>

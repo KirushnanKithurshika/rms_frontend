@@ -71,7 +71,7 @@ const RejectedTranscriptRequests: React.FC = () => {
     <div className="dashboard-cards">
       <div className="cardcourse">
         <div className="tARD">
-          <span className="tAR-heading">Rejected Transcript Requests</span>
+     
         </div>
 
         <div className="ah-card">

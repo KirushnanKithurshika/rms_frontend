@@ -43,6 +43,7 @@ import HODDashboard from "./pages/HOD/HODDashboard/HODDashboard";
 import TranscriptManagementAR from "./pages/Admin/TranscriptRequest/TranscriptManagementLayout";
 import TrasncriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
 import RejectedTranscriptRequests from "./pages/Admin/TranscriptRequest/RejectedTranscriptRequests";
+import AnnouncementAdminPage from "./pages/Admin/adminannouncement/AdminAnnouncement";
 
 function App() {
   return (
@@ -72,7 +73,7 @@ function App() {
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
-          
+           <Route path="/admin/Announcement" element={<AnnouncementAdminPage />} />
 
 
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
@@ -90,6 +91,8 @@ function App() {
           <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
           <Route path="/hod-approval" element={<HODDashboard />} />
+
+
 
           <Route path="/admin/academicsetup" element={<AcademicSetup />}>
             <Route index element={<Navigate to="universities" replace />} />
