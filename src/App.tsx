@@ -29,7 +29,7 @@ import SignatureBoard from "./components/SignatureCanvas/SignatureCanvas";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
-import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
+
 import AcademicSetup from "./pages/Admin/academicsetupLayout/academicsetup";
 import UniversitiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/University";
 import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/FacultyTable";
@@ -40,13 +40,16 @@ import StudentManagementLec from "./pages/lectures/studentmanagement/StudentMana
 import Courses from "./pages/lectures/courses/courses";
 import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
 import HODDashboard from "./pages/HOD/HODDashboard/HODDashboard";
+import TranscriptManagementAR from "./pages/Admin/TranscriptRequest/TranscriptManagementLayout";
+import TrasncriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
+import RejectedTranscriptRequests from "./pages/Admin/TranscriptRequest/RejectedTranscriptRequests";
 
 function App() {
   return (
     <Router>
       <div className="mt-16">
         <Routes>
-         
+
           <Route path="/" element={<WelcomePage />} />
           <Route path="/drop" element={<UserDropdown />} />
           <Route path="/login" element={<LoginPage />} />
@@ -59,26 +62,26 @@ function App() {
           <Route path="/lecturerhome" element={<LecturerDashboard />} />
           <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/courses" element={<Courses/>} />
+          <Route path="/courses" element={<Courses />} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
 
-      
+
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
-          <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
+          
 
-      
+
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
           <Route path="/student/transcript" element={<StudentTranscript />} />
           <Route path="/student/transcript/request" element={<StudentTranscriptRequestForm />} />
           <Route path="/student/transcript/status" element={<TranscripStatus />} />
 
-   
+
           <Route path="/approval-requests" element={<ApprovalPage />} />
           <Route path="/approval-history" element={<ApprovalHistory />} />
           <Route path="/course-history" element={<CourseHistory />} />
@@ -86,18 +89,29 @@ function App() {
           <Route path="/signatureboard" element={<SignatureBoard />} />
           <Route path="/results-approval-requests" element={<ResultsApprovalPage />} />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
- <Route path="/hod-approval" element={<HODDashboard/>} />
-         
+          <Route path="/hod-approval" element={<HODDashboard />} />
+
           <Route path="/admin/academicsetup" element={<AcademicSetup />}>
             <Route index element={<Navigate to="universities" replace />} />
             <Route path="universities" element={<UniversitiesTable />} />
             <Route path="faculties" element={<FacultiesTable />} />
             <Route path="departments" element={<DepartmentsTable />} />
             <Route path="semesters" element={<SemestersTable />} />
-            <Route path="batches" element={<BatchesTable/>} />
+            <Route path="batches" element={<BatchesTable />} />
           </Route>
 
-        
+          <Route
+            path="/admin/transcript-requests"
+            element={<TranscriptManagementAR />}
+          >
+     
+            <Route index element={<Navigate to="pending" replace />} />
+
+            <Route path="pending" element={<TrasncriptApprovalsAR/>} />
+            <Route path="rejected" element={<RejectedTranscriptRequests/>} />
+          </Route>
+
+
         </Routes>
       </div>
     </Router>
