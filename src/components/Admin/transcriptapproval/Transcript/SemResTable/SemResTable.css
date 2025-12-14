@@ -1,0 +1,104 @@
+.tsem-root {
+    width: 100%;
+}
+
+.tsem-wrap {
+    font-family: "Calibri", Arial, sans-serif;
+    color: #111;
+    page-break-inside: avoid;
+}
+
+
+.tsem-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #eaeef2;
+    color: #111;
+    border: 1px solid #8e9aa6;
+    border-bottom: none;
+
+    padding: 0.5mm 0.5mm 0.5mm 0.5mm;
+    font-weight: 600;
+}
+
+.tsem-title-left {
+    font-size: 13px;
+}
+
+.tsem-title-right {
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Table */
+.tsem-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #8e9aa6;
+    border-top: none;
+    font-size: 12px;
+    background: #fff;
+}
+
+.tsem-table thead th {
+    background: #f2f5f7;
+    color: #111;
+    text-align: left;
+    border-bottom: 1px solid #8e9aa6;
+    border-right: 1px solid #8e9aa6;
+    font-weight: 600;
+}
+
+.tsem-table thead th:last-child {
+    border-right: none;
+}
+
+.tsem-table tbody td {
+    padding: 0.2mm 2mm;
+    border-bottom: 1px solid #c7ced6;
+    border-right: 1px solid #c7ced6;
+    vertical-align: middle;
+    background: #fff;
+      text-align: left;
+}
+
+.tsem-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tsem-table tbody td:last-child {
+    border-right: none;
+}
+
+/* Group row (e.g., Developmental Courses) */
+.tsem-group td {
+    background: #f6f8fa;
+    font-weight: 700;
+    color: #222;
+}
+
+/* Utilities */
+.tsem-center {
+    text-align: center;
+}
+
+.tsem-attempt {
+    color: #555;
+    font-style: italic;
+    margin-left: 3px;
+}
+
+/* SGPA row */
+.tsem-sgpa td {
+    background: #f7fbff;
+    font-weight: 600;
+}
+
+.tsem-sgpa-value {
+    background: #eef6ff;
+    border-left: 1px solid #c7ced6;
+}
+
+

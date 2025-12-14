@@ -1,0 +1,330 @@
+.rp-container {
+  align-items: center;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff;
+  color: #0a2558;
+
+  margin: 0 auto;
+}
+
+.rp-title {
+  font-size: 20px;
+  color: #0a2558;
+  margin-top: -10px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.rp-header {
+  display: block;
+}
+
+.rp-divider {
+  border: none;
+  border-radius: 1px;
+  border-top: 2px solid #041748;
+  margin-bottom: 24px;
+}
+
+.rp-select-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rp-select-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #40444e;
+  white-space: nowrap;
+}
+
+.rp-select {
+  appearance: none;
+  width: 400px;
+  padding: 10px 36px 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #0a2558;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rp-select:focus {
+  outline: none;
+  border-color: #8aa7ff;
+  box-shadow: 0 0 0 3px rgba(63, 131, 248, 0.15);
+}
+
+.rp-divider {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 12px;
+}
+
+/* Tabs */
+.rp-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+
+.rp-tab {
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  color: #0a223f;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.rp-tab:hover {
+  background: #e9eef5;
+}
+
+.rp-tab.is-active {
+  background: #0b3e5a;
+  color: #fff;
+  border-color: #0b3e5a;
+}
+
+.rp-print-btn {
+  margin-left: auto;
+}
+
+
+.rp-card {
+overflow: auto;
+  border: 1px solid #d6d6d6;
+  padding: 16px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(10, 37, 88, 0.04);
+}
+
+.rp-card-header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.rp-card-header>div {
+  flex: 1;
+  min-width: 0;
+}
+
+.rp-section h4 {
+  text-align: left;
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #0a2558;
+  font-weight: 700;
+}
+
+.rp-section p {
+  text-align: left;
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #0a2558;
+  font-weight: 600;
+}
+
+.rp-section.rp-right p {
+  text-align: right;
+  font-weight: 700;
+}
+
+.rp-logo {
+  text-align: center;
+}
+
+.rp-logo img {
+  width: 160px;
+  height: auto;
+  margin-bottom: 6px;
+}
+
+
+.rp-table-wrap {
+  align-items: center;
+  overflow-x: auto;
+  display: block;
+  width: 100%;
+}
+
+.rp-table {
+  width: 100%;
+
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 700px;
+  background-color: #fff;
+}
+
+.rp-table th,
+.rp-table td {
+  border: 1px solid #d6d6d6;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.rp-table th {
+  background-color: #f9fbff;
+  color: #0a053d;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.rp-table tbody tr:nth-child(even) td {
+  background-color: #f9fbff;
+}
+
+.rp-table td {
+  color: #000000;
+  background-color: #fff;
+
+}
+
+
+.rp-print-footer {
+  color: #797979;
+  font-size: 12px;
+  text-align: left;
+  margin-top: 10px;
+}
+
+
+@media screen and (max-width: 768px) {
+
+
+  .rp-container {
+    padding: 12px;
+  }
+
+  .rp-title {
+    font-size: 16px;
+    margin-top: 0;
+  }
+
+  .rp-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rp-tab {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .rp-card-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .rp-section h4 {
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .rp-section p {
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .rp-section.rp-right p {
+    text-align: center;
+  }
+
+  .rp-logo img {
+    width: 120px;
+  }
+
+  .rp-table {
+    font-size: 12px;
+    min-width: 600px;
+  }
+
+  .rp-select-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .rp-select {
+    width: 100%;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+    /* full use of sheet */
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Show only Results Preview */
+  .rp-container,
+  .rp-container * {
+    visibility: visible !important;
+  }
+
+  /* Card should take full A4 width */
+  .rp-card {
+    display: block !important;
+    width: 210mm !important;
+    /* full A4 width */
+    height: auto !important;
+    /* grow with content */
+    margin: 0 !important;
+    padding: 10mm !important;
+    /* document-style margins inside */
+    box-sizing: border-box !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Table stretches with card */
+  .rp-table {
+    width: 100% !important;
+    /* take all available space */
+    min-width: 0 !important;
+    /* remove fixed 700px constraint */
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .rp-table th,
+  .rp-table td {
+    word-wrap: break-word;
+  }
+
+  /* Hide UI controls */
+  .rp-header,
+  .rp-tabs {
+    display: none !important;
+  }
+}

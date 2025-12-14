@@ -1,0 +1,62 @@
+.student-sidebar {
+  position:sticky;       
+  top: 0;                
+  height: 100vh;         
+  width: 280px;
+  overflow-x: hidden;
+  overflow-y: auto;     
+  background-color: #ffffff;
+  padding-top: 10px;
+  border: 1px solid #ffffff;
+  border-radius: 2px;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: width 0.3s ease;
+  z-index: 100;           
+}
+
+
+
+.student-sidebar.collapsed {
+  width: 70px;
+}
+
+.student-sidebar.hidden {
+  width: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
+}
+
+.student-sidebar.hidden .sidebar-toggle-btn {
+  margin-top: 180px;
+  position: fixed;
+  top:0;
+  margin-left: 0px;
+  left: 0;
+  right: auto;
+  border-radius: 0 6px 6px 0;
+  width: 28px;
+  height: 28px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+@media (max-width: 768px) {
+  .student-sidebar {
+top:0;
+  }
+
+  .student-sidebar.hidden .sidebar-toggle-btn {
+  margin-top: 0px;
+  
+ 
+}
+
+}

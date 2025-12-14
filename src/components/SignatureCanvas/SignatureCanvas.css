@@ -1,0 +1,102 @@
+/* Layout */
+.sig-wrap {
+  margin-bottom: 5px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+}
+
+/* Paper area */
+.sig-paper {
+  width: 75mm;
+  height: 100px;
+  position: relative;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.06);
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+}
+.sig-paper--final {
+  background: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sig-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  background: transparent;
+}
+
+/* Controls column */
+.sig-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 160px;
+}
+
+/* Outside toolbar */
+.sig-toolbar-outside {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.sig-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  background: #f8f8f8;
+  color: #333;
+  cursor: pointer;
+  transition: transform .06s ease, background .15s ease;
+}
+.sig-btn:hover { background: #f1f1f1; }
+.sig-btn:active { transform: translateY(1px); }
+.sig-btn--primary {
+  border-color: #155ee1;
+  background: #1a73e8;
+  color: #fff;
+}
+.sig-btn--primary:hover { background: #1765d1; }
+
+/* Upload UI */
+.sig-upload-label {
+  font-size: 12px;
+  padding: 8px 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #f8fafc;
+  color: #0f172a;
+  text-align: center;
+  transition: background .2s ease, border-color .2s ease;
+}
+.sig-upload-label:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+.sig-hint {
+  color: #64748b;
+  font-size: 11px;
+}
+
+/* Final image fits paper nicely */
+.sig-final-img {
+  display: block;
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  image-rendering: auto;
+}

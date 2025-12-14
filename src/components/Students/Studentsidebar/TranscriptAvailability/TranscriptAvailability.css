@@ -1,0 +1,169 @@
+.ta-card {
+    border: 2px dashed #cfcfcf;
+    border-radius: 18px;
+    padding: 24px 20px;
+    text-align: center;
+    background: #fff;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.ta-line {
+    margin: 2px 0;
+    color: #06223b;
+    font-weight: 600;
+}
+
+.ta-line-sub {
+    font-size: 14px;
+    color:#717171;
+}
+
+.ta-qr {
+    display: inline-block;
+    width: 160px;
+    height: 160px;
+    margin-top: 14px;
+}
+
+.ta-qr-missing {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 160px;
+    margin-top: 14px;
+    background: #f5f5f5;
+    color: #888;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.ta-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.ta-btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid #0f172a;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ta-btn:hover {
+    background: #f2f6ff;
+}
+
+.ta-btn.primary {
+    background: #0a2558;
+    color: #fff;
+    border-color: #0a2558;
+}
+
+.ta-btn.primary:hover {
+    background: #0b2f72;
+}
+
+.ta-caption {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #9a9a9a;
+}
+
+
+.ta-card.available {
+    border-color: #c2c3c2;
+}
+
+.ta-card.processing {
+    border-color: #e3b341;
+}
+
+.ta-card.notApplied {
+    border-color: #cfcfcf;
+}
+
+
+.ta-spinner {
+    margin: 16px auto 4px;
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #0a2558;
+    border-radius: 50%;
+    animation: ta-spin 0.9s linear infinite;
+}
+
+@keyframes ta-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* Small screens */
+@media (max-width: 768px) {
+  .ta-card {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    margin: 8px 12px;
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+
+  .ta-line {
+    margin: 4px 0;
+    font-size: 14px;
+  }
+  .ta-line-sub {
+    font-size: 12px;
+  }
+
+
+  .ta-qr,
+  .ta-qr-missing {
+    width: 128px;
+    height: 128px;
+    margin-top: 10px;
+  }
+
+  
+  
+
+
+  .ta-spinner {
+    width: 24px;
+    height: 24px;
+    border-width: 2.5px;
+    animation-duration: 1.1s; /* was 0.9s */
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 400px) {
+  .ta-card {
+    padding: 14px 12px;
+    border-radius: 12px;
+  }
+
+  .ta-qr,
+  .ta-qr-missing {
+    width: 112px;
+    height: 112px;
+  }
+
+  
+}
+
+/* Accessibility: reduce motion if the user prefers */
+@media (prefers-reduced-motion: reduce) {
+  .ta-spinner { animation: none; }
+}
