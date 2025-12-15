@@ -59,14 +59,14 @@ const AccountSettings: React.FC = () => {
     setProfileImage(savedProfileImage);
   };
 
-  // --- Password section state (LOWER PART) ---
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Bottom Save/Cancel (keep your original intentions)
+
   const handleSaveBottom = () => {
-    // TODO: submit password change
+
     alert("Profile saved successfully!");
   };
   const handleCancelBottom = () => {
@@ -83,9 +83,9 @@ const AccountSettings: React.FC = () => {
           <div className="dashboard-cards">
             <div className="account-settings-wrapper">
 
-              {/* Header with Back Button */}
+
               <div className="account-settings-header">
-                <button 
+                <button
                   className="back-btn"
                   onClick={() => navigate("/lecturerhome")}
                 >
@@ -94,7 +94,7 @@ const AccountSettings: React.FC = () => {
                 <div className="account-title">Account Settings</div>
               </div>
 
-              {/* Profile Picture Section */}
+
               <div className="profile-header">
                 <div className="profile-picture-wrapper">
                   <img src={profileImage} alt="Profile" className="profile-picture" />
@@ -115,7 +115,7 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
 
-              {/* Basic Info Form (UPPER PART) */}
+            
               <div className="form-grid">
                 <div className="form-group">
                   <label>User Name</label>
@@ -178,13 +178,13 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
 
-              {/* UPPER PART action buttons (uses the SAME classes) */}
+
               <div className="button-row">
-                <button className="save-btn" onClick={handleSaveUpper}>Save</button>
-                <button className="cancel-btn" onClick={handleCancelUpper}>Cancel</button>
+                <button className="save-btn-ACsetting" onClick={handleSaveUpper}>Save</button>
+                <button className="cancel-btn-ACsetting" onClick={handleCancelUpper}>Cancel</button>
               </div>
 
-              {/* Password Management Section */}
+
               <div className="password-section">
                 <div className="password-header">
                   <h4>Password Management</h4>
@@ -202,12 +202,12 @@ const AccountSettings: React.FC = () => {
                     <div className="form-group password-input-wrapper">
                       <label>Current Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showCurrentPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showCurrentPassword ? "text" : "password"}
+                          className="input"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                         >
                           {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
@@ -219,12 +219,12 @@ const AccountSettings: React.FC = () => {
                     <div className="form-group password-input-wrapper">
                       <label>New Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showNewPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          className="input"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowNewPassword(!showNewPassword)}
                         >
                           {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -232,30 +232,30 @@ const AccountSettings: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Confirm New Password */}
                     <div className="form-group password-input-wrapper full-width">
                       <label>Confirm New Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showConfirmPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          className="input"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
                           {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                       </div>
                     </div>
-                     <div className="button-row">
-                <button className="save-btn" onClick={handleSaveBottom}>Update</button>
-                <button className="cancel-btn" onClick={handleCancelBottom}>Cancel</button>
-              </div>
+                    <div></div>
+                    <div className="button-row">
+                      <button className="save-btn-ACsetting" onClick={handleSaveBottom}>Update</button>
+                      <button className="cancel-btn-ACsetting" onClick={handleCancelBottom}>Cancel</button>
+                    </div>
                   </div>
-                  
+
                 )}
-               
+
               </div>
 
             </div>
