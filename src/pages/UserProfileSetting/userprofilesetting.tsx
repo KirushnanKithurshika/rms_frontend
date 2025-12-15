@@ -187,7 +187,7 @@ const AccountSettings: React.FC = () => {
 
               <div className="password-section">
                 <div className="password-header">
-                  <h4>Password Management</h4>
+                  <h3>Password Management</h3>
                   <button
                     className="collapse-btn"
                     onClick={() => setShowPasswordSection(!showPasswordSection)}
