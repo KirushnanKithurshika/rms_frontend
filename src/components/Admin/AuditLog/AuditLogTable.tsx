@@ -366,6 +366,12 @@ const AuditLogTable: React.FC = () => {
                 scroll={{ x: true }}
             >
                 <Table.Column<AuditLog>
+                    title="No."
+                    key="index"
+                    width={70}
+                    render={(_, __, index) => (page - 1) * pageSize + index + 1}
+                />
+                <Table.Column<AuditLog>
                     title="Entity"
                     dataIndex="entity"
                     key="entity"
@@ -385,7 +391,7 @@ const AuditLogTable: React.FC = () => {
                         return <Tag color={color}>{a}</Tag>;
                     }}
                 />
-                <Table.Column<AuditLog> title="Name" dataIndex="changedBy" key="changedBy" ellipsis />
+                <Table.Column<AuditLog> title="Changed By" dataIndex="changedBy" key="changedBy" ellipsis />
                 <Table.Column<AuditLog>
                     title="Changed At"
                     dataIndex="changedAt"
