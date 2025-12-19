@@ -24,36 +24,6 @@ const statuses = ['All Statuses', 'Active', 'Inactive', 'Pending', 'Banned', 'Su
 const dateOptions = ['Newest', 'Oldest', 'Joined This Month', 'Joined Last 30 Days'];
 
 
-const demoUsers = [
-    {
-        name: "John Smith",
-        email: "john.smith@gmail.com",
-        username: "eg20204023",
-        status: "Active",
-        role: "Admin",
-        joined: "March 12, 2023",
-        active: "1 minute ago",
-    },
-    {
-        name: "Olivia Bennett",
-        email: "ollyben@gmail.com",
-        username: "eg20204025",
-        status: "Inactive",
-        role: "User",
-        joined: "June 27, 2022",
-        active: "1 month ago",
-    },
-    {
-        name: "John Smith",
-        email: "john.smith@gmail.com",
-        username: "eg20204023",
-        status: "Banned",
-        role: "Admin",
-        joined: "March 12, 2023",
-        active: "1 minute ago",
-    },
-];
-
 const statusColors: Record<string, string> = {
     Active: "active",
     Inactive: "inactive",
@@ -133,7 +103,7 @@ const UserManagement: React.FC = () => {
             try {
                 const qs = new URLSearchParams({ page: String(page - 1), size: String(pageSize) });
                 if (searchTerm.trim()) qs.set('search', searchTerm.trim());
-                const res = await fetch(`${API_BASE_URL}/users?${qs.toString()}`, {
+                const res = await fetch(`${API_BASE_URL}/users/not-student?${qs.toString()}`, {
                     headers: {
                         Authorization: token ? `Bearer ${token}` : '',
                         'Content-Type': 'application/json',
@@ -141,91 +111,14 @@ const UserManagement: React.FC = () => {
                 });
                 const json = await res.json().catch(() => ({}));
                 const payload: any = json?.data;
-                let list = Array.isArray(payload?.content) ? payload.content : Array.isArray(payload) ? payload : [];
-                // Helpers to normalize role names from various backend shapes
-                const normalizeToken = (s: any) => String(s || '')
-                    .trim()
-                    .toUpperCase()
-                    .replace(/^ROLE_/, '');
-                const extractRoleTokens = (u: any): string[] => {
-                    const tokens: string[] = [];
-                    // roles: [{name:"ADMIN"}|"ADMIN"]
-                    if (Array.isArray(u?.roles)) {
-                        for (const r of u.roles) {
-                            if (r && typeof r === 'object' && (r.name || r.roleName || r.code)) {
-                                tokens.push(normalizeToken(r.name || r.roleName || r.code));
-                            } else if (typeof r === 'string') {
-                                tokens.push(normalizeToken(r));
-                            }
-                        }
-                    }
-                    // authorities: [{authority:"ROLE_ADMIN"}|"ROLE_ADMIN"]
-                    if (Array.isArray(u?.authorities)) {
-                        for (const a of u.authorities) {
-                            if (a && typeof a === 'object' && (a.authority || a.name)) {
-                                tokens.push(normalizeToken(a.authority || a.name));
-                            } else if (typeof a === 'string') {
-                                tokens.push(normalizeToken(a));
-                            }
-                        }
-                    }
-                    // Single role fields
-                    if (u?.role) tokens.push(normalizeToken(u.role));
-                    if (u?.userRole) tokens.push(normalizeToken(u.userRole));
-                    return Array.from(new Set(tokens));
-                };
-                const hasStudentRole = (u: any) => extractRoleTokens(u).includes('STUDENT');
-                // Exclude STUDENT users; show other roles only
-                list = list.filter((u: any) => !hasStudentRole(u));
-                // client-side filters: role, status, date, search
-                const term = searchTerm.trim().toLowerCase();
-                if (term || selectedRole !== 'Roles' || (selectedStatus !== 'Status' && selectedStatus !== 'All Statuses') || selectedDate !== 'Date') {
-                    const roleFilter = (u: any) => {
-                        if (selectedRole === 'Roles' || selectedRole === 'All Roles') return true;
-                        const tokens = extractRoleTokens(u); // normalized
-                        const sel = normalizeToken(selectedRole);
-                        // Map UI selection to acceptable backend tokens (synonyms)
-                        const map: Record<string, string[]> = {
-                            ADMIN: ['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'SYSTEM_ADMIN'],
-                            LECTURER: ['LECTURER', 'LECTURE', 'TEACHER', 'INSTRUCTOR', 'MODERATOR'],
-                            USER: ['USER', 'NORMAL', 'BASIC'],
-                            GUEST: ['GUEST', 'ANONYMOUS', 'PUBLIC', 'VIEWER'],
-                        };
-                        const accepted = map[sel] || [sel];
-                        return tokens.some(t => accepted.includes(t));
-                    };
-                    const statusFromUser = (u: any) => (u.online ? 'Active' : (u.enabled === false ? 'Inactive' : 'Active'));
-                    const statusFilter = (u: any) => {
-                        if (selectedStatus === 'Status' || selectedStatus === 'All Statuses') return true;
-                        return statusFromUser(u).toLowerCase() === selectedStatus.toLowerCase();
-                    };
-                    const dateFilter = (u: any) => {
-                        if (selectedDate === 'Date') return true;
-                        const now = new Date();
-                        let from: Date | null = null;
-                        if (selectedDate === 'Joined This Month') {
-                            from = new Date(now.getFullYear(), now.getMonth(), 1);
-                        } else if (selectedDate === 'Joined Last 30 Days') {
-                            from = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-                        }
-                        if (!from) return true;
-                        const created = u.createdAt ? new Date(u.createdAt) : null;
-                        return created ? created >= from && created <= now : true;
-                    };
-                    const termFilter = (u: any) => {
-                        if (!term) return true;
-                        return [u.username, u.email, u.name, u.fullName]
-                            .filter(Boolean)
-                            .some((v: any) => String(v).toLowerCase().includes(term));
-                    };
-                    list = list.filter((u: any) => roleFilter(u) && statusFilter(u) && dateFilter(u) && termFilter(u));
-                }
+                const list = Array.isArray(payload?.content) ? payload.content : Array.isArray(payload) ? payload : [];
+                // Do not filter a paginated page locally; render exactly what the API returned
                 setItems(list);
                 const totalVal = (typeof payload?.totalElements === 'number' && payload.totalElements) || list.length;
                 setTotal(totalVal);
             } catch {
-                setItems(demoUsers);
-                setTotal(demoUsers.length);
+                setItems([]);
+                setTotal(0);
             } finally {
                 setLoading(false);
             }
@@ -421,6 +314,7 @@ const UserManagement: React.FC = () => {
                                     <table className="user-table">
                                         <thead>
                                             <tr>
+                                                <th>No.</th>
                                                 <th>Full Name</th>
                                                 <th>Email</th>
                                                 <th>Username</th>
@@ -442,6 +336,7 @@ const UserManagement: React.FC = () => {
                                                 const active = u.lastActive || (u.online ? 'Online' : '-');
                                                 return (
                                                     <tr key={u.id ?? i}>
+                                                        <td>{(page - 1) * pageSize + i + 1}</td>
                                                         <td>{fullName}</td>
                                                         <td>{email}</td>
                                                         <td>{username}</td>
