@@ -148,10 +148,9 @@ const ResultsSheetAP: React.FC<Props> = ({
 
                             <section className="rs-sign-exactAP avoid-break">
                                 <div className="sig-gridAP">
-                                    {/* LEFT COLUMN */}
-                                    {/* LEFT COLUMN */}
+                                   
                                     <div className="sig-colAP">
-                                        {/* 1) Small signature box (the span-sized one) */}
+                           
                                         <div className="sig-signboxAP">
                                             <SignatureBoardRS />
                                         </div>
@@ -162,7 +161,7 @@ const ResultsSheetAP: React.FC<Props> = ({
                                           
                                         </div>
 
-                                        {/* 3) Assistant Registrar full-size signature box */}
+                                   
                                         <div className="sig-signboxAP">
                                             <SignatureBoardRS />
                                         </div>

@@ -272,7 +272,7 @@ overflow: auto;
   @page {
     size: A4 portrait;
     margin: 0;
-    /* full use of sheet */
+   
   }
 
   body {
@@ -280,39 +280,39 @@ overflow: auto;
     padding: 0 !important;
   }
 
-  /* Hide everything by default */
+
   body * {
     visibility: hidden !important;
   }
 
-  /* Show only Results Preview */
+
   .rp-container,
   .rp-container * {
     visibility: visible !important;
   }
 
-  /* Card should take full A4 width */
+
   .rp-card {
     display: block !important;
-    width: 210mm !important;
-    /* full A4 width */
+    width: 200mm !important;
+
     height: auto !important;
-    /* grow with content */
+
     margin: 0 !important;
     padding: 10mm !important;
-    /* document-style margins inside */
+
     box-sizing: border-box !important;
     border: 1px solid #000 !important;
     box-shadow: none !important;
     page-break-inside: avoid;
   }
 
-  /* Table stretches with card */
+
   .rp-table {
     width: 100% !important;
-    /* take all available space */
+  
     min-width: 0 !important;
-    /* remove fixed 700px constraint */
+
     max-width: 100% !important;
     table-layout: fixed !important;
   }
@@ -322,7 +322,7 @@ overflow: auto;
     word-wrap: break-word;
   }
 
-  /* Hide UI controls */
+
   .rp-header,
   .rp-tabs {
     display: none !important;
