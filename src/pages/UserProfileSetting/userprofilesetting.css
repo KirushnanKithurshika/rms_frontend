@@ -203,6 +203,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-top: 10px;
+  
 }
 
 .full-width {
@@ -213,16 +214,18 @@
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  justify-content: flex-end;
+  margin-right: 30px;
 }
 
-.save-btn {
+.save-btn-ACsetting {
   color: white;
   background-color: #0b3054;
   width:100px;
   border: 2px solid #acaeaf;
   border-radius: 50px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   outline: none;
@@ -230,18 +233,18 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-.save-btn:hover {
+.save-btn-ACsetting:hover {
   background-color: #2ea3b5;
 }
 
-.cancel-btn {
+.cancel-btn-ACsetting {
   background: #ccc;
   color: black;
   padding: 6px 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   width:100px;
   border: 2px solid #acaeaf;
   border-radius: 50px;
@@ -249,7 +252,7 @@
   font-weight: 600;
 }
 
-.cancel-btn:hover {
+.cancel-btn-ACsetting:hover {
   background-color: #bbb;
 }
 

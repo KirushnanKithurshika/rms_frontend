@@ -95,7 +95,8 @@ const StudentResultsSheet: React.FC<Props> = (props) => {
   const handlePrint = () => window.print();
 
   return (
-    <div className="results-page">
+    <div className="results-page-students">
+
       <div className="sheet-scroller">
         <div className="a4-sheet" role="document" aria-label="A4 Results Sheet">
           <div className="rs-top">
