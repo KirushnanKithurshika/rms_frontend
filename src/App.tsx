@@ -156,7 +156,7 @@ function App() {
             path="/admin/student-management"
             element={<StudentManagement />}
           />
-          <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
+          {/* <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} /> */}
           <Route path="/admin/audit-logs" element={<AuditLog />} />
         </Route>
           <Route path="/admin/academicsetup" element={<AcademicSetup />}>
