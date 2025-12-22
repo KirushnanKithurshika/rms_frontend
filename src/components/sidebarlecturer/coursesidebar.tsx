@@ -6,7 +6,6 @@ import {
   FaChartBar,
   FaPencilAlt,
   FaChartLine,
-  FaEye,
   FaChevronLeft,
   FaChevronRight,
   FaHome,
@@ -23,7 +22,8 @@ import {
 type SidebarState = "expanded" | "collapsed" | "hidden";
 
 const LectureSidebar: React.FC = () => {
-  const [sidebarState, setSidebarState] = useState<SidebarState>("collapsed");
+
+  const [sidebarState, setSidebarState] = useState<SidebarState>("expanded");
   const [coursesExpanded, setCoursesExpanded] = useState(false);
 
   const courseList = [
@@ -37,19 +37,19 @@ const LectureSidebar: React.FC = () => {
       prev === "expanded"
         ? "collapsed"
         : prev === "collapsed"
-          ? "hidden"
-          : "expanded"
+        ? "hidden"
+        : "expanded"
     );
   };
 
-  // When sidebar is open (expanded) on small screen, clicking backdrop will hide it
+
   const handleBackdropClick = () => {
     setSidebarState("hidden");
   };
 
   return (
     <>
-      {/* 🔹 BACKDROP FOR MOBILE: click outside to close */}
+   
       {sidebarState === "expanded" && (
         <div
           className="mobile-sidebar-backdrop"
@@ -95,7 +95,6 @@ const LectureSidebar: React.FC = () => {
                 </>
               )}
             </NavLink>
-
 
             {coursesExpanded && sidebarState === "expanded" && (
               <div className="sidebar-tree">
@@ -149,7 +148,6 @@ const LectureSidebar: React.FC = () => {
               <FaChartLine className="sidebar-icon" />
               {sidebarState === "expanded" && <span>Results Management</span>}
             </NavLink>
-            
 
             <NavLink
               to="/lecturer/student-management"
