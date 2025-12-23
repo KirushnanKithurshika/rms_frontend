@@ -23,7 +23,7 @@ import {
 type SidebarState = "expanded" | "collapsed" | "hidden";
 
 const LectureSidebar: React.FC = () => {
-  const [sidebarState, setSidebarState] = useState<SidebarState>("collapsed");
+  const [sidebarState, setSidebarState] = useState<SidebarState>("expanded");
   const [coursesExpanded, setCoursesExpanded] = useState(false);
 
   const courseList = [
@@ -42,14 +42,14 @@ const LectureSidebar: React.FC = () => {
     );
   };
 
-  // When sidebar is open (expanded) on small screen, clicking backdrop will hide it
+
   const handleBackdropClick = () => {
     setSidebarState("hidden");
   };
 
   return (
     <>
-      {/* 🔹 BACKDROP FOR MOBILE: click outside to close */}
+   
       {sidebarState === "expanded" && (
         <div
           className="mobile-sidebar-backdrop"
