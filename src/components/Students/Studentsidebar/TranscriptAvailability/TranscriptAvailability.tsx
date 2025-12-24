@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./TranscriptAvailability.css";
 
 export type TranscriptStatus = "available" | "processing" | "notApplied";
@@ -11,6 +12,7 @@ type Props = {
   onApply?: () => void;
   onOpen?: () => void;
   onDownload?: () => void;
+  onRequestTranscript?: () => void;
   caption?: string;
 };
 
@@ -21,8 +23,17 @@ const TranscriptAvailability: React.FC<Props> = ({
   onApply,
   onOpen,
   onDownload,
+  onRequestTranscript,
   caption,
 }) => {
+  const navigate = useNavigate();
+  const handleRequestTranscript = () => {
+    if (onRequestTranscript) {
+      onRequestTranscript();
+      return;
+    }
+    navigate("/student/transcript/payment");
+  };
   const displaySrc =
     imageSrc ||
     (qrData
@@ -45,6 +56,9 @@ const TranscriptAvailability: React.FC<Props> = ({
           )}
 
           <div className="ta-actions">
+            <button className="ta-btn primary" onClick={handleRequestTranscript}>
+              Request Transcript btn
+            </button>
             {onOpen && <button className="ta-btn primary" onClick={onOpen}>Open</button>}
             {onDownload && <button className="ta-btn" onClick={onDownload}>Download</button>}
           </div>
@@ -63,7 +77,12 @@ const TranscriptAvailability: React.FC<Props> = ({
         <>
           <p className="ta-line strong">No transcript request found</p>
           <p className="ta-line">Please apply online to get your transcript.</p>
-          {onApply && <button className="ta-btn primary" onClick={onApply}>Apply Now</button>}
+          <div className="ta-actions">
+            <button className="ta-btn primary" onClick={handleRequestTranscript}>
+              Request Transcript
+            </button>
+            {onApply && <button className="ta-btn" onClick={onApply}>Apply Now</button>}
+          </div>
         </>
       )}
 

@@ -19,6 +19,7 @@ const StudentTranscript = () => {
   const handleDownload = () => {
     // e.g., window.open(`/api/transcripts/${transcriptId}/pdf`, "_blank");
   };
+  const handleRequestTranscript = () => navigate("/student/transcript/payment");
 
   return (
     <div className="lec-dashboard-container">
@@ -44,6 +45,7 @@ const StudentTranscript = () => {
             onApply={handleApply}
             onOpen={handleOpen}
             onDownload={handleDownload}
+            onRequestTranscript={handleRequestTranscript}
             caption={`Last updated: ${lastUpdated}`}
           />
         </div>
