@@ -30,3 +30,12 @@ jobs:
           tags: ghcr.io/kirushnankithurshika/rms_frontend:feature-localDeploy
           build-args: |
             VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: self-hosted
+    steps:
+      - name: Pull and restart frontend
+        run: |
+          docker-compose -f /home/deieg37/SRMS/docker-compose.server.yml pull frontend
+          docker-compose -f /home/deieg37/SRMS/docker-compose.server.yml up -d --no-deps frontend
