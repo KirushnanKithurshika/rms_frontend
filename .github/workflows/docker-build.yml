@@ -38,5 +38,5 @@ jobs:
       - name: Pull and restart frontend
         run: |
           docker-compose -f /home/deieg37/SRMS/docker-compose.server.yml pull frontend
-          docker rm -f srms-frontend || true
+          docker ps -a --format '{{.Names}}' | grep -E 'srms-frontend' | xargs -r docker rm -f
           docker-compose -f /home/deieg37/SRMS/docker-compose.server.yml up -d frontend
