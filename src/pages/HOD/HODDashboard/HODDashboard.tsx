@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Navbarin from "../../../components/Navbar/navbarin";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav";
 import { FaRegFilePdf } from "react-icons/fa";
 import "./hoddashboard.css";
 import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf";
+import api from "../../../services/api";
 
 import FinalResultsHOD from "../../../components/HOD/HODViewResultsSheet/HODViewResultsSheet";
 import type {
@@ -16,100 +17,80 @@ interface HODResultSheet {
   courseCode: string;
   courseTitle: string;
   batch: string;
-  semester: "Semester 01" | "Semester 02";
+  semester: string;
   approved?: boolean;
   subjectMeta: SubjectMeta;
   results: StudentResult[];
 }
 
 type CourseSummary = {
-  code: string;
-  title: string;
+  allocationId: number;
+  courseCode: string;
+  courseTitle: string;
   batch: string;
-  semester: "Semester 01" | "Semester 02";
+  semester: string;
+  hasSheet: boolean;
+  approved: boolean;
 };
 
-const allCourses: CourseSummary[] = [
-  {
-    code: "EE1202",
-    title: "Infrastructure",
-    batch: "22nd Batch",
-    semester: "Semester 01",
-  },
-  {
-    code: "EE1101",
-    title: "Basic Electrical Engineering",
-    batch: "22nd Batch",
-    semester: "Semester 01",
-  },
-  {
-    code: "CE1101",
-    title: "Engineering Mechanics",
-    batch: "22nd Batch",
-    semester: "Semester 01",
-  },
-  {
-    code: "ME1201",
-    title: "Thermodynamics",
-    batch: "22nd Batch",
-    semester: "Semester 02",
-  },
-];
-
-
-
-const initialSheets: HODResultSheet[] = [
-  {
-    id: 1,
-    courseCode: "EE1202",
-    courseTitle: "Infrastructure",
-    batch: "22nd Batch",
-    semester: "Semester 01",
-    approved: false,
-    subjectMeta: {
-      code: "EE1202",
-      title: "Infrastructure",
-      batch: "22nd Batch",
-      semester: "Semester 01",
-      academicYear: "2023/2024",
-      degreeProgram: "BSc. Eng. in Electrical & Information Engineering",
-      coordinator: "Dr. A. R. Silva",
-      credits: 3,
-    },
-    results: [
-      { index: 1, regNo: "EG/2020/4023", name: "Kithurshika K.", grade: "A" },
-      { index: 2, regNo: "EG/2020/4011", name: "Nevaa S.", grade: "A-" },
-      { index: 3, regNo: "EG/2020/4005", name: "Thana T.", grade: "B+" },
-      { index: 4, regNo: "EG/2020/4030", name: "Pamith P.", grade: "C" },
-    ],
-  },
-  {
-    id: 2,
-    courseCode: "EE1202",
-    courseTitle: "Infrastructure",
-    batch: "22nd Batch",
-    semester: "Semester 01",
-    approved: false,
-    subjectMeta: {
-      code: "EE1202",
-      title: "Infrastructure",
-      batch: "22nd Batch",
-      semester: "Semester 01",
-      academicYear: "2023/2024",
-      degreeProgram: "BSc. Eng. in Electrical & Information Engineering",
-      coordinator: "Dr. A. R. Silva",
-      credits: 3,
-    },
-    results: [
-      { index: 1, regNo: "EG/2020/4025", name: "Student One", grade: "B" },
-      { index: 2, regNo: "EG/2020/4026", name: "Student Two", grade: "A" },
-    ],
-  },
-];
-
 const HODDashboard: React.FC = () => {
-  const [sheets, setSheets] = useState<HODResultSheet[]>(initialSheets);
+  const [departmentId, setDepartmentId] = useState<number | null>(null);
+  const [departmentName, setDepartmentName] = useState<string>("");
+  const [courses, setCourses] = useState<CourseSummary[]>([]);
+  const [sheets, setSheets] = useState<HODResultSheet[]>([]);
   const [activeSheetId, setActiveSheetId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const uniqueSemesters = useMemo(() => {
+    if (!courses.length) return [];
+    return Array.from(new Set(courses.map((c) => c.semester || "Unspecified")));
+  }, [courses]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchDashboard = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const depRes = await api.get("/v1/user/department-id");
+        const depRaw = depRes.data?.data ?? depRes.data;
+        const depId = Number(
+          typeof depRaw === "object" && depRaw !== null ? depRaw?.departmentId : depRaw
+        );
+        if (!depId || Number.isNaN(depId)) {
+          throw new Error("Unable to determine department.");
+        }
+        if (!cancelled) {
+          setDepartmentId(depId);
+        }
+
+        const dashRes = await api.get(`/v1/departments/${depId}/hod-dashboard`);
+        const payload = dashRes.data?.data ?? dashRes.data;
+        if (cancelled) return;
+
+        setDepartmentName(payload?.departmentName ?? "");
+        setCourses(payload?.courses ?? []);
+        setSheets(payload?.sheets ?? []);
+      } catch (e: any) {
+        if (cancelled) return;
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Failed to load HOD dashboard.";
+        setError(msg);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const activeSheet = activeSheetId
     ? sheets.find((s) => s.id === activeSheetId) || null
@@ -130,8 +111,8 @@ const HODDashboard: React.FC = () => {
     setActiveSheetId(null);
   };
 
-  const getCoursesBySemester = (semester: "Semester 01" | "Semester 02") =>
-    allCourses.filter((c) => c.semester === semester);
+  const getCoursesBySemester = (semester: string) =>
+    courses.filter((c) => c.semester === semester);
 
  
   const handleTopBarApprove = () => {
@@ -154,60 +135,63 @@ const HODDashboard: React.FC = () => {
     );
   };
 
-  const renderSemesterSection = (semester: "Semester 01" | "Semester 02") => {
-    const courses = getCoursesBySemester(semester);
+  const renderSemesterSection = (semester: string) => {
+    const semesterCourses = getCoursesBySemester(semester);
+    const batchLabel = semesterCourses[0]?.batch;
 
     return (
-      <section className="hod-semester-section">
+      <section className="hod-semester-section" key={semester}>
         <div className="hod-semester-header">
           <span>{semester}</span>
-          <span className="hod-batch-label">22nd Batch</span>
+          {batchLabel && <span className="hod-batch-label">{batchLabel}</span>}
         </div>
 
         <section className="pa-scope pa-wrap">
           <div className="pa-list">
-            {courses.length === 0 && (
+            {semesterCourses.length === 0 && (
               <span className="hod-empty-placeholder" />
             )}
 
-            {courses.map((course) => {
+            {semesterCourses.map((course) => {
               const sheet = sheets.find(
                 (s) =>
-                  s.courseCode === course.code &&
+                  s.courseCode === course.courseCode &&
                   s.semester === course.semester &&
                   s.batch === course.batch
               );
 
-              const isPending = !sheet;
+              const canOpen = Boolean(sheet);
+              const isApproved = sheet?.approved ?? course.approved;
+              const isPending = !canOpen;
 
               return (
                 <div
-                  key={`${semester}-${course.code}`}
+                  key={`${semester}-${course.courseCode}-${course.batch}`}
                   className="pa-card"
                   role="group"
-                  aria-label={`${course.code}-${course.title}`}
+                  aria-label={`${course.courseCode}-${course.courseTitle}`}
                 >
                   <div className="pa-card-left">
                     <FaRegFilePdf className="pa-icon" aria-hidden="true" />
                     <div className="pa-title">
-                      {course.code}-{course.title}
+                      {course.courseCode}-{course.courseTitle}
                     </div>
                   </div>
 
                   <button
                     className={`pa-button ${
-                      sheet?.approved
+                      isApproved
                         ? "hod-approved"
                         : isPending
                         ? "hod-pending"
                         : ""
                     }`}
-                    onClick={() => sheet && !sheet.approved && openSheet(sheet)}
-                    disabled={!sheet || sheet.approved}
+                    onClick={() => canOpen && !isApproved && sheet && openSheet(sheet)}
+                    disabled={!canOpen || isApproved}
                   >
                     {isPending
                       ? "Pending"
-                      : sheet.approved
+                      : isApproved
                       ? "Approved"
                       : "View & Approve"}
                   </button>
@@ -223,6 +207,11 @@ const HODDashboard: React.FC = () => {
   return (
     <div className="lec-dashboard-container">
       <div className="hod-role-label">HOD</div>
+      {departmentName && (
+        <div className="hod-role-subtitle">
+          {departmentName} {departmentId ? `(ID: ${departmentId})` : ""}
+        </div>
+      )}
 
       <div className="nav">
         <Navbarin />
@@ -242,8 +231,22 @@ const HODDashboard: React.FC = () => {
 
               {!activeSheet && (
                 <div className="tAR-inline-body-results">
-                  {renderSemesterSection("Semester 01")}
-                  {renderSemesterSection("Semester 02")}
+                  {error && (
+                    <div className="hod-error" role="alert">
+                      {error}
+                    </div>
+                  )}
+                  {loading && (
+                    <div className="hod-loading">Loading dashboard...</div>
+                  )}
+                  {!loading && !error && uniqueSemesters.length === 0 && (
+                    <div className="hod-empty-placeholder">
+                      No courses available for approval.
+                    </div>
+                  )}
+                  {!loading &&
+                    !error &&
+                    uniqueSemesters.map((semester) => renderSemesterSection(semester))}
                 </div>
               )}
 

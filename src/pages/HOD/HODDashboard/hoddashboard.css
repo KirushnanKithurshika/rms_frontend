@@ -5,6 +5,13 @@
   padding: 14px 40px 4px;
 }
 
+.hod-role-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #005180;
+  padding: 0 40px 20px;
+}
+
 .hod-semester-section {
   width: 100%;
   background-color: #ffffff;
@@ -43,6 +50,43 @@
 
 .hod-empty-placeholder {
   display: inline-block;
+}
+
+.hod-semester-section .pa-list {
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.hod-semester-section .pa-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hod-semester-section .pa-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hod-semester-section .pa-list::-webkit-scrollbar-thumb {
+  background-color: #cbd5f5;
+  border-radius: 999px;
+}
+
+.hod-error {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+.hod-loading {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background-color: #e0f2fe;
+  color: #075985;
+  font-weight: 500;
 }
 
 
