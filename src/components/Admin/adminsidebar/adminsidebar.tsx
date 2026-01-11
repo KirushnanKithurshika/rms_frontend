@@ -64,14 +64,13 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Results Management</span>}
           </NavLink>
 
-          {/* NEW: Transcript Requests */}
-          <NavLink to="/admin/transcripts" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+      
+          <NavLink to="/admin/transcript-requests" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaScroll className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Transcript Requests </span>}
           </NavLink>
 
-          {/* NEW: Academic Setup panel (University / Semester / Faculty / Departments / Batches) */}
-          <NavLink to="/admin/academicsetup" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+             <NavLink to="/admin/academicsetup" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaUniversity className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Academic Setup </span>}
           </NavLink>
@@ -101,7 +100,7 @@ const AdminSidebar: React.FC = () => {
             {sidebarState === 'expanded' && <span>Department Control Panel</span>}
           </NavLink>
 
-          <NavLink to="/admin/feedback" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/admin/Announcement" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}>
             <FaBullhorn className="sidebar-icon" />
             {sidebarState === 'expanded' && <span>Announcement</span>}
           </NavLink>

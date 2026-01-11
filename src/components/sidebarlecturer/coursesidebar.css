@@ -89,8 +89,8 @@
 
 .sidebar-toggle-btn {
   margin-left: 20px;
-margin-bottom: 10px;
-  z-index: 1000; /* ensure it's above scroll */
+  margin-bottom: 10px;
+  z-index: 1000; 
   background-color: white;
   border: none;
   border-radius: 5px;
@@ -218,15 +218,15 @@ margin-bottom: 10px;
 
 .mobile-sidebar-backdrop {
   position: fixed;
-  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  inset: 0; 
   background: rgba(0, 0, 0, 0.35);
   z-index: 900;
-  display: none; /* default hidden */
+  display: none; 
 }
 
 @media screen and (max-width: 768px) {
   .course-sidebar {
-    width: 240px;
+    width: 280px;
   }
 
   .course-sidebar.collapsed {
@@ -293,7 +293,7 @@ margin-bottom: 10px;
 
 @media screen and (max-width: 480px) {
   .course-sidebar {
-    width: 180px;
+    width: 200px;
   }
 
   .course-sidebar.collapsed {

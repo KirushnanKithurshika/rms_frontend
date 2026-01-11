@@ -71,7 +71,7 @@ const StudentsConAss: React.FC<Props> = ({
   };
 
   return (
-    <div className="results-page">
+    <div className="results-page-students">
       <div className="sheet-scroller">
         <div
           className="a4-sheet"
