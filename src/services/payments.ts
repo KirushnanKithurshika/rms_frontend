@@ -49,6 +49,7 @@ export type AdminPayment = {
   paidAt?: string;
   createdAt: string;
   isTranscriptRequest: boolean;
+  isApproved: boolean;
 };
 
 export type AdminPaymentsResponse = {
@@ -102,5 +103,13 @@ export async function fetchAdminPayments(query: AdminPaymentsQuery = {}) {
       sortDir: query.sortDir ?? "desc",
     },
   });
+  return res.data;
+}
+
+export async function approveTranscriptRequest(payherePaymentId: string) {
+  const safeId = encodeURIComponent(payherePaymentId);
+  const res = await paymentsApi.put<{ message?: string }>(
+    `/${safeId}/approveTranscript`
+  );
   return res.data;
 }
