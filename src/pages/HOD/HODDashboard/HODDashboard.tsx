@@ -170,27 +170,12 @@ const HODDashboard: React.FC = () => {
     setActiveSheetId(sheet.id);
   };
 
-  const handleApproveSheet = (sheetId: number) => {
-    setSheets((prev) =>
-      prev.map((s) => (s.id === sheetId ? { ...s, approved: true } : s))
-    );
-    setActiveSheetId(null);
-  };
-
   const handleBackFromResults = () => {
     setActiveSheetId(null);
   };
 
   const getCoursesBySemester = (semester: string) =>
     courses.filter((c) => c.semester === semester);
-
- 
-  const handleTopBarApprove = () => {
-    if (!activeSheet) return;
-    handleApproveSheet(activeSheet.id);
-    alert("Approved successfully!");
-  };
-
 
   const handleDownloadPdf = async () => {
     if (!activeSheet) return;
@@ -313,14 +298,14 @@ const HODDashboard: React.FC = () => {
                         ? "hod-pending"
                         : ""
                     }`}
-                    onClick={() => canOpen && !isApproved && sheet && openSheet(sheet)}
-                    disabled={!canOpen || isApproved}
+                    onClick={() => canOpen && sheet && openSheet(sheet)}
+                    disabled={!canOpen}
                   >
                     {isPending
                       ? "Pending"
                       : isApproved
                       ? "Approved"
-                      : "View & Approve"}
+                      : "View"}
                   </button>
                 </div>
               );
@@ -492,14 +477,6 @@ const HODDashboard: React.FC = () => {
                       >
                         Download PDF
                       </button>
-
-                      <button
-                        type="button"
-                        className="taAR-btn"
-                        onClick={handleTopBarApprove}
-                      >
-                        Approve
-                      </button>
                     </div>
                   </div>
 
@@ -507,9 +484,7 @@ const HODDashboard: React.FC = () => {
                     <FinalResultsHOD
                       subject={activeSheet.subjectMeta}
                       results={activeSheet.results}
-                      isApproved={activeSheet.approved}
                       onBack={handleBackFromResults}
-                      onApprove={() => handleApproveSheet(activeSheet.id)}
                     />
                   </div>
                 </>

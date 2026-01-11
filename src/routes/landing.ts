@@ -21,6 +21,11 @@ const LANDING_RULES: Array<{ anyOf: string[]; path: string }> = [
     anyOf: ["APPROVE_RESULT_DEPARTMENT"],
     path: "/hod-approval",
   },
+    // Dean/Senete landing – privileges uniquely have
+  {
+    anyOf: ["APPROVE_RESULT_FACULTY", "APPROVE_RESULT_SENATE"],
+    path: "/results-approval-requests",
+  },
 ];
 
 // Fallback if nothing matches
