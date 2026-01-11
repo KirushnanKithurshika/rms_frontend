@@ -159,16 +159,125 @@ const tryDecodeQrPayload = async (blob: Blob): Promise<string | undefined> => {
 
 const StudentTranscript = () => {
   const navigate = useNavigate();
+  const userId = useAppSelector(selectUserId);
 
-  const transcriptId = "ABC123";
-  const lastUpdated = "2025-09-25 14:05";
+  const [status, setStatus] = useState<TranscriptStatus>("processing");
+  const [qrSrc, setQrSrc] = useState<string | undefined>(undefined);
+  const [caption, setCaption] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const [verificationUrl, setVerificationUrl] = useState<string | undefined>(
+    undefined
+  );
+  const [verifyParams, setVerifyParams] = useState<VerifyParams | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
-  const handleApply = () => navigate("/student/transcript/apply");
-  const handleOpen = () => navigate(`/student/transcript/view?id=${transcriptId}`);
-  const handleDownload = () => {
-    // e.g., window.open(`/api/transcripts/${transcriptId}/pdf`, "_blank");
+  useEffect(() => {
+    if (!userId) return;
+
+    let currentObjectUrl: string | null = null;
+    let cancelled = false;
+
+    const fetchQr = async () => {
+      setLoading(true);
+      setStatus("processing");
+      setCaption(undefined);
+      setVerificationUrl(undefined);
+      setVerifyParams(null);
+      setVerifyResult(null);
+      setVerifyError(null);
+      try {
+        const res = await api.get(`/transcripts/${userId}/qr`, {
+          responseType: "arraybuffer",
+          headers: { Accept: "image/png" },
+        });
+        const blob = new Blob([res.data], { type: "image/png" });
+        const url = URL.createObjectURL(blob);
+        currentObjectUrl = url;
+        if (cancelled) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        setQrSrc(url);
+        setStatus("available");
+
+        const headerPayload =
+          (res.headers?.["x-verification-url"] as string | undefined) ||
+          (res.headers?.["x-verification-link"] as string | undefined) ||
+          (res.headers?.["x-qr-data"] as string | undefined) ||
+          (res.headers?.["x-qr-url"] as string | undefined);
+        const payload = headerPayload || (await tryDecodeQrPayload(blob));
+
+        if (cancelled) return;
+
+        if (payload) {
+          setVerificationUrl(payload);
+          const params = getVerifyParamsFromUrl(payload);
+          setVerifyParams(params);
+          setCaption(
+            params
+              ? "Scan the QR or click Open to verify your transcript via blockchain."
+              : "Scan this QR code to verify your transcript via blockchain."
+          );
+        } else {
+          setCaption("Scan this QR code to verify your transcript via blockchain.");
+        }
+      } catch (e: any) {
+        if (cancelled) return;
+        const msg =
+          e?.response?.data?.message ||
+          e?.response?.data?.error ||
+          "Your transcript is not prepared or not yet released.";
+        setStatus("processing");
+        setCaption(msg);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchQr();
+
+    return () => {
+      cancelled = true;
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+      }
+    };
+  }, [userId]);
+
+  const handleApply = () => navigate("/student/transcript/request");
+
+  const handleOpen = async () => {
+    if (verifying) return;
+    if (!verifyParams) {
+      setVerifyError("Unable to read verification data from the QR code.");
+      return;
+    }
+
+    setVerifying(true);
+    setVerifyError(null);
+    setVerifyResult(null);
+    try {
+      const res = await api.get("/transcripts/verify", { params: verifyParams });
+      const data = (res.data?.data ?? res.data) as VerifyResult;
+      setVerifyResult(data);
+      if (data?.valid && data?.ipfsUrl && typeof window !== "undefined") {
+        window.open(data.ipfsUrl, "_blank", "noopener,noreferrer");
+      }
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        e?.message ||
+        "Unable to verify transcript.";
+      setVerifyError(msg);
+    } finally {
+      setVerifying(false);
+    }
   };
-  const handleRequestTranscript = () => navigate("/student/transcript/payment");
 
   return (
     <div className="lec-dashboard-container">
