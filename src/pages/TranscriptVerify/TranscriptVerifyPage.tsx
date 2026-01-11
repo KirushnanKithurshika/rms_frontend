@@ -22,12 +22,18 @@ const TranscriptVerifyPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const missingParams = !regNo || !cid;
+  const missingMsg = "Missing registration number or CID in verification link.";
+
   useEffect(() => {
-    if (!regNo || !cid) {
-      setError("Missing registration number or CID in verification link.");
+    if (missingParams) {
+      setResult(null);
+      setError(missingMsg);
+      setLoading(false);
       return;
     }
 
+    let cancelled = false;
     const run = async () => {
       setLoading(true);
       setError(null);
@@ -36,20 +42,25 @@ const TranscriptVerifyPage: React.FC = () => {
           params: { regNo, cid },
         });
         const data = res.data?.data ?? res.data;
-        setResult(data as VerifyResult);
+        if (!cancelled) setResult(data as VerifyResult);
       } catch (e: any) {
+        if (cancelled) return;
         const msg =
           e?.response?.data?.message ||
           e?.message ||
           "Transcript verification failed.";
         setError(msg);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     run();
-  }, [regNo, cid]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [missingParams, regNo, cid]);
 
   const showResult = !loading && !error && result;
 
