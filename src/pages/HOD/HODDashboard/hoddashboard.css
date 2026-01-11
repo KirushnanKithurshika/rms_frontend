@@ -1,0 +1,77 @@
+
+.hod-role-label {
+  font-size: 12px;
+  color: #8f8f8f;
+  padding: 14px 40px 4px;
+}
+
+.hod-semester-section {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.hod-semester-header {
+  background-color: #005180;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.hod-batch-label {
+  opacity: 0.95;
+}
+
+
+.hod-semester-body {
+  padding: 16px 24px;
+  background-color: #ffffff;
+}
+
+
+.hod-semester-body-empty {
+  min-height: 80px;
+}
+
+.hod-empty-placeholder {
+  display: inline-block;
+}
+
+
+
+.pa-button.hod-pending {
+ background-color: #ffe6b3;
+  color: #8a5a00;
+  cursor: default;
+}
+
+.pa-button.hod-pending:hover {
+  background-color: #cbd2e0;
+  transform: none;
+}
+
+
+.hod-approved {
+  background-color: #059669 !important;
+}
+
+@media (max-width: 768px) {
+  .hod-semester-header {
+    padding: 8px 16px;
+  }
+
+  .hod-semester-body {
+    padding: 12px 16px;
+  }
+}
+
+
+/* comment */

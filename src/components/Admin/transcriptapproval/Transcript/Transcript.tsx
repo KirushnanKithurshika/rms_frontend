@@ -112,8 +112,8 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
   const serial = data?.serialNo ?? s?.serialNo;
   const ogpa = p?.overallGPA ?? p?.overallGradePointAverage;
 
-  const SPLIT_AFTER = 4; // change to 5 etc. if you need more/less on page 2
-  const semesters: SemesterData[] = SAMPLE_SEMESTERS; // or pass your real data here
+  const SPLIT_AFTER = 4; 
+  const semesters: SemesterData[] = SAMPLE_SEMESTERS; 
 
   return (
     <>
@@ -323,7 +323,7 @@ const Transcript: React.FC<Props> = ({ data = SAMPLE_DATA }) => {
         </section>
       </section>
 
-      {/* ===== Page 4: Explanation / Legend ===== */}
+   
       <section className="sheet a4">
         <TranscriptExplanation />
       </section>

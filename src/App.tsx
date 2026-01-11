@@ -63,7 +63,7 @@ import SignatureBoard from "./components/SignatureCanvas/SignatureCanvas";
 import ResultsApprovalPage from "./pages/ApprovalResults/ResultsApproval/ResultsApproval";
 import AnnouncementPage from "./pages/lectures/Announcement/Announcemnet";
 import ModifyResults from "./pages/lectures/modifyresults/modifyresults";
-import TranscriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
+
 import AcademicSetup from "./pages/Admin/academicsetupLayout/academicsetup";
 import UniversitiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/University";
 import FacultiesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/FacultyTable";
@@ -72,6 +72,12 @@ import SemestersTable from "./pages/Admin/academicsetupLayout/AcademicSetupTable
 import BatchesTable from "./pages/Admin/academicsetupLayout/AcademicSetupTables/BatchesTable";
 import StudentManagementLec from "./pages/lectures/studentmanagement/StudentManagementL";
 import Courses from "./pages/lectures/courses/courses";
+import ActivateAccount from "./pages/ActivateAccountPage/activateaccount";
+import HODDashboard from "./pages/HOD/HODDashboard/HODDashboard";
+import TranscriptManagementAR from "./pages/Admin/TranscriptRequest/TranscriptManagementLayout";
+import TrasncriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
+import RejectedTranscriptRequests from "./pages/Admin/TranscriptRequest/RejectedTranscriptRequests";
+import AnnouncementAdminPage from "./pages/Admin/adminannouncement/AdminAnnouncement";
 import TranscriptVerifyPage from "./pages/TranscriptVerify/TranscriptVerifyPage";
 
 function App() {
@@ -98,6 +104,7 @@ function App() {
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/landing" element={<LandingRedirect />} />
           <Route path="/drop" element={<UserDropdown />} />
+          <Route path="/activate-account" element={<ActivateAccount />} />
           <Route path="/account-setting" element={<AccountSettings />} />
 
           {/* Lecturer routes */}
@@ -105,19 +112,19 @@ function App() {
           <Route path="/lecturer/student-management" element={<StudentManagementLec />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
           <Route path="/createcourseui" element={<CreateCourseUI />} />
-          <Route path="/courses" element={<Courses/>} />
+          <Route path="/courses" element={<Courses />} />
           <Route path="/results-preview" element={<ResultsPreviewPage />} />
           <Route path="/results-analysis" element={<AnalizePage />} />
           <Route path="/createcourse" element={<CreateCourseForm />} />
 
-      
+
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/user-management" element={<UserManagement />} />
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
-          <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
+           <Route path="/admin/Announcement" element={<AnnouncementAdminPage />} />
 
-      
+
           <Route path="/student/student-dashboard" element={<StudentDashboard />} />
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
@@ -142,7 +149,7 @@ function App() {
           />
           <Route path="/lec-announcement-page" element={<AnnouncementPage />} />
         </Route>
-
+ <Route path="/hod-approval" element={<HODDashboard/>} />
         {/* ------------------ ADMIN-ONLY AREA ------------------ */}
         <Route element={<RequireRole roles={["ADMIN"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -152,7 +159,7 @@ function App() {
             path="/admin/student-management"
             element={<StudentManagement />}
           />
-          <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} />
+          {/* <Route path="/admin/transcripts" element={<TranscriptApprovalsAR />} /> */}
           <Route path="/admin/audit-logs" element={<AuditLog />} />
         </Route>
           <Route path="/admin/academicsetup" element={<AcademicSetup />}>
@@ -161,10 +168,21 @@ function App() {
             <Route path="faculties" element={<FacultiesTable />} />
             <Route path="departments" element={<DepartmentsTable />} />
             <Route path="semesters" element={<SemestersTable />} />
-            <Route path="batches" element={<BatchesTable/>} />
+            <Route path="batches" element={<BatchesTable />} />
+          </Route>
+
+          <Route
+            path="/admin/transcript-requests"
+            element={<TranscriptManagementAR />}
+          >
+     
+            <Route index element={<Navigate to="pending" replace />} />
+
+            <Route path="pending" element={<TrasncriptApprovalsAR/>} />
+            <Route path="rejected" element={<RejectedTranscriptRequests/>} />
           </Route>
         {/* ------------------ FALLBACK ------------------ */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+<Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );
