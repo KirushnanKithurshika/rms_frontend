@@ -44,6 +44,7 @@ import TranscriptManagementAR from "./pages/Admin/TranscriptRequest/TranscriptMa
 import TrasncriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
 import RejectedTranscriptRequests from "./pages/Admin/TranscriptRequest/RejectedTranscriptRequests";
 import AnnouncementAdminPage from "./pages/Admin/adminannouncement/AdminAnnouncement";
+import AdminResultsManagement from "./pages/Admin/adminresultsApproval/AdminResultsApproval";
 
 function App() {
   return (
@@ -74,7 +75,7 @@ function App() {
           <Route path="/admin/role-management" element={<RoleManagement />} />
           <Route path="/admin/student-management" element={<StudentManagement />} />
            <Route path="/admin/Announcement" element={<AnnouncementAdminPage />} />
-
+   <Route path="/admin/results-management" element={<AdminResultsManagement/>} />
 
           <Route path="/StudentResultsSheet" element={<StudentResultsSheet />} />
           <Route path="/student-courses" element={<StudentCoursesPage />} />
@@ -101,6 +102,7 @@ function App() {
             <Route path="departments" element={<DepartmentsTable />} />
             <Route path="semesters" element={<SemestersTable />} />
             <Route path="batches" element={<BatchesTable />} />
+            
           </Route>
 
           <Route

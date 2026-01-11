@@ -37,7 +37,7 @@ const ResultsApprovalPage = () => {
           <ResultsApprovalSidebar />
         </div>
 
-        {/* Main Area */}
+     
         <div className="main-area-approval">
           <div className="card-approval">
             <div className="CAA">
