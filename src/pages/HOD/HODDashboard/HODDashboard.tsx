@@ -29,8 +29,22 @@ type CourseSummary = {
   courseTitle: string;
   batch: string;
   semester: string;
+  semesterId?: number;
   hasSheet: boolean;
   approved: boolean;
+};
+
+type ResultBatchStatus = "BATCH_CREATED" | "DEPT_APPROVED" | string;
+
+type ResultBatch = {
+  id: number;
+  name: string;
+  semesterId: number;
+  semesterName: string;
+  departmentId: number;
+  departmentName: string;
+  status: ResultBatchStatus;
+  resultCount: number;
 };
 
 const HODDashboard: React.FC = () => {
@@ -41,10 +55,32 @@ const HODDashboard: React.FC = () => {
   const [activeSheetId, setActiveSheetId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSemesterKey, setSelectedSemesterKey] = useState<string | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
+  const [selectedSemesterId, setSelectedSemesterId] = useState<number | null>(null);
+  const [batchName, setBatchName] = useState("");
+  const [batchError, setBatchError] = useState<string | null>(null);
+  const [currentBatch, setCurrentBatch] = useState<ResultBatch | null>(null);
+  const [creatingBatch, setCreatingBatch] = useState(false);
+  const [approvingBatch, setApprovingBatch] = useState(false);
 
-  const uniqueSemesters = useMemo(() => {
-    if (!courses.length) return [];
-    return Array.from(new Set(courses.map((c) => c.semester || "Unspecified")));
+  const semesterOptions = useMemo(() => {
+    const map = new Map<string, { key: string; name: string; id: number | null }>();
+    courses.forEach((c) => {
+      const name = c.semester || "Unspecified";
+      const id = typeof c.semesterId === "number" ? c.semesterId : null;
+      const key = `${id ?? "na"}::${name}`;
+      if (!map.has(key)) {
+        map.set(key, { key, name, id });
+      }
+    });
+    return Array.from(map.values());
+  }, [courses]);
+
+  const semesterNames = useMemo(() => {
+    const names = new Set<string>();
+    courses.forEach((c) => names.add(c.semester || "Unspecified"));
+    return Array.from(names);
   }, [courses]);
 
   useEffect(() => {
@@ -71,8 +107,13 @@ const HODDashboard: React.FC = () => {
         if (cancelled) return;
 
         setDepartmentName(payload?.departmentName ?? "");
-        setCourses(payload?.courses ?? []);
+        const incomingCourses = payload?.courses ?? [];
+        setCourses(incomingCourses);
         setSheets(payload?.sheets ?? []);
+        setCurrentBatch(null);
+        setBatchError(null);
+        setBatchName("");
+        setSelectedSemesterKey((prev) => prev);
       } catch (e: any) {
         if (cancelled) return;
         const msg =
@@ -91,6 +132,35 @@ const HODDashboard: React.FC = () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!semesterOptions.length) {
+      setSelectedSemesterKey(null);
+      setSelectedSemester(null);
+      setSelectedSemesterId(null);
+      return;
+    }
+    const exists = semesterOptions.some((opt) => opt.key === selectedSemesterKey);
+    if (!exists) {
+      setSelectedSemesterKey(semesterOptions[0].key);
+    }
+  }, [semesterOptions, selectedSemesterKey]);
+
+  useEffect(() => {
+    if (!selectedSemesterKey) {
+      setSelectedSemester(null);
+      setSelectedSemesterId(null);
+      return;
+    }
+    const match = semesterOptions.find((opt) => opt.key === selectedSemesterKey);
+    setSelectedSemester(match?.name ?? null);
+    setSelectedSemesterId(match?.id ?? null);
+  }, [selectedSemesterKey, semesterOptions]);
+
+  useEffect(() => {
+    if (!selectedSemester) return;
+    setBatchName((prev) => (prev ? prev : `${selectedSemester} Batch`));
+  }, [selectedSemester]);
 
   const activeSheet = activeSheetId
     ? sheets.find((s) => s.id === activeSheetId) || null
@@ -133,6 +203,63 @@ const HODDashboard: React.FC = () => {
       "#results-pdf-root",
       `${activeSheet.courseCode}-${activeSheet.courseTitle}.pdf`
     );
+  };
+
+  const handleCreateBatch = async () => {
+    if (!departmentId || !selectedSemesterId) {
+      setBatchError("Select a semester that includes a valid ID.");
+      return;
+    }
+    if (!batchName.trim()) {
+      setBatchError("Provide a batch name.");
+      return;
+    }
+
+    setCreatingBatch(true);
+    setBatchError(null);
+    try {
+      const res = await api.post("/result-batches", null, {
+        params: {
+          name: batchName.trim(),
+          semesterId: selectedSemesterId,
+          departmentId,
+        },
+      });
+      const data = (res.data?.data ?? res.data) as ResultBatch;
+      setCurrentBatch(data);
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        e?.message ||
+        "Failed to create batch.";
+      setBatchError(msg);
+    } finally {
+      setCreatingBatch(false);
+    }
+  };
+
+  const handleApproveBatch = async () => {
+    if (!currentBatch?.id) {
+      setBatchError("Create a batch before approving.");
+      return;
+    }
+    setApprovingBatch(true);
+    setBatchError(null);
+    try {
+      const res = await api.post(`/result-batches/${currentBatch.id}/approve-department`);
+      const data = (res.data?.data ?? res.data) as ResultBatch;
+      setCurrentBatch(data);
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        e?.message ||
+        "Failed to approve batch.";
+      setBatchError(msg);
+    } finally {
+      setApprovingBatch(false);
+    }
   };
 
   const renderSemesterSection = (semester: string) => {
@@ -231,6 +358,100 @@ const HODDashboard: React.FC = () => {
 
               {!activeSheet && (
                 <div className="tAR-inline-body-results">
+                  <div className="hod-batch-panel">
+                    <div className="batch-panel-header">
+                      <div>
+                        <h3>Create/Approve Result Batch</h3>
+                        <p>Select a semester, provide a batch name, then create and approve.</p>
+                      </div>
+                      {currentBatch && (
+                        <span className={`batch-status ${currentBatch.status?.toLowerCase()}`}>
+                          {currentBatch.status.replace(/_/g, " ")}
+                        </span>
+                      )}
+                    </div>
+                    <div className="batch-panel-grid">
+                      <label className="batch-field">
+                        <span>Semester</span>
+                        <select
+                          value={selectedSemesterKey ?? ""}
+                          onChange={(e) =>
+                            setSelectedSemesterKey(e.target.value || null)
+                          }
+                        >
+                          <option value="">Select semester</option>
+                          {semesterOptions.map((opt) => (
+                            <option
+                              key={opt.key}
+                              value={opt.key}
+                              disabled={!opt.id}
+                            >
+                              {opt.name}
+                              {opt.id ? ` (ID: ${opt.id})` : " (ID missing)"}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="batch-field">
+                        <span>Batch Name</span>
+                        <input
+                          type="text"
+                          value={batchName}
+                          onChange={(e) => setBatchName(e.target.value)}
+                          placeholder="e.g. Sem 02 - 22nd Batch"
+                        />
+                      </label>
+                      <div className="batch-actions">
+                        <button
+                          type="button"
+                          className="taAR-btn"
+                          onClick={handleCreateBatch}
+                          disabled={
+                            creatingBatch ||
+                            !selectedSemesterId ||
+                            !departmentId ||
+                            !batchName.trim()
+                          }
+                        >
+                          {creatingBatch ? "Creating..." : "Create Batch"}
+                        </button>
+                        <button
+                          type="button"
+                          className="taAR-btn taAR-btn--ghost"
+                          onClick={handleApproveBatch}
+                          disabled={
+                            approvingBatch ||
+                            !currentBatch ||
+                            currentBatch.status === "DEPT_APPROVED"
+                          }
+                        >
+                          {approvingBatch
+                            ? "Approving..."
+                            : currentBatch?.status === "DEPT_APPROVED"
+                            ? "Approved"
+                            : "Approve Department"}
+                        </button>
+                      </div>
+                    </div>
+                    {batchError && (
+                      <div className="hod-error" role="alert">
+                        {batchError}
+                      </div>
+                    )}
+                    {currentBatch && (
+                      <div className="batch-summary">
+                        <span>
+                          <strong>ID:</strong> {currentBatch.id}
+                        </span>
+                        <span>
+                          <strong>Results:</strong> {currentBatch.resultCount}
+                        </span>
+                        <span>
+                          <strong>Semester:</strong> {currentBatch.semesterName}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   {error && (
                     <div className="hod-error" role="alert">
                       {error}
@@ -239,14 +460,14 @@ const HODDashboard: React.FC = () => {
                   {loading && (
                     <div className="hod-loading">Loading dashboard...</div>
                   )}
-                  {!loading && !error && uniqueSemesters.length === 0 && (
+                  {!loading && !error && semesterNames.length === 0 && (
                     <div className="hod-empty-placeholder">
                       No courses available for approval.
                     </div>
                   )}
                   {!loading &&
                     !error &&
-                    uniqueSemesters.map((semester) => renderSemesterSection(semester))}
+                    semesterNames.map((semester) => renderSemesterSection(semester))}
                 </div>
               )}
 
