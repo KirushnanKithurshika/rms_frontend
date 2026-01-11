@@ -159,7 +159,7 @@ const TranscriptPaymentPage: React.FC = () => {
                   }}
                   disabled={loading}
                 />
-                <span>Official Transcript (LKR 500.00)</span>
+                <span>Orginal Transcript (LKR 500.00)</span>
               </label>
               <label className="tp-radio">
                 <input
@@ -177,7 +177,7 @@ const TranscriptPaymentPage: React.FC = () => {
                   }}
                   disabled={loading}
                 />
-                <span>Unofficial Transcript (LKR 300.00)</span>
+                <span>Softcopy Transcript (LKR 300.00)</span>
               </label>
             </div>
             {fieldErrors.transcriptType && (
