@@ -371,6 +371,7 @@ const StudentManagement: React.FC = () => {
                   <table className="user-table">
                     <thead>
                       <tr>
+                        <th>No.</th>
                         <th>Full Name</th>
                         <th>Reg No</th>
                         <th>Username</th>
@@ -387,11 +388,11 @@ const StudentManagement: React.FC = () => {
                     <tbody>
                       {loading ? (
                         <tr>
-                          <td colSpan={9}> loading...</td>
+                          <td colSpan={12}> loading...</td>
                         </tr>
                       ) : Student.length === 0 ? (
                         <tr>
-                          <td colSpan={9}> No data available</td>
+                          <td colSpan={12}> No data available</td>
                         </tr>
                       ) : (
                         Student.map((student, i) => (
@@ -403,6 +404,7 @@ const StudentManagement: React.FC = () => {
                             student.regNo ||
                             i
                           }>
+                            <td>{(page - 1) * pageSize + i + 1}</td>
                             <td>
                               {student.firstName} {student.lastName}
                             </td>

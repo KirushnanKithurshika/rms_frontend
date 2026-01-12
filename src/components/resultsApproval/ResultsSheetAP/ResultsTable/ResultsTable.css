@@ -14,8 +14,21 @@
   }
   .results-table td:nth-child(2) { text-align: left; }
   .results-table thead { font-weight: bold; }
-  .results-table tbody tr:nth-child(even) { background: #f7f7f7; }
+.results-table tbody tr:nth-child(even) { background: #f7f7f7; }
 
-  .RT{
+.RT{
     margin-top: 5px;
   }
+
+.rt-wrapper {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.rt-loading,
+.rt-empty {
+  padding: 12px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #1f2937;
+}

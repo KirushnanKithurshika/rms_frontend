@@ -35,6 +35,7 @@ import StudentCoursesPage from "./pages/Students/StudentsCourse/studentscoursein
 import StudentTranscript from "./pages/Students/Studenttranscriptpage/StudentTrancscript";
 import StudentTranscriptRequestForm from "./pages/Students/StuentstranscriptApplicationPage/StuTraAppPage";
 import TranscripStatus from "./pages/Students/stuTraStatus/StuTraStatus";
+import TranscriptPaymentPage from "./pages/Payments/TranscriptPaymentPage";
 
 // Shared / user
 import AccountSettings from "./pages/UserProfileSetting/userprofilesetting";
@@ -78,6 +79,7 @@ import TranscriptManagementAR from "./pages/Admin/TranscriptRequest/TranscriptMa
 import TrasncriptApprovalsAR from "./pages/Admin/TranscriptRequest/TraPendApp";
 import RejectedTranscriptRequests from "./pages/Admin/TranscriptRequest/RejectedTranscriptRequests";
 import AnnouncementAdminPage from "./pages/Admin/adminannouncement/AdminAnnouncement";
+import TranscriptVerifyPage from "./pages/TranscriptVerify/TranscriptVerifyPage";
 
 function App() {
   return (
@@ -85,6 +87,8 @@ function App() {
       <Routes>
         {/* ------------------ PUBLIC / AUTH FLOW ------------------ */}
         <Route path="/not-authorized" element={<NotAuthorized />} />
+        {/* Public transcript verification (QR landing) */}
+        <Route path="/verify-transcript" element={<TranscriptVerifyPage />} />
 
         {/* Welcome + auth pages: only for anonymous users */}
         <Route element={<RequireAnonymous />}>
@@ -133,6 +137,10 @@ function App() {
           <Route
             path="/student/transcript/status"
             element={<TranscripStatus />}
+          />
+          <Route
+            path="/student/transcript/payment"
+            element={<TranscriptPaymentPage />}
           />
 
           <Route path="/approval-requests" element={<ApprovalPage />} />

@@ -200,6 +200,72 @@ body {
     margin-top: 30mm;
 }
 
+.meta-table {
+    width: 100%;
+    border: 1px solid #cbd5f5;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.meta-table .meta-label {
+    font-weight: 600;
+    width: 25%;
+    padding: 6px;
+    border: 1px solid #cbd5f5;
+    background: #f4f8ff;
+}
+
+.meta-table .meta-value {
+    width: 75%;
+    padding: 6px;
+    border: 1px solid #cbd5f5;
+    background: #fff;
+}
+
+.rs-note {
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 12px;
+}
+
+.rs-loading {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #1f2937;
+}
+
+.clean-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.clean-table th,
+.clean-table td {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 12px;
+}
+
+.clean-table th {
+    background: #f3f4f6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.row-light {
+    background: #ffffff;
+}
+
+.row-dark {
+    background: #f9fafb;
+}
+
+.rs-note strong {
+    color: #1f2937;
+}
+
 .footer-block .cols {
     display: flex;
     justify-content: space-between;
