@@ -16,6 +16,17 @@ const LANDING_RULES: Array<{ anyOf: string[]; path: string }> = [
     anyOf: ["VIEW_RESULT", "VIEW_TRANSCRIPT"],
     path: "/student/student-dashboard",
   },
+  // HOD landing – privileges HOD uniquely have
+  {
+    anyOf: ["APPROVE_RESULT_DEPARTMENT"],
+    path: "/hod-approval",
+  },
+    // Dean/Senete/AR landing – privileges uniquely have
+  {
+    anyOf: ["APPROVE_RESULT_FACULTY", "APPROVE_RESULT_SENATE", "RELEASE_RESULT"],
+    path: "/results-approval-requests",
+  },
+
 ];
 
 // Fallback if nothing matches

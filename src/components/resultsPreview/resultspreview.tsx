@@ -13,6 +13,22 @@ import {
 import api from "../../services/api";
 
 // No dummy data; wired to backend
+import { downloadResultsSheetPdf } from "../../utils/downloadResultsSheetPreview"; 
+
+// Dummy Data
+const dummyData = [
+  { id: "1", name: "Student A", project: 18, quiz1: 25, quiz2: 28, total: 71, status: "Pass" },
+  { id: "2", name: "Student B", project: 15, quiz1: 22, quiz2: 27, total: 64, status: "Pass" },
+  { id: "3", name: "Student C", project: 17, quiz1: 26, quiz2: 25, total: 68, status: "Pass" },
+  { id: "4", name: "Student D", project: 19, quiz1: 27, quiz2: 29, total: 75, status: "Pass" },
+  { id: "5", name: "Student E", project: 20, quiz1: 28, quiz2: 28, total: 76, status: "Pass" },
+];
+
+const courses = [
+  { code: "EC7201", name: "Information Security" },
+  { code: "EC7202", name: "Computer Networks" },
+  { code: "EC7203", name: "Web Engineering" },
+];
 
 type Option = { value: string; label: string };
 
@@ -88,7 +104,7 @@ const CustomDropdownVL: React.FC<{
   );
 };
 
-/** ------- Main Component ------- */
+
 const ResultsPreview: React.FC = () => {
   const dispatch = useAppDispatch();
   const userId = useAppSelector(selectUserId);
@@ -121,6 +137,10 @@ dispatch(fetchAllocationsByLecturer(lid));
 })();
 }, [dispatch, userId]);
 
+
+  const caPageRef = useRef<HTMLDivElement | null>(null);
+  const fePageRef = useRef<HTMLDivElement | null>(null);
+
   const courseOptions: Option[] = useMemo(() => {
     return allocations.map((a) => ({
       value: String(a.allocationId),
@@ -147,7 +167,6 @@ dispatch(fetchAllocationsByLecturer(lid));
     );
   }, [dispatch, selectedAllocationId, activeTab]);
 
-  // -------- PDF Export (only results content) ----------
   const handleExportPDF = async () => {
     const input = document.querySelector(".rp-results-content") as HTMLElement;
     if (!input) return;
@@ -260,12 +279,11 @@ dispatch(fetchAllocationsByLecturer(lid));
         </button>
       </div>
 
-      {/* Results Page */}
       <div className="rp-page">
         {activeTab === "CA" && (
           <div className="rp-card">
             <div className="rp-results-content">
-              <div className="results-page">
+              <div className="results-page-preview" ref={caPageRef}>
                 <div className="rp-card-header">
                   <div className="rp-section">
                     <h4>
@@ -290,6 +308,7 @@ dispatch(fetchAllocationsByLecturer(lid));
                     </p>
                   </div>
                 </div>
+
                 <div className="rp-table-wrap">
                   <table className="rp-table">
                     <thead>
@@ -355,7 +374,7 @@ dispatch(fetchAllocationsByLecturer(lid));
         {activeTab === "FE" && (
           <div className="rp-card">
             <div className="rp-results-content">
-              <div className="results-page">
+              <div className="results-page" ref={fePageRef}>
                 <div className="rp-card-header">
                   <div className="rp-section">
                     <h4>
@@ -380,6 +399,7 @@ dispatch(fetchAllocationsByLecturer(lid));
                     </p>
                   </div>
                 </div>
+
                 <div className="rp-table-wrap">
                   <table className="rp-table">
                     <thead>
