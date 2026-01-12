@@ -157,11 +157,110 @@ const tryDecodeQrPayload = async (blob: Blob): Promise<string | undefined> => {
   return decodeWithJsQr(blob);
 };
 
+type AvailabilityState = TranscriptStatus | "loading" | "unavailable";
+
 const StudentTranscript = () => {
   const navigate = useNavigate();
+  const userId = useAppSelector(selectUserId);
 
   const transcriptId = "ABC123";
   const lastUpdated = "2025-09-25 14:05";
+
+  const [qrSrc, setQrSrc] = useState<string | undefined>(undefined);
+  const [status, setStatus] = useState<AvailabilityState>("loading");
+  const [caption, setCaption] = useState<string>("Fetching transcript status...");
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadQr = async () => {
+      setLoading(true);
+      setVerifyError(null);
+      try {
+        const res = await api.get(`/transcripts/${userId}/qr`, {
+          responseType: "blob",
+        });
+        if (cancelled) return;
+        const blob: Blob = res.data;
+        const url = URL.createObjectURL(blob);
+        setQrSrc(url);
+        setCaption("Scan to verify transcript authenticity.");
+        setStatus("available");
+        setVerificationUrl(null);
+        const payload = await tryDecodeQrPayload(blob);
+        if (payload && !cancelled) {
+          setVerificationUrl(payload);
+          setVerifying(true);
+          const params = getVerifyParamsFromUrl(payload);
+          if (params) {
+            try {
+              const verifyRes = await api.get("/api/v1/transcripts/verify", {
+                params,
+              });
+              if (cancelled) return;
+              const data = verifyRes.data?.data ?? verifyRes.data;
+              setVerifyResult(
+                typeof data === "object"
+                  ? {
+                      valid: data.valid,
+                      message: data.message,
+                      regNo: data.regNo,
+                      cid: data.cid,
+                      ipfsUrl: data.ipfsUrl,
+                      txHash: data.txHash,
+                      anchoredAt: data.anchoredAt,
+                    }
+                  : { valid: false, message: "Invalid verify response." }
+              );
+            } catch (err: any) {
+              if (cancelled) return;
+              setVerifyError(
+                err?.response?.data?.message ||
+                  err?.message ||
+                  "Failed to verify transcript."
+              );
+              setVerifyResult(null);
+            } finally {
+              if (!cancelled) setVerifying(false);
+            }
+          } else {
+            setVerifyError("QR payload missing required verification parameters.");
+            setVerifyResult(null);
+            setVerifying(false);
+          }
+        } else {
+          setVerifyError("Unable to decode QR payload.");
+          setVerifying(false);
+        }
+      } catch (err: any) {
+        if (cancelled) return;
+        setStatus("unavailable");
+        setCaption(
+          err?.response?.data?.message ||
+            err?.message ||
+            "Unable to fetch transcript QR."
+        );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    if (userId) {
+      loadQr();
+    } else {
+      setStatus("unavailable");
+      setCaption("User not identified.");
+    }
+
+    return () => {
+      cancelled = true;
+      if (qrSrc) URL.revokeObjectURL(qrSrc);
+    };
+  }, [userId]);
 
   const handleApply = () => navigate("/student/transcript/apply");
   const handleOpen = () => navigate(`/student/transcript/view?id=${transcriptId}`);
@@ -189,7 +288,13 @@ const StudentTranscript = () => {
 
           <div className="card-students-trsnscript">
             <TranscriptAvailability
-              status={status}
+              status={
+                status === "available"
+                  ? "available"
+                  : status === "processing"
+                  ? "processing"
+                  : "notApplied"
+              }
               imageSrc={qrSrc}
               onApply={handleApply}
               onOpen={status === "available" ? handleOpen : undefined}
