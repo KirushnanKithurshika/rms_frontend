@@ -83,7 +83,7 @@ const DEFAULT_ROWS: ResultSheetRow[] = [
 const gradeRow = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "E", "N", "W"];
 const gpRow = ["4.0", "4.0", "3.7", "3.3", "3.0", "2.7", "2.3", "2.0", "1.7", "0.0", "-", "-"];
 
-const formatLongDate = (d?: string | Date) => {
+const formatLongDate = (d?: string | Date | null) => {
   const date = d ? new Date(d) : new Date();
   return new Intl.DateTimeFormat("en-US", {
     month: "long",

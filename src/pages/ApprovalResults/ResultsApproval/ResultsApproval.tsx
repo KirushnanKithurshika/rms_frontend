@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Navbarin from "../../../components/Navbar/navbarin";
 import "./ResultsApproval.css";
-import PendingApprovals from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
+import PendingApprovals, {
+  type ApprovalItem,
+} from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
 import ResultsSheetAP from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
 import type {
@@ -247,7 +249,7 @@ const ResultsApprovalPage = () => {
         const actionableRelease = !approvalLevel && canRelease && batch.status === "SENATE_APPROVED";
         const actionable = actionableApproval || actionableRelease;
         const statusLabel = STATUS_LABELS[batch.status] ?? batch.status;
-        const statusClass = actionable
+        const statusClass: ApprovalItem["statusClass"] = actionable
           ? "pending"
           : approvalLevel
           ? batch.status === completedStatus

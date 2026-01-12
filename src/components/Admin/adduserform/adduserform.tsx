@@ -135,8 +135,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             if (!id || !label) return null;
             return { id, label };
           })
-          .filter((r): r is Role => Boolean(r?.id && r?.label))
-          .filter((r) => r.label.toUpperCase() !== "STUDENT");
+          .filter((r: Role | null): r is Role => Boolean(r?.id && r?.label))
+          .filter((r: Role) => r.label.toUpperCase() !== "STUDENT");
 
         setRoles(mapped);
         setSelectedRoleId((prev) => {
@@ -177,7 +177,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             if (!id || !name) return null;
             return { id, name };
           })
-          .filter((d): d is Department => Boolean(d?.id && d?.name));
+          .filter((d: Department | null): d is Department => Boolean(d?.id && d?.name));
 
         setDepartments(mapped);
       } catch {
