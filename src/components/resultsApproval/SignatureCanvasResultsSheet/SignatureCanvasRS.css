@@ -111,6 +111,9 @@
   border: 1px solid #cbd5e1;
   border-radius: 4px;
 }
+.sig-preview-inline {
+  margin-bottom: 0.75rem;
+}
 .sig-toolbar-overlay {
   position: absolute;
   top: 6px;

@@ -42,11 +42,14 @@ const ResultsApprovalPage = () => {
   const privileges = useAppSelector(selectPrivileges);
   const canApproveFaculty = privileges?.includes("APPROVE_RESULT_FACULTY");
   const canApproveSenate = privileges?.includes("APPROVE_RESULT_SENATE");
+  const canRelease = privileges?.includes("RELEASE_RESULT");
   const approvalLevel: ApprovalLevel | null = canApproveSenate
     ? "SENATE"
     : canApproveFaculty
     ? "FACULTY"
     : null;
+  const showReleaseOnly = !approvalLevel && canRelease;
+  const noAccess = !approvalLevel && !canRelease;
 
   const [batches, setBatches] = useState<ResultBatchResponse[]>([]);
   const [listLoading, setListLoading] = useState(false);
@@ -54,8 +57,10 @@ const ResultsApprovalPage = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [approving, setApproving] = useState(false);
+  const [releasing, setReleasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signatureData, setSignatureData] = useState<string | null>(null);
+  const [releaseSignature, setReleaseSignature] = useState<string | null>(null);
   const printRootRef = useRef<HTMLDivElement | null>(null);
 
   const completedStatus = approvalLevel === "SENATE" ? "SENATE_APPROVED" : "FACULTY_APPROVED";
@@ -63,7 +68,7 @@ const ResultsApprovalPage = () => {
     approvalLevel === "SENATE" ? "SENATE" : approvalLevel === "FACULTY" ? "FACULTY_COMMITTEE" : null;
 
   const fetchBatches = useCallback(async () => {
-    if (!approvalLevel) return;
+    if (noAccess) return;
     setListLoading(true);
     setError(null);
     try {
@@ -81,7 +86,7 @@ const ResultsApprovalPage = () => {
     } finally {
       setListLoading(false);
     }
-  }, [approvalLevel]);
+  }, [noAccess]);
 
   useEffect(() => {
     fetchBatches();
@@ -131,6 +136,7 @@ const ResultsApprovalPage = () => {
 
   useEffect(() => {
     setSignatureData(null);
+    setReleaseSignature(null);
   }, [selectedId, approvalLevel]);
 
   const isBatchActionable = useCallback(
@@ -183,24 +189,78 @@ const ResultsApprovalPage = () => {
     }
   };
 
+  const handleRelease = async () => {
+    if (!selectedBatch || !releaseActionEnabled) return;
+    if (!releaseSignature) {
+      showError("Please capture your signature before releasing.");
+      return;
+    }
+    setReleasing(true);
+    setError(null);
+    try {
+      await api.post(`/result-batches/${selectedBatch.id}/release`, {
+        signatureImage: releaseSignature,
+      });
+      showSuccess("Batch released successfully.");
+      await fetchBatches();
+      await fetchBatchDetails(selectedBatch.id);
+      setReleaseSignature(null);
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Failed to release batch.";
+      setError(msg);
+      showError(msg);
+    } finally {
+      setReleasing(false);
+    }
+  };
+
   const handleDownloadPdf = async () => {
     if (!selectedBatch) return;
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     await downloadExactHtmlPdf("#results-pdf-root", `${selectedBatch.name}.pdf`);
   };
 
-  const approvalHeading = approvalLevel === "SENATE" ? "Senate" : "Dean";
+  const approvalHeading = approvalLevel === "SENATE"
+    ? "Senate Result Approval"
+    : approvalLevel === "FACULTY"
+    ? "Dean Result Approval"
+    : canRelease
+    ? "Results Release"
+    : "Results Approval";
+
+  const displayBatches = useMemo(() => {
+    if (approvalLevel) return batches;
+    if (canRelease) {
+      return batches.filter((b) => ["SENATE_APPROVED", "RELEASED"].includes(b.status));
+    }
+    return [];
+  }, [approvalLevel, batches, canRelease]);
 
   const pendingItems = useMemo(
     () =>
-      batches.map((batch) => {
-        const actionable = isBatchActionable(batch);
+      displayBatches.map((batch) => {
+        const actionableApproval = approvalLevel ? isBatchActionable(batch) : false;
+        const actionableRelease = !approvalLevel && canRelease && batch.status === "SENATE_APPROVED";
+        const actionable = actionableApproval || actionableRelease;
         const statusLabel = STATUS_LABELS[batch.status] ?? batch.status;
         const statusClass = actionable
           ? "pending"
-          : batch.status === completedStatus
+          : approvalLevel
+          ? batch.status === completedStatus
+            ? "approved"
+            : "neutral"
+          : batch.status === "RELEASED"
           ? "approved"
           : "neutral";
+        const actionLabel = actionable
+          ? approvalLevel
+            ? "View & Approve"
+            : "View & Release"
+          : "View";
         return {
           id: String(batch.id),
           title: batch.name,
@@ -208,10 +268,10 @@ const ResultsApprovalPage = () => {
           statusText: statusLabel,
           statusClass,
           meta: `${batch.resultCount ?? 0} results`,
-          actionLabel: actionable ? "View & Approve" : "View",
+          actionLabel,
         };
       }),
-    [batches, completedStatus, isBatchActionable]
+    [approvalLevel, canRelease, completedStatus, displayBatches, isBatchActionable]
   );
 
   const currentApprovalRecord = useMemo(() => {
@@ -226,6 +286,15 @@ const ResultsApprovalPage = () => {
       isBatchActionable(selectedBatch) &&
       !currentApprovalRecord?.signatureUrl
     );
+  const releaseRecord = useMemo(
+    () =>
+      selectedBatch?.approvals?.find((a) => a.level === "SPECIAL_RESULTS_BOARD") ?? null,
+    [selectedBatch]
+  );
+  const releaseActionEnabled = Boolean(
+    canRelease && selectedBatch && selectedBatch.status === "SENATE_APPROVED"
+  );
+  const releaseRequiresSignature = releaseActionEnabled && !releaseRecord?.signatureUrl;
 
   return (
     <div className="lec-dashboard-container">
@@ -242,18 +311,16 @@ const ResultsApprovalPage = () => {
           <div className="card-approval">
             <div className="CAA">
               <div className="tARD">
-                <span className="tAR-heading">
-                  {approvalLevel ? `${approvalHeading} Result Approval` : "Results Approval"}
-                </span>
+                <span className="tAR-heading">{approvalHeading}</span>
               </div>
 
-              {!approvalLevel && (
+              {noAccess && (
                 <div className="tAR-inline-body-results">
                   <p>You do not have permission to approve result batches.</p>
                 </div>
               )}
 
-              {approvalLevel && !selectedId && (
+              {!noAccess && !selectedId && (
                 <>
                   {error && (
                     <div className="hod-error" role="alert">
@@ -267,7 +334,7 @@ const ResultsApprovalPage = () => {
                 </>
               )}
 
-              {approvalLevel && selectedId && selectedBatch && (
+              {!noAccess && selectedId && selectedBatch && (
                 <>
                   <div className="tAR-inline">
                     <div className="tAR-inline-topbar">
@@ -290,21 +357,23 @@ const ResultsApprovalPage = () => {
                         Download PDF
                       </button>
 
-                      <button
-                        type="button"
-                        className="taAR-btn"
-                        onClick={handleApprove}
-                        disabled={
-                          approving || detailsLoading || !isBatchActionable(selectedBatch)
-                            || (requiresSignature && !signatureData)
-                        }
-                      >
-                        {approving
-                          ? "Approving…"
-                          : isBatchActionable(selectedBatch)
-                          ? "Approve"
-                          : "Already Approved"}
-                      </button>
+                      {approvalLevel && (
+                        <button
+                          type="button"
+                          className="taAR-btn"
+                          onClick={handleApprove}
+                          disabled={
+                            approving || detailsLoading || !isBatchActionable(selectedBatch)
+                              || (requiresSignature && !signatureData)
+                          }
+                        >
+                          {approving
+                            ? "Approving…"
+                            : isBatchActionable(selectedBatch)
+                            ? "Approve"
+                            : "Already Approved"}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -338,6 +407,42 @@ const ResultsApprovalPage = () => {
                     </div>
                   )}
 
+                  {selectedBatch && (releaseActionEnabled || releaseRecord) && (
+                    <div className="signature-panel">
+                      <div className="signature-panel-header">
+                        <span>Assistant Registrar Release Signature</span>
+                        {releaseRecord?.decidedAt && (
+                          <span>{new Date(releaseRecord.decidedAt).toLocaleString()}</span>
+                        )}
+                      </div>
+                      {releaseRecord?.signatureUrl ? (
+                        <div className="signature-preview">
+                          <img src={releaseRecord.signatureUrl} alt="Release signature" />
+                          <p className="signature-info">
+                            Signed by {releaseRecord.approver ?? "N/A"}
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <SignatureBoardRS
+                            value={releaseSignature}
+                            onChange={setReleaseSignature}
+                          />
+                          {releaseActionEnabled && (
+                            <button
+                              type="button"
+                              className="taAR-btn"
+                              onClick={handleRelease}
+                              disabled={releasing || !releaseSignature}
+                            >
+                              {releasing ? "Releasing…" : "Release Results"}
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+
                   <div className="tAR-inline-body-results">
                     <div className="rap" ref={printRootRef}>
                       <ResultsSheetAP
@@ -348,6 +453,8 @@ const ResultsApprovalPage = () => {
                         statusLabel={STATUS_LABELS[selectedBatch.status] ?? selectedBatch.status}
                         results={selectedBatch.results}
                         approvals={selectedBatch.approvals}
+                        finalApprovalDate={releaseRecord?.decidedAt ?? undefined}
+                        pendingReleaseSignature={releaseSignature}
                         loading={detailsLoading}
                       />
                     </div>

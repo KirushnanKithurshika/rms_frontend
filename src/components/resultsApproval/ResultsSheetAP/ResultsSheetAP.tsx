@@ -38,6 +38,7 @@ type Props = {
   loading?: boolean;
   finalApprovalDate?: string | Date;
   approvals?: ApprovalSignature[];
+  pendingReleaseSignature?: string | null;
 };
 
 const DEFAULT_ROWS: ResultSheetRow[] = [
@@ -107,6 +108,7 @@ const ResultsSheetAP: React.FC<Props> = ({
   loading,
   finalApprovalDate,
   approvals,
+  pendingReleaseSignature,
 }) => {
   const rows = Array.isArray(results) && results.length > 0 ? results : DEFAULT_ROWS;
   const moduleList = useMemo(() => {
@@ -129,6 +131,9 @@ const ResultsSheetAP: React.FC<Props> = ({
     });
     return map;
   }, [approvals]);
+  const releaseApproval = approvalsByLevel.get("SPECIAL_RESULTS_BOARD");
+  const releaseSignatureToShow = releaseApproval?.signatureUrl ?? pendingReleaseSignature ?? null;
+  const finalDateSource = finalApprovalDate ?? releaseApproval?.decidedAt ?? null;
 
   return (
     <section className="sheet a4" id="results-pdf-root">
@@ -227,10 +232,12 @@ const ResultsSheetAP: React.FC<Props> = ({
                     </div>
                   )}
                   <div className="sig-signboxAP">
-                    <SignatureBoardRS readOnly value={null} />
+                    <SignatureBoardRS
+                      readOnly
+                      value={releaseSignatureToShow}
+                    />
                   </div>
 
-                  <div className="sig-smallAP">Assistant Registrar</div>
                   <div className="sig-captionAP">
                     Assistant Registrar
                     <br />
@@ -238,10 +245,17 @@ const ResultsSheetAP: React.FC<Props> = ({
                     <br />
                     Hapugala, Galle
                   </div>
+                  {(releaseApproval?.decidedAt || pendingReleaseSignature) && (
+                    <div className="sig-smallAP">
+                      {releaseApproval?.decidedAt
+                        ? new Date(releaseApproval.decidedAt).toLocaleDateString()
+                        : "Pending Release"}
+                    </div>
+                  )}
 
                   <div className="sig-dateAP">
                     <span className="sig-dateLabelAP">Final Approval Date :</span>
-                    <span className="sig-dateValueAP">{formatLongDate(finalApprovalDate)}</span>
+                    <span className="sig-dateValueAP">{formatLongDate(finalDateSource)}</span>
                   </div>
                 </div>
 
