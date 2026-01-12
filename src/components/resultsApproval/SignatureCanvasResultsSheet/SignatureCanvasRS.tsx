@@ -5,7 +5,13 @@ import "./SignatureCanvasRS.css";
 type Point = { x: number; y: number };
 type Stroke = Point[];
 
-export default function SignatureBoardRS() {
+type Props = {
+  value?: string | null;
+  readOnly?: boolean;
+  onChange?: (value: string | null) => void;
+};
+
+export default function SignatureBoardRS({ value = null, readOnly = false, onChange }: Props) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -21,7 +27,23 @@ export default function SignatureBoardRS() {
   const [isDraggingImg, setIsDraggingImg] = useState(false);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  const [finalPngUrl, setFinalPngUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(value ?? null);
+
+  useEffect(() => {
+    setPreviewUrl(value ?? null);
+  }, [value]);
+
+  if (readOnly) {
+    return (
+      <div className="sig-paper sig-paper--final" aria-label="Signature preview">
+        {previewUrl ? (
+          <img src={previewUrl} alt="Signature" className="sig-final-imgAR" />
+        ) : (
+          <div className="sig-placeholder">Awaiting signature</div>
+        )}
+      </div>
+    );
+  }
 
   const sizeCanvas = () => {
     const c = canvasRef.current;
@@ -154,11 +176,14 @@ export default function SignatureBoardRS() {
     setStrokes([]);
     setCurrStroke([]);
     setImg(null);
+    setPreviewUrl(null);
+    onChange?.(null);
   };
   const save = () => {
     const c = canvasRef.current!;
     const url = c.toDataURL("image/png");
-    setFinalPngUrl(url);
+    setPreviewUrl(url);
+    onChange?.(url);
   };
 
   // uploads
@@ -194,17 +219,14 @@ export default function SignatureBoardRS() {
     e.stopPropagation();
   };
 
-  if (finalPngUrl) {
-    return (
-      <div className="sig-paper sig-paper--final" aria-label="Signature PNG output">
-        <img src={finalPngUrl} alt="Signature" className="sig-final-imgAR" />
-      </div>
-    );
-  }
-
   return (
     <div className="sig-wrap">
 
+      {previewUrl && (
+        <div className="sig-preview-inline">
+          <img src={previewUrl} alt="Saved signature" />
+        </div>
+      )}
       <div className="sig-toolbar-outside" role="toolbar" aria-label="Signature tools">
         <button className="sig-icon-btn" onClick={undo} title="Undo (Ctrl+Z)">
           <FaUndoAlt />

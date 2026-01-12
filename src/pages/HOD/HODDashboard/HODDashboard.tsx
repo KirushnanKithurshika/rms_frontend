@@ -7,6 +7,7 @@ import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf";
 import api from "../../../services/api";
 
 import FinalResultsHOD from "../../../components/HOD/HODViewResultsSheet/HODViewResultsSheet";
+import SignatureBoardRS from "../../../components/resultsApproval/SignatureCanvasResultsSheet/SignatureCanvasRS";
 import type {
   SubjectMeta,
   StudentResult,
@@ -63,6 +64,7 @@ const HODDashboard: React.FC = () => {
   const [currentBatch, setCurrentBatch] = useState<ResultBatch | null>(null);
   const [creatingBatch, setCreatingBatch] = useState(false);
   const [approvingBatch, setApprovingBatch] = useState(false);
+  const [hodSignature, setHodSignature] = useState<string | null>(null);
 
   const semesterOptions = useMemo(() => {
     const map = new Map<string, { key: string; name: string; id: number | null }>();
@@ -212,6 +214,7 @@ const HODDashboard: React.FC = () => {
       });
       const data = (res.data?.data ?? res.data) as ResultBatch;
       setCurrentBatch(data);
+      setHodSignature(null);
     } catch (e: any) {
       const msg =
         e?.response?.data?.message ||
@@ -229,12 +232,19 @@ const HODDashboard: React.FC = () => {
       setBatchError("Create a batch before approving.");
       return;
     }
+    if (!hodSignature) {
+      setBatchError("Please capture your signature before approval.");
+      return;
+    }
     setApprovingBatch(true);
     setBatchError(null);
     try {
-      const res = await api.post(`/result-batches/${currentBatch.id}/approve-department`);
+      const res = await api.post(`/result-batches/${currentBatch.id}/approve-department`, {
+        signatureImage: hodSignature,
+      });
       const data = (res.data?.data ?? res.data) as ResultBatch;
       setCurrentBatch(data);
+      setHodSignature(null);
     } catch (e: any) {
       const msg =
         e?.response?.data?.message ||
@@ -418,6 +428,15 @@ const HODDashboard: React.FC = () => {
                         </button>
                       </div>
                     </div>
+                    {currentBatch?.status !== "DEPT_APPROVED" && (
+                      <div className="hod-signature-panel">
+                        <h4>Department Board Signature</h4>
+                        <SignatureBoardRS value={hodSignature} onChange={setHodSignature} />
+                        <span className="hod-signature-hint">
+                          Save your signature before approving the batch.
+                        </span>
+                      </div>
+                    )}
                     {batchError && (
                       <div className="hod-error" role="alert">
                         {batchError}

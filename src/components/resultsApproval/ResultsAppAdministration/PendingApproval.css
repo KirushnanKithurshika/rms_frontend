@@ -56,6 +56,13 @@
   flex: 0 0 auto;
 }
 
+.pa-scope .pa-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
 .pa-scope .pa-title {
   color: var(--pa-text);
   font-size: 12px;
@@ -64,6 +71,52 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: min(70vw, 680px);
+}
+
+.pa-scope .pa-subtitle {
+  font-size: 11px;
+  color: var(--pa-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-scope .pa-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.pa-scope .pa-meta-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.pa-scope .pa-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+.pa-scope .pa-status--pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pa-scope .pa-status--approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pa-scope .pa-status--neutral {
+  background: #e5e7eb;
+  color: #374151;
 }
 
 .pa-scope .pa-button {
@@ -96,6 +149,12 @@
   box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.45);
 }
 
+.pa-scope .pa-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 @media (max-width: 640px) {
   .pa-scope .pa-card {
     flex-direction: column;
@@ -116,4 +175,11 @@
 
 .pa-scope .pa-card:hover {
   border-color: #d9dde4;
+}
+
+.pa-scope .pa-empty {
+  padding: 1rem;
+  text-align: center;
+  color: var(--pa-muted);
+  font-size: 0.9rem;
 }
