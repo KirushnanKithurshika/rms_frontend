@@ -146,7 +146,7 @@ const AccountSettings: React.FC = () => {
               <div className="account-settings-header">
                 <button
                   className="back-btn"
-                  onClick={() => navigate("/lecturerhome")}
+                  onClick={() => navigate("/")}
                 >
                   <FaArrowLeft />
                 </button>
