@@ -7,7 +7,7 @@ import "./userprofilesetting.css";
 import api from "../../services/api";
 import { Popconfirm, message } from "antd";
 import { useAppSelector } from "../../app/hooks";
-import { selectUsername } from "../../features/auth/selectors";
+import { selectUsername, selectUserRoles } from "../../features/auth/selectors";
 
 type BasicForm = {
   email: string;
@@ -20,7 +20,9 @@ type BasicForm = {
 const AccountSettings: React.FC = () => {
   const navigate = useNavigate();
   const username = useAppSelector(selectUsername);
+  const roles = useAppSelector(selectUserRoles);
   const displayName = username || "User";
+  const primaryRole = roles[0] || "User";
 
   const [showPasswordSection, setShowPasswordSection] = useState(true);
   const [profileImage, setProfileImage] = useState(
@@ -168,7 +170,7 @@ const AccountSettings: React.FC = () => {
                 </div>
                 <div className="profile-info">
                   <h3 className="profile-name">{displayName}</h3>
-                  <p className="profile-id">Lecturer</p>
+                  <p className="profile-id">{primaryRole}</p>
                 </div>
               </div>
 
