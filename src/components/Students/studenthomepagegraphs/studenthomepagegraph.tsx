@@ -49,7 +49,7 @@ const StudentMetrics: React.FC = () => {
 
   // Calculate metrics
   const semesters = resultsSheet.semesters;
-  const currentSemester = semesters.length;
+  const currentSemester = semesters.length + 1;
   const allCourses = semesters.flatMap((s) => [...s.core, ...s.electives]);
   const totalCourses = allCourses.length;
   const totalCredits = allCourses.reduce((sum, c) => sum + c.credits, 0);
