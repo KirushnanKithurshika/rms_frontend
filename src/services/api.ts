@@ -28,13 +28,14 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token") || "";
   const url = String(config.url ?? "");
   const isAuthEndpoint = /\/auth(\/|$)/.test(url);
+  const authRequiresToken = /\/auth\/change-password(\/|$)/.test(url);
 
   const headers =
     config.headers instanceof AxiosHeaders
       ? config.headers
       : new AxiosHeaders(config.headers);
 
-  if (token && !isAuthEndpoint) {
+  if (token && (!isAuthEndpoint || authRequiresToken)) {
     headers.set("Authorization", `Bearer ${token}`);
   } else {
     headers.delete("Authorization");

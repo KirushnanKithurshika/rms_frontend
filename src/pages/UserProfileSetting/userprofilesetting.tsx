@@ -4,6 +4,10 @@ import Navbarin from '../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
 import { FaArrowLeft, FaChevronDown, FaCamera, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./userprofilesetting.css";
+import api from "../../services/api";
+import { Popconfirm, message } from "antd";
+import { useAppSelector } from "../../app/hooks";
+import { selectUsername } from "../../features/auth/selectors";
 
 type BasicForm = {
   email: string;
@@ -15,6 +19,8 @@ type BasicForm = {
 
 const AccountSettings: React.FC = () => {
   const navigate = useNavigate();
+  const username = useAppSelector(selectUsername);
+  const displayName = username || "User";
 
   const [showPasswordSection, setShowPasswordSection] = useState(true);
   const [profileImage, setProfileImage] = useState(
@@ -63,11 +69,61 @@ const AccountSettings: React.FC = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
 
-  const handleSaveBottom = () => {
+  const validatePasswordForm = () => {
+    if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      return "Please fill in all password fields.";
+    }
+    if (passwordForm.newPassword.length < 8) {
+      return "New password must be at least 8 characters.";
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      return "New password and confirm password do not match.";
+    }
+    return null;
+  };
 
-    alert("Profile saved successfully!");
+  const handleSaveBottom = async () => {
+    const validationError = validatePasswordForm();
+    if (validationError) {
+      messageApi.error(validationError);
+      return;
+    }
+
+    try {
+      setIsUpdatingPassword(true);
+      const res = await api.post("/auth/change-password", {
+        oldPassword: passwordForm.oldPassword,
+        newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword,
+      });
+      const successMessage = res?.data?.message || "Password changed successfully.";
+      messageApi.success(successMessage);
+      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || "Could not change password. Please try again.";
+      messageApi.error(msg);
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleConfirmOpen = () => {
+    const validationError = validatePasswordForm();
+    if (validationError) {
+      messageApi.error(validationError);
+      return;
+    }
+    setConfirmOpen(true);
   };
   const handleCancelBottom = () => {
     navigate("/lecturerhome");
@@ -75,6 +131,7 @@ const AccountSettings: React.FC = () => {
 
   return (
     <div className="lec-dashboard-container">
+      {contextHolder}
       <div className="nav"><Navbarin /></div>
       <div className="breadcrumb"><BreadcrumbNav /></div>
 
@@ -110,7 +167,7 @@ const AccountSettings: React.FC = () => {
                   />
                 </div>
                 <div className="profile-info">
-                  <h3 className="profile-name">Dr.A.R.Silva</h3>
+                  <h3 className="profile-name">{displayName}</h3>
                   <p className="profile-id">Lecturer</p>
                 </div>
               </div>
@@ -119,7 +176,7 @@ const AccountSettings: React.FC = () => {
               <div className="form-grid">
                 <div className="form-group">
                   <label>User Name</label>
-                  <input type="text" value="kithurshika" disabled className="input disabled-input" />
+                  <input type="text" value={displayName} disabled className="input disabled-input" />
                 </div>
 
                 <div className="form-group">
@@ -127,8 +184,8 @@ const AccountSettings: React.FC = () => {
                   <input
                     type="email"
                     placeholder="Enter Email"
-                    className="input"
-                    value={form.email}
+                    disabled className="input disabled-input"
+                    value={displayName}
                     onChange={onChange("email")}
                   />
                 </div>
@@ -205,6 +262,12 @@ const AccountSettings: React.FC = () => {
                         <input
                           type={showCurrentPassword ? "text" : "password"}
                           className="input"
+                          placeholder="Enter current password"
+                          value={passwordForm.oldPassword}
+                          onChange={(e) =>
+                            setPasswordForm((p) => ({ ...p, oldPassword: e.target.value }))
+                          }
+                          autoComplete="off"
                         />
                         <span
                           className="eye-icon"
@@ -222,6 +285,12 @@ const AccountSettings: React.FC = () => {
                         <input
                           type={showNewPassword ? "text" : "password"}
                           className="input"
+                          placeholder="Enter new password"
+                          value={passwordForm.newPassword}
+                          onChange={(e) =>
+                            setPasswordForm((p) => ({ ...p, newPassword: e.target.value }))
+                          }
+                          autoComplete="new-password"
                         />
                         <span
                           className="eye-icon"
@@ -238,6 +307,12 @@ const AccountSettings: React.FC = () => {
                         <input
                           type={showConfirmPassword ? "text" : "password"}
                           className="input"
+                          placeholder="Confirm new password"
+                          value={passwordForm.confirmPassword}
+                          onChange={(e) =>
+                            setPasswordForm((p) => ({ ...p, confirmPassword: e.target.value }))
+                          }
+                          autoComplete="new-password"
                         />
                         <span
                           className="eye-icon"
@@ -249,7 +324,30 @@ const AccountSettings: React.FC = () => {
                     </div>
                     <div></div>
                     <div className="button-row">
-                      <button className="save-btn-ACsetting" onClick={handleSaveBottom}>Update</button>
+                      <Popconfirm
+                        title="Change password?"
+                        description="Are you sure you want to update your password?"
+                        okText="Update"
+                        cancelText="Cancel"
+                        okButtonProps={{ loading: isUpdatingPassword }}
+                        open={confirmOpen}
+                        onOpenChange={(open) => {
+                          if (!open) setConfirmOpen(false);
+                        }}
+                        onConfirm={() => {
+                          setConfirmOpen(false);
+                          handleSaveBottom();
+                        }}
+                        onCancel={() => setConfirmOpen(false)}
+                      >
+                        <button
+                          className="save-btn-ACsetting"
+                          onClick={handleConfirmOpen}
+                          disabled={isUpdatingPassword}
+                        >
+                          {isUpdatingPassword ? "Updating..." : "Update"}
+                        </button>
+                      </Popconfirm>
                       <button className="cancel-btn-ACsetting" onClick={handleCancelBottom}>Cancel</button>
                     </div>
                   </div>
