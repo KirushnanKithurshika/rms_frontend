@@ -4,7 +4,11 @@ import "./ResultsApproval.css";
 import PendingApprovals from "../../../components/resultsApproval/ResultsAppAdministration/PendingApproval";
 import ResultsApprovalSidebar from "../../../components/resultsApproval/ResultsApprovalSidebar/reapproval";
 import ResultsSheetAP from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
-import type { ResultSheetRow } from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
+import type {
+  ResultSheetRow,
+  ApprovalSignature,
+} from "../../../components/resultsApproval/ResultsSheetAP/ResultsSheetAP";
+import SignatureBoardRS from "../../../components/resultsApproval/SignatureCanvasResultsSheet/SignatureCanvasRS";
 import { downloadExactHtmlPdf } from "../../../utils/downloadResultsSheetPdf";
 import { useAppSelector } from "../../../app/hooks";
 import { selectPrivileges } from "../../../features/auth/selectors";
@@ -19,6 +23,7 @@ type ResultBatchResponse = {
   status: string;
   resultCount?: number;
   results?: ResultSheetRow[];
+  approvals?: ApprovalSignature[];
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -50,9 +55,12 @@ const ResultsApprovalPage = () => {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [approving, setApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signatureData, setSignatureData] = useState<string | null>(null);
   const printRootRef = useRef<HTMLDivElement | null>(null);
 
   const completedStatus = approvalLevel === "SENATE" ? "SENATE_APPROVED" : "FACULTY_APPROVED";
+  const currentLevelKey =
+    approvalLevel === "SENATE" ? "SENATE" : approvalLevel === "FACULTY" ? "FACULTY_COMMITTEE" : null;
 
   const fetchBatches = useCallback(async () => {
     if (!approvalLevel) return;
@@ -118,7 +126,12 @@ const ResultsApprovalPage = () => {
     setSelectedId(null);
     setSelectedBatch(null);
     setError(null);
+    setSignatureData(null);
   };
+
+  useEffect(() => {
+    setSignatureData(null);
+  }, [selectedId, approvalLevel]);
 
   const isBatchActionable = useCallback(
     (batch?: ResultBatchResponse | null) => {
@@ -136,6 +149,12 @@ const ResultsApprovalPage = () => {
 
   const handleApprove = async () => {
     if (!selectedBatch || !approvalLevel || !isBatchActionable(selectedBatch)) return;
+    const signatureRequired =
+      !currentApprovalRecord?.signatureUrl && approvalLevel !== null && !!currentLevelKey;
+    if (signatureRequired && !signatureData) {
+      showError("Please capture your signature before approving.");
+      return;
+    }
 
     setApproving(true);
     setError(null);
@@ -145,10 +164,12 @@ const ResultsApprovalPage = () => {
           ? `/result-batches/${selectedBatch.id}/approve-senate`
           : `/result-batches/${selectedBatch.id}/approve-faculty`;
 
-      await api.post(path);
+      const payload = signatureData ? { signatureImage: signatureData } : {};
+      await api.post(path, payload);
       showSuccess("Batch approved successfully.");
       await fetchBatches();
       await fetchBatchDetails(selectedBatch.id);
+      setSignatureData(null);
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ||
@@ -192,6 +213,19 @@ const ResultsApprovalPage = () => {
       }),
     [batches, completedStatus, isBatchActionable]
   );
+
+  const currentApprovalRecord = useMemo(() => {
+    if (!currentLevelKey || !selectedBatch?.approvals) return null;
+    return selectedBatch.approvals.find((a) => a.level === currentLevelKey) ?? null;
+  }, [currentLevelKey, selectedBatch]);
+  const requiresSignature =
+    !!(
+      approvalLevel &&
+      currentLevelKey &&
+      selectedBatch &&
+      isBatchActionable(selectedBatch) &&
+      !currentApprovalRecord?.signatureUrl
+    );
 
   return (
     <div className="lec-dashboard-container">
@@ -262,6 +296,7 @@ const ResultsApprovalPage = () => {
                         onClick={handleApprove}
                         disabled={
                           approving || detailsLoading || !isBatchActionable(selectedBatch)
+                            || (requiresSignature && !signatureData)
                         }
                       >
                         {approving
@@ -273,6 +308,36 @@ const ResultsApprovalPage = () => {
                     </div>
                   </div>
 
+                  {approvalLevel && (
+                    <div className="signature-panel">
+                      <div className="signature-panel-header">
+                        <span>
+                          {currentApprovalRecord?.signatureUrl
+                            ? "Signature recorded"
+                            : "Capture your signature"}
+                        </span>
+                        {currentApprovalRecord?.decidedAt && (
+                          <span>
+                            {new Date(currentApprovalRecord.decidedAt).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      {currentApprovalRecord?.signatureUrl ? (
+                        <div className="signature-preview">
+                          <img
+                            src={currentApprovalRecord.signatureUrl}
+                            alt="Recorded signature"
+                          />
+                          <p className="signature-info">
+                            Signed by {currentApprovalRecord.approver ?? "N/A"}
+                          </p>
+                        </div>
+                      ) : (
+                        <SignatureBoardRS value={signatureData} onChange={setSignatureData} />
+                      )}
+                    </div>
+                  )}
+
                   <div className="tAR-inline-body-results">
                     <div className="rap" ref={printRootRef}>
                       <ResultsSheetAP
@@ -282,6 +347,7 @@ const ResultsApprovalPage = () => {
                         batchName={selectedBatch.name}
                         statusLabel={STATUS_LABELS[selectedBatch.status] ?? selectedBatch.status}
                         results={selectedBatch.results}
+                        approvals={selectedBatch.approvals}
                         loading={detailsLoading}
                       />
                     </div>

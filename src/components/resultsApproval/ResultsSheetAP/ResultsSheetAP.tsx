@@ -15,6 +15,13 @@ export type ResultSheetRow = {
   status?: string | null;
 };
 
+export type ApprovalSignature = {
+  level?: string;
+  approver?: string | null;
+  signatureUrl?: string | null;
+  decidedAt?: string | null;
+};
+
 type Props = {
   university?: string;
   facultyLine?: string;
@@ -30,6 +37,7 @@ type Props = {
   results?: ResultSheetRow[];
   loading?: boolean;
   finalApprovalDate?: string | Date;
+  approvals?: ApprovalSignature[];
 };
 
 const DEFAULT_ROWS: ResultSheetRow[] = [
@@ -98,6 +106,7 @@ const ResultsSheetAP: React.FC<Props> = ({
   results,
   loading,
   finalApprovalDate,
+  approvals,
 }) => {
   const rows = Array.isArray(results) && results.length > 0 ? results : DEFAULT_ROWS;
   const moduleList = useMemo(() => {
@@ -111,6 +120,15 @@ const ResultsSheetAP: React.FC<Props> = ({
     });
     return Array.from(map.entries()).map(([code, name]) => ({ code, name }));
   }, [rows]);
+  const approvalsByLevel = useMemo(() => {
+    const map = new Map<string, ApprovalSignature>();
+    approvals?.forEach((a) => {
+      if (a.level) {
+        map.set(a.level, a);
+      }
+    });
+    return map;
+  }, [approvals]);
 
   return (
     <section className="sheet a4" id="results-pdf-root">
@@ -195,17 +213,24 @@ const ResultsSheetAP: React.FC<Props> = ({
               <div className="sig-gridAP">
                 <div className="sig-colAP">
                   <div className="sig-signboxAP">
-                    <SignatureBoardRS />
+                    <SignatureBoardRS
+                      readOnly
+                      value={approvalsByLevel.get("DEPARTMENT_BOARD")?.signatureUrl}
+                    />
                   </div>
-                  <div className="sig-rightHeaderAP sig-rightHeaderAP--below">
-                    <div className="sig-smallAP">Checked</div>
-                  </div>
-
+                  <div className="sig-captionAP">Head of Department</div>
+                  {approvalsByLevel.get("DEPARTMENT_BOARD")?.decidedAt && (
+                    <div className="sig-smallAP">
+                      {new Date(
+                        approvalsByLevel.get("DEPARTMENT_BOARD")!.decidedAt!
+                      ).toLocaleDateString()}
+                    </div>
+                  )}
                   <div className="sig-signboxAP">
-                    <SignatureBoardRS />
+                    <SignatureBoardRS readOnly value={null} />
                   </div>
 
-                  <div className="sig-smallAP">Certified Correct.</div>
+                  <div className="sig-smallAP">Assistant Registrar</div>
                   <div className="sig-captionAP">
                     Assistant Registrar
                     <br />
@@ -222,14 +247,20 @@ const ResultsSheetAP: React.FC<Props> = ({
 
                 <div className="sig-colAP">
                   <div className="sig-signboxAP">
-                    <SignatureBoardRS />
+                    <SignatureBoardRS
+                      readOnly
+                      value={approvalsByLevel.get("FACULTY_COMMITTEE")?.signatureUrl}
+                    />
                   </div>
                   <div className="sig-captionAP">Dean, Faculty of Engineering</div>
 
                   <div className="sig-signboxAP">
-                    <SignatureBoardRS />
+                    <SignatureBoardRS
+                      readOnly
+                      value={approvalsByLevel.get("SENATE")?.signatureUrl}
+                    />
                   </div>
-                  <div className="sig-captionAP">Vice-chancellor, University of Ruhuna</div>
+                  <div className="sig-captionAP">Senate Approval</div>
                 </div>
               </div>
             </section>
