@@ -57,7 +57,7 @@ const TranscriptAvailability: React.FC<Props> = ({
 
           <div className="ta-actions">
             <button className="ta-btn primary" onClick={handleRequestTranscript}>
-              Request Transcript btn
+              payment
             </button>
             {onOpen && <button className="ta-btn primary" onClick={onOpen}>Open</button>}
             {onDownload && <button className="ta-btn" onClick={onDownload}>Download</button>}

@@ -198,7 +198,7 @@ const StudentTranscript = () => {
           const params = getVerifyParamsFromUrl(payload);
           if (params) {
             try {
-              const verifyRes = await api.get("/api/v1/transcripts/verify", {
+              const verifyRes = await api.get("/transcripts/verify", {
                 params,
               });
               if (cancelled) return;
