@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Navbarin from "../../../components/Navbar/navbarin.tsx";
 import BreadcrumbNav from "../../../components/breadcrumbnav/breadcrumbnav.tsx";
-import AdminSidebar from "../../../components/Admin/adminsidebar/adminsidebar.tsx";
 import TranscriptApprovalCard from "../../../components/Admin/transcriptapproval/TranscriptApprovalAR/transcriptApprovalCard.tsx";
 import Transcript, { type TranscriptData } from "../../../components/Admin/transcriptapproval/Transcript/Transcript.tsx";
 import { downloadTranscriptPDF } from "../../../utils/downloadTranscriptPdf"; // ⬅️ new
@@ -30,8 +29,6 @@ const TrasncriptApprovalsAR: React.FC = () => {
   >(["pending"]);
   const [searchTerm, setSearchTerm] = useState("");
   const printRootRef = useRef<HTMLDivElement | null>(null);
-
-  // sample transcript data (use real data later)
   const sampleData: TranscriptData = useMemo(
     () => ({
       serialNo: "EG-TR-009991",
@@ -179,8 +176,7 @@ const TrasncriptApprovalsAR: React.FC = () => {
     });
   }, [payments, filterStatus, searchTerm]);
 
-  // ⬇️ Download-only (no system print UI). Captures each .sheet.a4 as a PDF page.
-  const handleDownloadPdf = async () => {
+    const handleDownloadPdf = async () => {
     const node = printRootRef.current;
     if (!node) return;
     const { registrationNo } = sampleData.student;
@@ -192,15 +188,8 @@ const TrasncriptApprovalsAR: React.FC = () => {
       <div className="nav"><Navbarin /></div>
       <div className="breadcrumb"><BreadcrumbNav /></div>
 
-      <div
-        className={`sidebar-backdrop ${isSidebarOpen ? "active" : ""}`}
-        onClick={handleBackdropClick}
-      />
 
-      <div className="main-area">
-        <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
-          <AdminSidebar />
-        </div>
+        
 
         <div className="dashboard-content">
           <div className="dashboard-cards">
@@ -241,7 +230,7 @@ const TrasncriptApprovalsAR: React.FC = () => {
 
                     <div className="tAR-inline-spacer" />
 
-                    {/* ⬇️ Download PDF (no print dialog) */}
+                 
                     <button
                       type="button"
                       className="taAR-btn taAR-btn--ghost"
@@ -497,7 +486,7 @@ const TrasncriptApprovalsAR: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+ 
   );
 };
 

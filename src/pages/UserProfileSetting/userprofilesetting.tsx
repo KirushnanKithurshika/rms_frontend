@@ -4,6 +4,10 @@ import Navbarin from '../../components/Navbar/navbarin.tsx';
 import BreadcrumbNav from '../../components/breadcrumbnav/breadcrumbnav.tsx';
 import { FaArrowLeft, FaChevronDown, FaCamera, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./userprofilesetting.css";
+import api from "../../services/api";
+import { Popconfirm, message } from "antd";
+import { useAppSelector } from "../../app/hooks";
+import { selectUsername, selectUserRoles } from "../../features/auth/selectors";
 
 type BasicForm = {
   email: string;
@@ -15,6 +19,10 @@ type BasicForm = {
 
 const AccountSettings: React.FC = () => {
   const navigate = useNavigate();
+  const username = useAppSelector(selectUsername);
+  const roles = useAppSelector(selectUserRoles);
+  const displayName = username || "User";
+  const primaryRole = roles[0] || "User";
 
   const [showPasswordSection, setShowPasswordSection] = useState(true);
   const [profileImage, setProfileImage] = useState(
@@ -59,15 +67,65 @@ const AccountSettings: React.FC = () => {
     setProfileImage(savedProfileImage);
   };
 
-  // --- Password section state (LOWER PART) ---
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
-  // Bottom Save/Cancel (keep your original intentions)
-  const handleSaveBottom = () => {
-    // TODO: submit password change
-    alert("Profile saved successfully!");
+
+  const validatePasswordForm = () => {
+    if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      return "Please fill in all password fields.";
+    }
+    if (passwordForm.newPassword.length < 8) {
+      return "New password must be at least 8 characters.";
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      return "New password and confirm password do not match.";
+    }
+    return null;
+  };
+
+  const handleSaveBottom = async () => {
+    const validationError = validatePasswordForm();
+    if (validationError) {
+      messageApi.error(validationError);
+      return;
+    }
+
+    try {
+      setIsUpdatingPassword(true);
+      const res = await api.post("/auth/change-password", {
+        oldPassword: passwordForm.oldPassword,
+        newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword,
+      });
+      const successMessage = res?.data?.message || "Password changed successfully.";
+      messageApi.success(successMessage);
+      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || "Could not change password. Please try again.";
+      messageApi.error(msg);
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleConfirmOpen = () => {
+    const validationError = validatePasswordForm();
+    if (validationError) {
+      messageApi.error(validationError);
+      return;
+    }
+    setConfirmOpen(true);
   };
   const handleCancelBottom = () => {
     navigate("/lecturerhome");
@@ -75,6 +133,7 @@ const AccountSettings: React.FC = () => {
 
   return (
     <div className="lec-dashboard-container">
+      {contextHolder}
       <div className="nav"><Navbarin /></div>
       <div className="breadcrumb"><BreadcrumbNav /></div>
 
@@ -83,18 +142,18 @@ const AccountSettings: React.FC = () => {
           <div className="dashboard-cards">
             <div className="account-settings-wrapper">
 
-              {/* Header with Back Button */}
+
               <div className="account-settings-header">
-                <button 
+                <button
                   className="back-btn"
-                  onClick={() => navigate("/lecturerhome")}
+                  onClick={() => navigate("/")}
                 >
                   <FaArrowLeft />
                 </button>
                 <div className="account-title">Account Settings</div>
               </div>
 
-              {/* Profile Picture Section */}
+
               <div className="profile-header">
                 <div className="profile-picture-wrapper">
                   <img src={profileImage} alt="Profile" className="profile-picture" />
@@ -110,16 +169,16 @@ const AccountSettings: React.FC = () => {
                   />
                 </div>
                 <div className="profile-info">
-                  <h3 className="profile-name">Dr.A.R.Silva</h3>
-                  <p className="profile-id">Lecturer</p>
+                  <h3 className="profile-name">{displayName}</h3>
+                  <p className="profile-id">{primaryRole}</p>
                 </div>
               </div>
 
-              {/* Basic Info Form (UPPER PART) */}
+            
               <div className="form-grid">
                 <div className="form-group">
                   <label>User Name</label>
-                  <input type="text" value="kithurshika" disabled className="input disabled-input" />
+                  <input type="text" value={displayName} disabled className="input disabled-input" />
                 </div>
 
                 <div className="form-group">
@@ -127,8 +186,8 @@ const AccountSettings: React.FC = () => {
                   <input
                     type="email"
                     placeholder="Enter Email"
-                    className="input"
-                    value={form.email}
+                    disabled className="input disabled-input"
+                    value={displayName}
                     onChange={onChange("email")}
                   />
                 </div>
@@ -178,16 +237,16 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
 
-              {/* UPPER PART action buttons (uses the SAME classes) */}
+
               <div className="button-row">
-                <button className="save-btn" onClick={handleSaveUpper}>Save</button>
-                <button className="cancel-btn" onClick={handleCancelUpper}>Cancel</button>
+                <button className="save-btn-ACsetting" onClick={handleSaveUpper}>Save</button>
+                <button className="cancel-btn-ACsetting" onClick={handleCancelUpper}>Cancel</button>
               </div>
 
-              {/* Password Management Section */}
+
               <div className="password-section">
                 <div className="password-header">
-                  <h4>Password Management</h4>
+                  <h3>Password Management</h3>
                   <button
                     className="collapse-btn"
                     onClick={() => setShowPasswordSection(!showPasswordSection)}
@@ -202,12 +261,18 @@ const AccountSettings: React.FC = () => {
                     <div className="form-group password-input-wrapper">
                       <label>Current Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showCurrentPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showCurrentPassword ? "text" : "password"}
+                          className="input"
+                          placeholder="Enter current password"
+                          value={passwordForm.oldPassword}
+                          onChange={(e) =>
+                            setPasswordForm((p) => ({ ...p, oldPassword: e.target.value }))
+                          }
+                          autoComplete="off"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                         >
                           {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
@@ -219,12 +284,18 @@ const AccountSettings: React.FC = () => {
                     <div className="form-group password-input-wrapper">
                       <label>New Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showNewPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          className="input"
+                          placeholder="Enter new password"
+                          value={passwordForm.newPassword}
+                          onChange={(e) =>
+                            setPasswordForm((p) => ({ ...p, newPassword: e.target.value }))
+                          }
+                          autoComplete="new-password"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowNewPassword(!showNewPassword)}
                         >
                           {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -232,30 +303,59 @@ const AccountSettings: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Confirm New Password */}
                     <div className="form-group password-input-wrapper full-width">
                       <label>Confirm New Password</label>
                       <div className="password-field">
-                        <input 
-                          type={showConfirmPassword ? "text" : "password"} 
-                          className="input" 
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          className="input"
+                          placeholder="Confirm new password"
+                          value={passwordForm.confirmPassword}
+                          onChange={(e) =>
+                            setPasswordForm((p) => ({ ...p, confirmPassword: e.target.value }))
+                          }
+                          autoComplete="new-password"
                         />
-                        <span 
-                          className="eye-icon" 
+                        <span
+                          className="eye-icon"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
                           {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                       </div>
                     </div>
-                     <div className="button-row">
-                <button className="save-btn" onClick={handleSaveBottom}>Update</button>
-                <button className="cancel-btn" onClick={handleCancelBottom}>Cancel</button>
-              </div>
+                    <div></div>
+                    <div className="button-row">
+                      <Popconfirm
+                        title="Change password?"
+                        description="Are you sure you want to update your password?"
+                        okText="Update"
+                        cancelText="Cancel"
+                        okButtonProps={{ loading: isUpdatingPassword }}
+                        open={confirmOpen}
+                        onOpenChange={(open) => {
+                          if (!open) setConfirmOpen(false);
+                        }}
+                        onConfirm={() => {
+                          setConfirmOpen(false);
+                          handleSaveBottom();
+                        }}
+                        onCancel={() => setConfirmOpen(false)}
+                      >
+                        <button
+                          className="save-btn-ACsetting"
+                          onClick={handleConfirmOpen}
+                          disabled={isUpdatingPassword}
+                        >
+                          {isUpdatingPassword ? "Updating..." : "Update"}
+                        </button>
+                      </Popconfirm>
+                      <button className="cancel-btn-ACsetting" onClick={handleCancelBottom}>Cancel</button>
+                    </div>
                   </div>
-                  
+
                 )}
-               
+
               </div>
 
             </div>

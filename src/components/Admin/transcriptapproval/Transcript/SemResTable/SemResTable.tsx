@@ -24,14 +24,13 @@ export type SemesterData = {
 
 type Props = {
   semesters?: SemesterData[];
-  /** Show semesters in [startIndex, endIndex). Omit endIndex to go till the end. */
+
   startIndex?: number;
   endIndex?: number;
-  /** Optional: hard page break AFTER this zero-based index within the shown slice */
+
   breakAfterIndex?: number;
 };
 
-/* ===== Sample (also exported so Transcript can reuse) ===== */
 export const SAMPLE_SEMESTERS: SemesterData[] = [
   {
     title: "Development Programme",

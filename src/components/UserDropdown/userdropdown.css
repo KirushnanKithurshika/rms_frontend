@@ -18,7 +18,7 @@ button.dropdown-itemuser {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;            /* add horizontal padding */
+  padding: 10px 12px;          
   font-size: 12px;
   color: #0a2558;
   cursor: pointer;
@@ -54,11 +54,8 @@ button.dropdown-itemuser:focus-visible {
   color: #0a2558;
 }
 
-/* --------- Responsive --------- */
 @media screen and (max-width: 768px) {
-  .dropdown-menuuser {
-    width: 120px;
-  }
+ 
 
   a.dropdown-itemuser,
   button.dropdown-itemuser {
@@ -69,9 +66,7 @@ button.dropdown-itemuser:focus-visible {
 }
 
 @media screen and (max-width: 480px) {
-  .dropdown-menuuser {
-    width: 120px;
-  }
+  
 
   a.dropdown-itemuser,
   button.dropdown-itemuser {
