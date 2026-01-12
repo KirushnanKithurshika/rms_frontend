@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import "./ResultsSheetAp.css";
 import SignatureBoardRS from "../SignatureCanvasResultsSheet/SignatureCanvasRS";
 import ResultsTable from "./ResultsTable/ResultsTable";
@@ -35,12 +35,38 @@ type Props = {
 const DEFAULT_ROWS: ResultSheetRow[] = [
   {
     id: 1,
-    studentRegNo: "EG/2020/2005",
-    studentName: "Sample Student",
-    courseCode: "EE4250",
-    courseName: "Signals & Systems",
+    studentRegNo: "EG/2020/3801",
+    studentName: "Student A A",
+    courseCode: "CE1101",
+    courseName: "Mathematics I",
     gradeLetter: "A",
-    totalPercent: 81.2,
+    status: "FACULTY_APPROVED",
+  },
+  {
+    id: 2,
+    studentRegNo: "EG/2020/3801",
+    studentName: "Student A A",
+    courseCode: "CE1202",
+    courseName: "Engineering Mechanics",
+    gradeLetter: "B+",
+    status: "FACULTY_APPROVED",
+  },
+  {
+    id: 3,
+    studentRegNo: "EG/2020/3802",
+    studentName: "Student B B",
+    courseCode: "CE1101",
+    courseName: "Mathematics I",
+    gradeLetter: "B",
+    status: "FACULTY_APPROVED",
+  },
+  {
+    id: 4,
+    studentRegNo: "EG/2020/3802",
+    studentName: "Student B B",
+    courseCode: "CE1202",
+    courseName: "Engineering Mechanics",
+    gradeLetter: "A-",
     status: "FACULTY_APPROVED",
   },
 ];
@@ -74,6 +100,17 @@ const ResultsSheetAP: React.FC<Props> = ({
   finalApprovalDate,
 }) => {
   const rows = Array.isArray(results) && results.length > 0 ? results : DEFAULT_ROWS;
+  const moduleList = useMemo(() => {
+    const map = new Map<string, string>();
+    rows.forEach((row, idx) => {
+      const code = row.courseCode ?? `COURSE-${idx + 1}`;
+      const name = row.courseName ?? row.courseCode ?? `Course ${idx + 1}`;
+      if (!map.has(code)) {
+        map.set(code, name);
+      }
+    });
+    return Array.from(map.entries()).map(([code, name]) => ({ code, name }));
+  }, [rows]);
 
   return (
     <section className="sheet a4" id="results-pdf-root">
@@ -88,23 +125,25 @@ const ResultsSheetAP: React.FC<Props> = ({
           {version && <div className="hdr ver">{version}</div>}
 
           <div className="section-title avoid-break">Batch Summary</div>
-          <table className="list avoid-break meta-table">
+          <table className="meta-table avoid-break">
             <tbody>
               <tr>
                 <td className="meta-label">Batch</td>
                 <td className="meta-value">{batchName ?? "N/A"}</td>
+              </tr>
+              <tr>
                 <td className="meta-label">Semester</td>
                 <td className="meta-value">{semesterName ?? "N/A"}</td>
               </tr>
               <tr>
                 <td className="meta-label">Department</td>
-                <td className="meta-value" colSpan={3}>
-                  {departmentName}
-                </td>
+                <td className="meta-value">{departmentName}</td>
               </tr>
               <tr>
                 <td className="meta-label">Status</td>
                 <td className="meta-value">{statusLabel ?? "Pending review"}</td>
+              </tr>
+              <tr>
                 <td className="meta-label">Result Count</td>
                 <td className="meta-value">{rows.length}</td>
               </tr>
@@ -112,6 +151,22 @@ const ResultsSheetAP: React.FC<Props> = ({
           </table>
 
           {summaryNote && <p className="rs-note">{summaryNote}</p>}
+
+          <div className="section-title avoid-break">Modules Counting for GPA</div>
+          <div className="labels">
+            <span className="u">Module No.</span>
+            <span className="u">Module Name</span>
+          </div>
+          <table className="list avoid-break">
+            <tbody>
+              {moduleList.map((m, i) => (
+                <tr key={`module-${i}`}>
+                  <td className="code">{m.code}</td>
+                  <td className="name">{m.name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           <div className="section-title avoid-break">Student Results</div>
           <div className="rs-box">

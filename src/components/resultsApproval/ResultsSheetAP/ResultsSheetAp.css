@@ -202,6 +202,7 @@ body {
 
 .meta-table {
     width: 100%;
+    border: 1px solid #cbd5f5;
     border-collapse: collapse;
     margin-bottom: 10px;
 }
@@ -215,8 +216,10 @@ body {
 }
 
 .meta-table .meta-value {
+    width: 75%;
     padding: 6px;
     border: 1px solid #cbd5f5;
+    background: #fff;
 }
 
 .rs-note {
